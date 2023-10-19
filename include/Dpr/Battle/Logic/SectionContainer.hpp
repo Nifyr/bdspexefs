@@ -98,7 +98,7 @@ namespace Dpr
                 struct Dpr_Battle_Logic_Section_FromEvent_ChangeTokusei_o* m_section_FromEvent_ChangeTokusei;
                 struct Dpr_Battle_Logic_Section_FromEvent_ChangeWeather_o* m_section_FromEvent_ChangeWeather;
                 struct Dpr_Battle_Logic_Section_FromEvent_CheckJuryoku_o* m_section_FromEvent_CheckJuryoku;
-                struct Dpr_Battle_Logic_Section_FromEvent_CheckSpecialWazaAdditionalEffectOccur_o* m_section_FromEvent_CheckSpecialWazaAdditionalEffectOccur;
+                struct Section_FromEvent_CheckSpecialWazaAdditionalEffectOccur_o* m_section_FromEvent_CheckSpecialWazaAdditionalEffectOccur;
                 struct Dpr_Battle_Logic_Section_FromEvent_ConsumeItem_o* m_section_FromEvent_ConsumeItem;
                 struct Dpr_Battle_Logic_Section_CureSick_o* m_section_CureSick;
                 struct Dpr_Battle_Logic_Section_FromEvent_Damage_o* m_section_FromEvent_Damage;
@@ -110,7 +110,7 @@ namespace Dpr
                 struct Dpr_Battle_Logic_Section_FromEvent_ExtendPokeType_o* m_section_FromEvent_ExtendPokeType;
                 struct Dpr_Battle_Logic_Section_FieldEffect_Add_o* m_section_FieldEffect_Add;
                 struct Dpr_Battle_Logic_Section_FromEvent_FieldEffect_Remove_o* m_section_FromEvent_FieldEffect_Remove;
-                struct Dpr_Battle_Logic_Section_FromEvent_FormChange_o* m_section_FromEvent_FormChange;
+                struct Section_FromEvent_FormChange_o* m_section_FromEvent_FormChange;
                 struct Dpr_Battle_Logic_Section_FromEvent_FreeFallStart_o* m_section_FromEvent_FreeFallStart;
                 struct Dpr_Battle_Logic_Section_FromEvent_FriendshipEffect_o* m_section_FromEvent_FriendshipEffect;
                 struct Dpr_Battle_Logic_Section_FromEvent_GetWeather_o* m_section_FromEvent_GetWeather;

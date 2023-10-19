@@ -41,17 +41,6 @@ static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableNightmare
 
 // --- EventHandler delegates ---
 void HandlerNightmarePosTurncheckDone(EventFactor_EventHandlerArgs_o **args, uint8_t pokePos, MethodInfo *method) {
-    uint8_t pokeID = Common::GetWorkValue(args, WORKIDX_USER_POKEID, nullptr);
-    BTL_POKEPARAM_o * bpp = Common::GetPokeParam(args, pokeID, nullptr);
-    if (bpp->CheckNemuri(BTL_POKEPARAM_NemuriCheckMode::NEMURI_CHECK_ONLY_SICK, nullptr) &&
-    bpp->CheckSick(WazaSick::WAZASICK_AKUMU, nullptr)) {
-        HandlerDamage(args, pokeID, pokeID,
-                      Calc::QuotMaxHP(bpp, 4, true, nullptr),
-                      false, false);
-        return;
-    }
-    HandlerCureSick(args, pokeID);
-    Pos::common_removePosEffect(args, pokePos, nullptr);
 }
 
 EventFactor_EventHandlerTable_o * CreatePosEventHandler(uint16_t eventID, Il2CppMethodPointer methodPointer) {
@@ -61,7 +50,7 @@ EventFactor_EventHandlerTable_o * CreatePosEventHandler(uint16_t eventID, Il2Cpp
 // --- HandlerGetFunc delegates ---
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_NightmarePos(MethodInfo *method) {
     if (sHandlerTableNightmarePos == nullptr) {
-        sHandlerTableNightmarePos = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 1);
+        sHandlerTableNightmarePos = CreateEventHandlerTable( 1);
         sHandlerTableNightmarePos->m_Items[0] = CreatePosEventHandler(EventID::TURNCHECK_DONE, (Il2CppMethodPointer) &HandlerNightmarePosTurncheckDone);
     }
     return sHandlerTableNightmarePos;

@@ -1,0 +1,137 @@
+[target=main, version=bd_130]
+// ZukanWork$$IsGet
+17dca28:
+    mov w0, #1
+
+// ZukanWork$$IsSee
+17dcae8:
+    mov w0, #1
+
+// ZukanWork$$IsUwasa
+17dcba8:
+    mov w0, #1
+
+// ZukanWork$$GetStatus
+17dcc60:
+    mov w0, #3
+
+// ZukanWork$$IsGet
+17dcd8c:
+    mov w0, #1
+
+//0x382 = 898
+// ZukanWork$$GetViewModelUniqueID
+017DCF78:
+    cmp w19, #904
+
+// ZukanWork$$SetViewModelUniqueID
+017DD030:
+    cmp w20, #904
+
+// ZukanWork$$.cctor
+017DDEE0:
+    mov w1, #905
+
+// UgMainProc$$CreatePoke
+018D372C:
+    cmp w0, #0
+
+// PokemonSelector$$Update
+0199CA48:
+    cmp w9, #906
+
+0199CA54:
+    sub w8, w8, #904
+
+0199CA88:
+    sub w8, w8, #904
+
+// Dpr.UI.UIZukan$$SetupZukan
+01A39760:
+    cmp w22, #906
+
+// Dpr.Field.Walking.FieldWalkingManager$$UpdatePartnerPokeIndex
+01CD637C:
+    cmp w8, #904
+
+// Dpr.Field.Walking.FieldWalkingManager$$IsPokeParaOK
+01CD6494:
+    cmp w8, #905
+
+// Dpr.Field.Walking.FieldWalkingManager$$LoadPartnerPoke
+01CD6628:
+    cmp w8, #904
+
+// Dpr.Field.Walking.FieldWalkingManager$$CheckPartnerPokeChange
+01CD6ECC:
+    cmp w8, #904
+
+// Dpr.Field.Walking.FieldWalkingManager$$IsCanTurearuki
+01CD799C:
+    cmp w8, #904
+
+// Dpr.Field.Walking.FieldWalkingManager.<CreatePartner>d__43$$MoveNext
+01CD8B1C:
+    cmp w8, #904
+01CD8CD8:
+    cmp w8, #904
+01CD8F68:
+    cmp w8, #904
+
+// Dpr.Battle.Logic.tables$$.cctor
+01F7B440:
+    mov w8, #905
+
+// Dpr.Battle.Logic.MainModule$$setupCommon_ClientPublicInformation
+0202FAF0:
+    mov w26, #906
+
+// Pml.PokePara.CoreParam$$ChangeEgg
+020494EC:
+    mov w0, #906
+
+// Pml.PokePara.EggGenerator$$SetupEggParam
+0204EA40:
+    mov w0, #906
+
+// Pml.PokePara.EggGenerator$$IsWazaMachineAbleToUse
+02051BA0:
+    cmp w21, #906
+
+// Pml.PokePara.InitialSpec$$.ctor
+02052220:
+    mov w8, #906
+
+// Pml.Personal.PersonalSystem$$GetMonsLabel
+024A09B4:
+    cmp w8, #906
+024A09C4:
+    cmp w0, #905
+
+// Pml.Personal.PersonalSystem$$GetMonsName
+024A0A5C:
+    cmp  w8, #906
+    mov  w8, #905
+024A0B64:
+    cmp  w8, #906
+    mov  w8, #905
+
+// Pml.Personal.PersonalSystem$$GetDataID
+024A0EAC:
+    cmp w19, #905
+024A0F54:
+    cmp w19, #905
+
+// Pml.Personal.PersonalSystem$$GetDataID_AddPersonal
+024A2ACC:
+    cmp w19, #905
+024A2BC8:
+    cmp w19, #905
+
+// Pml.PokePara.Accessor$$Initialize
+024A3B48:
+    mov w9, #906
+
+// Pml.PokePara.Accessor$$GetNickName
+024A6B38:
+    mov w0, #906

@@ -1,0 +1,9 @@
+[target=main, version=bd_130]
+
+// Fake out
+1898960:
+    b Dpr_Battle_Logic_BtlAiBasic_BaciAI_Seq_158
+
+// Pain split
+1c28430:
+    b Dpr_Battle_Logic_BtlAiExpert_ExpertAI_Seq_091

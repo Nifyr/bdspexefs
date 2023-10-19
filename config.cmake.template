@@ -1,8 +1,8 @@
 # Used for FTP
-set(SWITCH_IP 192.168.1.1)
+set(SWITCH_IP 127.0.0.1)
 
 # Used for logging
-set(LOGGER_IP 192.168.1.1)
+set(LOGGER_IP 127.0.0.1)
 set(LOGGER_PORT 5123)
 
 set(SWITCH_TARGET bd_130)
@@ -11,5 +11,5 @@ add_compile_definitions(
         AFFECTION_ENABLED=true
         EXP_SHARE_ENABLED=true
         TIME_PENALTY_ENABLED=true
-        RELEASE=true
+        RELEASE=false
 )

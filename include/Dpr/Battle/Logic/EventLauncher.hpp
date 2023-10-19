@@ -2,6 +2,7 @@
 
 #include "il2cpp.hpp"
 #include "PokeAction.hpp"
+#include "EventSystem.hpp"
 
 namespace Dpr
 {
@@ -13,7 +14,7 @@ namespace Dpr
 
             struct EventLauncher_Fields {
                 struct Dpr_Battle_Logic_MainModule_o* m_pMainModule;
-                struct Dpr_Battle_Logic_EventSystem_o* m_pEventSystem;
+                struct EventSystem_o* m_pEventSystem;
                 struct Dpr_Battle_Logic_BattleEnv_o* m_pBattleEnv;
             };
 
@@ -25,6 +26,7 @@ namespace Dpr
                 void Event_ActProcCanceled(PokeAction_o *action, MethodInfo *method);
                 void Event_ActProcEnd(BTL_POKEPARAM_o *bpp, int32_t actionCmd, MethodInfo *method);
                 void Event_ActProcStart(PokeAction_o *action, MethodInfo *method);
+                uint32_t Event_CheckSpecialWazaAdditionalPer(uint8_t atkPokeID, uint8_t defPokeID, uint32_t defaultPer, MethodInfo *method);
             };
         }
     }

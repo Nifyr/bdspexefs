@@ -1,0 +1,4 @@
+[target=main, version=bd_130]
+// Section_ProcessActionCore$$Execute
+21c0460:
+    b Dpr_Battle_Logic_Section_ProcessActionCore_Execute_0

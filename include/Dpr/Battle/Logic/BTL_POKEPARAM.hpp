@@ -3,6 +3,7 @@
 #include "il2cpp.hpp"
 #include "Pml/PokePara/CoreParam.h"
 #include "System/Array.hpp"
+#include "PokeTypePair.hpp"
 
 namespace Dpr
 {
@@ -72,13 +73,18 @@ namespace Dpr
                 uint16_t GetItem(MethodInfo *method);
                 uint16_t GetMonsNo(MethodInfo *method);
                 uint32_t GetPokeSick(MethodInfo *method);
+                PokeTypePair_o GetPokeType(MethodInfo *method);
                 Pml::PokePara::CoreParam * GetSrcDataConst(MethodInfo *method);
                 int32_t GetValue(int32_t valueID,MethodInfo *method);
                 bool HENSIN_Check(MethodInfo *method);
                 bool IsDead(MethodInfo *method);
                 bool IsMatchTokusei(int32_t tokusei, MethodInfo *method);
+                bool IsMatchType(uint8_t type,MethodInfo *method);
                 bool TURNFLAG_Get(int32_t flagID, MethodInfo *method);
                 void TURNFLAG_Set(int32_t flagID, MethodInfo *method);
+                int32_t WAZA_GetID(uint8_t idx, MethodInfo *method);
+                uint16_t WAZA_GetPP(uint8_t wazaIdx, MethodInfo *method);
+                uint8_t WAZA_SearchIdx(int32_t waza, MethodInfo *method);
             };
 
             namespace BTL_POKEPARAM_ValueID
@@ -170,6 +176,16 @@ namespace Dpr
                     COUNTER_FREEFALL,
                     COUNTER_TURN_FROM_GWALL_BROKEN,
                     COUNTER_MAX
+                };
+            }
+
+            namespace BTL_POKEPARAM_ExTypeCause
+            {
+                enum BTL_POKEPARAM_ExTypeCause
+                {
+                    EXTYPE_CAUSE_NONE,
+                    EXTYPE_CAUSE_HALLOWEEN,
+                    EXTYPE_CAUSE_MORINONOROI
                 };
             }
         }

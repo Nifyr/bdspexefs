@@ -2,6 +2,7 @@
 
 #include "il2cpp.hpp"
 #include "PosPoke.hpp"
+#include "WazaParam.hpp"
 
 namespace Dpr
 {

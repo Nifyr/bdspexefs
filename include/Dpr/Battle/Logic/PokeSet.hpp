@@ -24,13 +24,14 @@ namespace Dpr
             };
 
             struct PokeSet_o {
-                BTL_POKEPARAM_o * SeekNext(MethodInfo *method);
-                void SeekStart(MethodInfo *method);
-                void Remove(BTL_POKEPARAM_o *bpp, MethodInfo *method);
-
                 PokeSet_c *klass;
                 void *monitor;
                 PokeSet_Fields fields;
+
+                BTL_POKEPARAM_o *Get(uint32_t idx, MethodInfo *method);
+                void Remove(BTL_POKEPARAM_o *bpp, MethodInfo *method);
+                BTL_POKEPARAM_o *SeekNext(MethodInfo *method);
+                void SeekStart(MethodInfo *method);
             };
         }
     }

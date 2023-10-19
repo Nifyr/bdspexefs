@@ -3,6 +3,18 @@
 18298a8:
     bl Waza_system_array_new
 
+// Section_WazaExec_DelayWazaReady$$Execute
+1f18424:
+    nop
+
+// Section_ProcessActionCore$$Execute
+21c0460:
+    b Dpr_Battle_Logic_Section_ProcessActionCore_Execute
+
+// EventLauncher$$Event_WazaExecuteStart
+1d1cc90:
+    b Dpr_Battle_Logic_EventLauncher_Event_WazaExecuteStart
+
 // Handler.Pos$$.cctor
 1937290:
     bl Pos_system_array_new
@@ -23,10 +35,64 @@
 20d0f00:
     b Dpr_Battle_Logic_PosEffectManager_CreateEffectStatusArray
 
-// Section_WazaExec_DelayWazaReady$$Execute
-1f18424:
-    nop
+// Handler.Field$$.cctor
+1904274:
+    bl Field_system_array_new
 
-// Section_ProcessActionCore$$Execute
-21c0460:
-    b Dpr_Battle_Logic_Section_ProcessActionCore_Execute
+// FieldStatus$$AddDependPoke
+18fabc8:
+    cmp w1, #0xe
+
+// FieldStatus$$CheckEffect
+18f54b8:
+    cmp w1, #0xe
+18fb2e8:
+    cmp w1, #0xe
+
+// FieldStatus$$CheckRemainingTurn
+18fb370:
+    cmp w1, #0xe
+
+// FieldStatus$$GetDependPokeCount
+18fb598:
+    cmp w1, #0xe
+
+// FieldStatus$$GetDependPokeID
+18fb528:
+    cmp w1, #0xe
+
+// FieldStatus$$GetPassedTurn
+18fb418:
+    cmp w1, #0xe
+
+// FieldStatus$$GetWholeTurn
+18fb470:
+    cmp w1, #0xe
+
+// FieldStatus$$IncTurnCount
+18fb200:
+    cmp w1, #0xe
+
+// FieldStatus$$initWork
+18fa2b0:
+    b Dpr_Battle_Logic_FieldStatus_initWork
+
+// FieldStatus$$IsDependPoke
+18fb028:
+    cmp w1, #0xe
+
+// FieldStatus$$RemoveEffect
+18facc8:
+    cmp w1, #0xe
+
+// FieldStatus.Data$$.ctor
+18fa1c4:
+    mov w20, #0xf
+
+// Section_TurnCheck_Field$$Execute
+2170b2c:
+    cmp w20, #0xf
+
+// Side$$handler_side_Omajinai
+1939c40:
+    b Dpr_Battle_Logic_Handler_Side_handler_side_Omajinai

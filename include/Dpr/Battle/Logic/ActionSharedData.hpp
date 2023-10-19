@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "il2cpp.hpp"
+#include "WazaEffectParams.hpp"
 
 namespace Dpr
 {

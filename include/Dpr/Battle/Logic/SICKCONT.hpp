@@ -11,6 +11,7 @@ namespace Dpr
         {
             struct SICKCONT {
                 static BTL_SICKCONT_o MakeTurnParam(uint8_t causePokeID, uint8_t turns, uint16_t param, MethodInfo *method);
+                static BTL_SICKCONT_o MakeTurn(uint8_t causePokeID, uint8_t turns, MethodInfo *method);
             };
         }
     }

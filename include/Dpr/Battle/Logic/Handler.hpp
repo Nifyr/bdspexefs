@@ -609,6 +609,26 @@ namespace Dpr
                     struct Pos_GET_FUNC_TABLE_ELEM_Fields fields;
                 };
 
+                struct Field_HandlerGetFunc_Fields {
+                    System_MulticastDelegate_Fields super;
+                };
+
+                struct Field_HandlerGetFunc_o {
+                    void ctor(intptr_t m_target, MethodInfo * method);
+                    struct Field_HandlerGetFunc_c *klass;
+                    void *monitor;
+                    struct Field_HandlerGetFunc_Fields fields;
+                };
+
+                struct Field_GET_FUNC_TABLE_ELEM_Fields {
+                    int32_t effect;
+                    struct Field_HandlerGetFunc_o* func;
+                };
+
+                struct Field_GET_FUNC_TABLE_ELEM_o {
+                    struct Field_GET_FUNC_TABLE_ELEM_Fields fields;
+                };
+
                 extern Waza_c * Waza_TypeInfo;
                 // 4c5b330
 
@@ -620,6 +640,9 @@ namespace Dpr
 
                 extern void * Pos_HandlerGetFunc_TypeInfo;
                 extern MethodInfo * Method_ADD_BatonTouch;
+
+                extern void * Field_HandlerGetFunc_TypeInfo;
+                extern MethodInfo * Method_ADD_Fld_Ground;
             }
         }
     }

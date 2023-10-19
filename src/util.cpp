@@ -1,6 +1,7 @@
 #include "util.hpp"
 #include "il2cpp-api.h"
 #include "PlayerWork.hpp"
+#include "logger.hpp"
 #include "Dpr/Battle/Logic/BTL_POKEPARAM.hpp"
 #include "Dpr/Battle/Logic/Common.hpp"
 #include "Dpr/Battle/Logic/DamageCause.hpp"
@@ -8,6 +9,7 @@
 #include "Dpr/Battle/Logic/RankEffectCause.hpp"
 #include "Dpr/Battle/Logic/SickCause.hpp"
 #include "Pml/WazaData/WazaSick.hpp"
+#include "Dpr/Battle/Logic/SICKCONT.hpp"
 
 using namespace Dpr::Battle::Logic;
 using namespace Pml::WazaData;
@@ -53,20 +55,36 @@ uint32_t GetBadgeCount()
          (bVar7 & 1) + (bVar8 & 1);
 }
 
+System::Array<EventFactor_EventHandlerTable_o *> * CreateEventHandlerTable(uint32_t size) {
+    auto *array = (System::Array<EventFactor_EventHandlerTable_o *> *) malloc(32 + 8 * size);
+    array->max_length = size;
+    for (int i = 0; i < size; ++i)
+        array->m_Items[i] = nullptr;
+    return array;
+}
 Dpr::Battle::Logic::EventFactor_EventHandlerTable_o * CreateEventHandler(uint16_t eventID, MethodInfo * src, Il2CppMethodPointer methodPointer)
 {
     MethodInfo * method = copyMethodInfo(src, methodPointer);
-    auto * evtHandlerTable = (Dpr::Battle::Logic::EventFactor_EventHandlerTable_o *) il2cpp_object_new(Dpr::Battle::Logic::EventFactor_EventHandlerTable_TypeInfo);
-    auto * evtHandler = (Dpr::Battle::Logic::EventFactor_EventHandler_o *) il2cpp_object_new(Dpr::Battle::Logic::EventFactor_EventHandler_TypeInfo);
+    auto * evtHandlerTable = (Dpr::Battle::Logic::EventFactor_EventHandlerTable_o *) malloc(sizeof(Dpr::Battle::Logic::EventFactor_EventHandlerTable_o));
+    auto * evtHandler = (Dpr::Battle::Logic::EventFactor_EventHandler_o *) malloc(sizeof(Dpr::Battle::Logic::EventFactor_EventHandler_o));
     evtHandler->ctor((intptr_t) methodPointer, method);
+    evtHandler->fields.super.delegates = nullptr;
     evtHandlerTable->fields.eventID = eventID;
     evtHandlerTable->fields.eventHandler = evtHandler;
-
     return evtHandlerTable;
 }
 uint8_t HighestMultiple(uint8_t max, uint8_t factor) {
     uint8_t factor2 = max / factor;
     return factor * factor2;
+}
+bool HandlerAddFieldEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect) {
+    auto *desc = (Section_FieldEffect_Add_Description_o *)
+            il2cpp_object_new(Section_FieldEffect_Add_Description_TypeInfo);
+    desc->ctor(nullptr);
+    desc->fields.pokeID = pokeID;
+    desc->fields.effect = effect;
+    desc->fields.cont = SICKCONT::MakeTurn(pokeID, 5, nullptr);
+    return Common::AddFieldEffect(args, &desc, nullptr);
 }
 void HandlerAddPosEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {
     system_load_typeinfo((void *)0xa909);
@@ -93,17 +111,17 @@ void HandlerAddSick(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, uint8
     addSickDesc->fields.isFailResultDisplay = false;
     Common::AddSick(args, &addSickDesc, nullptr);
 }
-void HandlerCureSick(EventFactor_EventHandlerArgs_o **args, uint8_t targetPokeID) {
+void HandlerCureSick(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, int32_t sickID, uint8_t targetPokeID) {
     system_load_typeinfo((void *)0x893f);
     auto desc = (Section_CureSick_Description_o *)
             il2cpp_object_new(Section_CureSick_Description_TypeInfo);
     desc->ctor(nullptr);
-    desc->fields.pokeID = targetPokeID;
-    desc->fields.sick = WazaSick::WAZASICK_AKUMU;
+    desc->fields.pokeID = causePokeID;
+    desc->fields.sick = sickID;
     desc->fields.targetPokeID->m_Items[0] = targetPokeID;
     desc->fields.targetPokeCount = 1;
     desc->fields.isDisplayTokuseiWindow = false;
-    desc->fields.isStandardMessageDisable = true;
+    desc->fields.isStandardMessageDisable = false;
     Common::CureSick(args,&desc,nullptr);
 }
 void HandlerDamage(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, uint8_t targetPokeID, uint16_t damage,
@@ -119,7 +137,7 @@ void HandlerDamage(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, u
     desc->fields.damageCausePokeID = causePokeID;
     desc->fields.disableDeadProcess = disableDeadProcess;
     desc->fields.isDisplayTokuseiWindow = displayAbility;
-    Common::Damage(args,&desc, nullptr);
+    Common::Damage(args, &desc, nullptr);
 }
 void HandlerFormChange(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, uint8_t nextForm, bool persistOnSwitch,
                        bool displayAbility, bool animationEnabled) {
@@ -172,5 +190,18 @@ void HandlerRankReset(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {
     desc->ctor(nullptr);
     desc->fields.pokeCount = 1;
     desc->fields.pokeID->m_Items[0] = pokeID;
-    Common::RankReset(args,&desc, nullptr);
+    Common::RankReset(args, &desc, nullptr);
+}
+void HandlerShrink(EventFactor_EventHandlerArgs_o **args, uint8_t targetPokeID, uint8_t percentage) {
+    system_load_typeinfo((void *)0x58b8);
+    auto *desc = (Section_FromEvent_Shrink_Description_o *)
+            il2cpp_object_new(Section_FromEvent_Shrink_Description_TypeInfo);
+    desc->ctor(nullptr);
+    desc->fields.pokeID = targetPokeID;
+    desc->fields.percentage = percentage;
+    Common::Shrink(args, &desc, nullptr);
+}
+System_Int64_array *NewInt64Array(uint32_t len) {
+    system_load_typeinfo((void *)0x270d);
+    return (System_Int64_array *)system_array_new(System_Int64_array_TypeInfo, len);
 }

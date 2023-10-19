@@ -186,6 +186,13 @@ struct System_UInt64_array {
 	uint64_t m_Items[65535];
 };
 
+struct System_Int64_array {
+    Il2CppObject obj;
+    Il2CppArrayBounds *bounds;
+    il2cpp_array_size_t max_length;
+    int64_t m_Items[65535];
+};
+
 struct UnityEngine_Vector2Int_Fields {
 	int32_t m_X;
 	int32_t m_Y;

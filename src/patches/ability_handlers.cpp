@@ -803,7 +803,7 @@ EventFactor_EventHandlerTable_o * CreateAbilityEventHandler(uint16_t eventID, Il
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_ZenMode(MethodInfo *method)
 {
     if (sHandlerTableZenMode == nullptr) {
-        sHandlerTableZenMode = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 2);
+        sHandlerTableZenMode = CreateEventHandlerTable( 2);
         sHandlerTableZenMode->m_Items[0] = CreateAbilityEventHandler(EventID::MEMBER_IN_COMP, (Il2CppMethodPointer) &HandlerZenModeMemberInComp);
         sHandlerTableZenMode->m_Items[1] = CreateAbilityEventHandler(EventID::TURNCHECK_DONE, (Il2CppMethodPointer) &HandlerZenModeTurncheckDone);
     }
@@ -812,7 +812,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_ZenMode(MethodInfo *metho
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_StanceChange(MethodInfo *method)
 {
     if (sHandlerTableStanceChange == nullptr) {
-        sHandlerTableStanceChange = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 1);
+        sHandlerTableStanceChange = CreateEventHandlerTable( 1);
         sHandlerTableStanceChange->m_Items[0] = CreateAbilityEventHandler(EventID::WAZA_CALL_DECIDE, (Il2CppMethodPointer) &HandlerStanceChangeWazaCallDecide);
     }
     return sHandlerTableStanceChange;
@@ -820,7 +820,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_StanceChange(MethodInfo *
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_ShieldsDown(MethodInfo *method)
 {
     if (sHandlerTableShieldsDown == nullptr) {
-        sHandlerTableShieldsDown = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 5);
+        sHandlerTableShieldsDown = CreateEventHandlerTable( 5);
         sHandlerTableShieldsDown->m_Items[0] = CreateAbilityEventHandler(EventID::CHECK_INEMURI, (Il2CppMethodPointer) &HandlerShieldsDownCheckInemuri);
         sHandlerTableShieldsDown->m_Items[1] = CreateAbilityEventHandler(EventID::MEMBER_IN_COMP, (Il2CppMethodPointer) &HandlerShieldsDownMemberInComp);
         sHandlerTableShieldsDown->m_Items[2] = CreateAbilityEventHandler(EventID::ADDSICK_CHECKFAIL, (Il2CppMethodPointer) &HandlerShieldsDownAddSickCheckFail);
@@ -832,7 +832,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_ShieldsDown(MethodInfo *m
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_Schooling(MethodInfo *method)
 {
     if (sHandlerTableSchooling == nullptr) {
-        sHandlerTableSchooling = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 2);
+        sHandlerTableSchooling = CreateEventHandlerTable( 2);
         sHandlerTableSchooling->m_Items[0] = CreateAbilityEventHandler(EventID::MEMBER_IN_COMP, (Il2CppMethodPointer) &HandlerSchoolingMemberInComp);
         sHandlerTableSchooling->m_Items[1] = CreateAbilityEventHandler(EventID::TURNCHECK_DONE, (Il2CppMethodPointer) &HandlerSchoolingTurncheckDone);
     }
@@ -841,7 +841,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_Schooling(MethodInfo *met
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_Disguise(MethodInfo *method)
 {
     if (sHandlerTableDisguise == nullptr) {
-        sHandlerTableDisguise = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 2);
+        sHandlerTableDisguise = CreateEventHandlerTable( 2);
         sHandlerTableDisguise->m_Items[0] = CreateAbilityEventHandler(EventID::WAZA_DMG_PROC2, (Il2CppMethodPointer) &HandlerDisguiseWazaDmgProc2);
         sHandlerTableDisguise->m_Items[1] = CreateAbilityEventHandler(EventID::WAZA_DMG_REACTION, (Il2CppMethodPointer) &HandlerDisguiseWazaDmgReaction);
     }
@@ -850,7 +850,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_Disguise(MethodInfo *meth
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_BattleBond(MethodInfo *method)
 {
     if (sHandlerTableBattleBond == nullptr) {
-        sHandlerTableBattleBond = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 3);
+        sHandlerTableBattleBond = CreateEventHandlerTable( 3);
         sHandlerTableBattleBond->m_Items[0] = CreateAbilityEventHandler(EventID::WAZA_HIT_COUNT, (Il2CppMethodPointer) &HandlerBattleBondWazaHitCount);
         sHandlerTableBattleBond->m_Items[1] = CreateAbilityEventHandler(EventID::WAZA_POWER, (Il2CppMethodPointer) &HandlerBattleBondWazaPower);
         sHandlerTableBattleBond->m_Items[2] = CreateAbilityEventHandler(EventID::DAMAGEPROC_END_HIT_REAL, (Il2CppMethodPointer) &HandlerBattleBondDamageprocEndHitReal);
@@ -860,7 +860,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_BattleBond(MethodInfo *me
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_PowerConstruct(MethodInfo *method)
 {
     if (sHandlerTablePowerConstruct == nullptr) {
-        sHandlerTablePowerConstruct = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 2);
+        sHandlerTablePowerConstruct = CreateEventHandlerTable( 2);
         sHandlerTablePowerConstruct->m_Items[0] = CreateAbilityEventHandler(EventID::MEMBER_IN_COMP, (Il2CppMethodPointer) &HandlerPowerConstructMemberInComp);
         sHandlerTablePowerConstruct->m_Items[1] = CreateAbilityEventHandler(EventID::TURNCHECK_DONE, (Il2CppMethodPointer) &HandlerPowerConstructTurncheckDone);
     }
@@ -869,7 +869,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_PowerConstruct(MethodInfo
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_GulpMissile(MethodInfo *method)
 {
     if (sHandlerTableGulpMissile == nullptr) {
-        sHandlerTableGulpMissile = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 2);
+        sHandlerTableGulpMissile = CreateEventHandlerTable( 2);
         sHandlerTableGulpMissile->m_Items[0] = CreateAbilityEventHandler(EventID::WAZASEQ_END, (Il2CppMethodPointer) &HandlerGulpMissileWazaseqEnd);
         sHandlerTableGulpMissile->m_Items[1] = CreateAbilityEventHandler(EventID::WAZA_DMG_REACTION, (Il2CppMethodPointer) &HandlerGulpMissileWazaDmgReaction);
     }
@@ -878,7 +878,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_GulpMissile(MethodInfo *m
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_IceFace(MethodInfo *method)
 {
     if (sHandlerTableIceFace == nullptr) {
-        sHandlerTableIceFace = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 4);
+        sHandlerTableIceFace = CreateEventHandlerTable( 4);
         sHandlerTableIceFace->m_Items[0] = CreateAbilityEventHandler(EventID::WAZA_DMG_PROC2, (Il2CppMethodPointer) &HandlerIceFaceWazaDmgProc2);
         sHandlerTableIceFace->m_Items[1] = CreateAbilityEventHandler(EventID::WAZA_DMG_REACTION, (Il2CppMethodPointer) &HandlerIceFaceWazaDmgReaction);
         sHandlerTableIceFace->m_Items[2] = CreateAbilityEventHandler(EventID::MEMBER_IN_COMP, (Il2CppMethodPointer) &HandlerIceFaceMemberInComp);
@@ -889,7 +889,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_IceFace(MethodInfo *metho
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_HungerSwitch(MethodInfo *method)
 {
     if (sHandlerTableHungerSwitch == nullptr) {
-        sHandlerTableHungerSwitch = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 1);
+        sHandlerTableHungerSwitch = CreateEventHandlerTable( 1);
         sHandlerTableHungerSwitch->m_Items[0] = CreateAbilityEventHandler(EventID::TURNCHECK_DONE, (Il2CppMethodPointer) &HandlerHungerSwitchTurncheckDone);
     }
     return sHandlerTableHungerSwitch;
@@ -897,7 +897,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_HungerSwitch(MethodInfo *
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_QuickDraw(MethodInfo *method)
 {
     if (sHandlerTableQuickDraw == nullptr) {
-        sHandlerTableQuickDraw = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 2);
+        sHandlerTableQuickDraw = CreateEventHandlerTable( 2);
         sHandlerTableQuickDraw->m_Items[0] = CreateAbilityEventHandler(EventID::CHECK_SP_PRIORITY, (Il2CppMethodPointer) &HandlerQuickDrawCheckSpPriority);
         sHandlerTableQuickDraw->m_Items[1] = CreateAbilityEventHandler(EventID::TURNCHECK_DONE, (Il2CppMethodPointer) &HandlerQuickDrawTurncheckDone);
     }
@@ -906,7 +906,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_QuickDraw(MethodInfo *met
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_CuriousMedicine(MethodInfo *method)
 {
     if (sHandlerTableCuriousMedicine == nullptr) {
-        sHandlerTableCuriousMedicine = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 1);
+        sHandlerTableCuriousMedicine = CreateEventHandlerTable( 1);
         sHandlerTableCuriousMedicine->m_Items[0] = CreateAbilityEventHandler(EventID::MEMBER_IN_EVO, (Il2CppMethodPointer) &HandlerCuriousMedicineMemberInEvo);
     }
     return sHandlerTableCuriousMedicine;
@@ -914,7 +914,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_CuriousMedicine(MethodInf
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_Transistor(MethodInfo *method)
 {
     if (sHandlerTableTransistor == nullptr) {
-        sHandlerTableTransistor = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 1);
+        sHandlerTableTransistor = CreateEventHandlerTable( 1);
         sHandlerTableTransistor->m_Items[0] = CreateAbilityEventHandler(EventID::ATTACKER_POWER, (Il2CppMethodPointer) &HandlerTransistorAttackerPower);
     }
     return sHandlerTableTransistor;
@@ -922,7 +922,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_Transistor(MethodInfo *me
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_DragonsMaw(MethodInfo *method)
 {
     if (sHandlerTableDragonsMaw == nullptr) {
-        sHandlerTableDragonsMaw = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 1);
+        sHandlerTableDragonsMaw = CreateEventHandlerTable( 1);
         sHandlerTableDragonsMaw->m_Items[0] = CreateAbilityEventHandler(EventID::ATTACKER_POWER, (Il2CppMethodPointer) &HandlerDragonsMawAttackerPower);
     }
     return sHandlerTableDragonsMaw;
@@ -930,7 +930,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_DragonsMaw(MethodInfo *me
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_ChillingNeigh(MethodInfo *method)
 {
     if (sHandlerTableChillingNeigh == nullptr) {
-        sHandlerTableChillingNeigh = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 1);
+        sHandlerTableChillingNeigh = CreateEventHandlerTable( 1);
         sHandlerTableChillingNeigh->m_Items[0] = CreateAbilityEventHandler(EventID::DAMAGEPROC_END_HIT_REAL, (Il2CppMethodPointer) &HandlerChillingNeighDamageprocEndHitReal);
     }
     return sHandlerTableChillingNeigh;
@@ -938,7 +938,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_ChillingNeigh(MethodInfo 
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_GrimNeigh(MethodInfo *method)
 {
     if (sHandlerTableGrimNeigh == nullptr) {
-        sHandlerTableGrimNeigh = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 1);
+        sHandlerTableGrimNeigh = CreateEventHandlerTable( 1);
         sHandlerTableGrimNeigh->m_Items[0] = CreateAbilityEventHandler(EventID::DAMAGEPROC_END_HIT_REAL, (Il2CppMethodPointer) &HandlerGrimNeighDamageprocEndHitReal);
     }
     return sHandlerTableGrimNeigh;
@@ -946,7 +946,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_GrimNeigh(MethodInfo *met
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_AsOne0(MethodInfo *method)
 {
     if (sHandlerTableAsOne0 == nullptr) {
-        sHandlerTableAsOne0 = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 3);
+        sHandlerTableAsOne0 = CreateEventHandlerTable( 3);
         sHandlerTableAsOne0->m_Items[0] = CreateAbilityEventHandler(EventID::MEMBER_IN_PREV2, (Il2CppMethodPointer) &Tokusei::handler_Kinchoukan_MemberIn);
         sHandlerTableAsOne0->m_Items[1] = CreateAbilityEventHandler(EventID::DAMAGEPROC_END_HIT_REAL, (Il2CppMethodPointer) &HandlerChillingNeighDamageprocEndHitReal);
         sHandlerTableAsOne0->m_Items[2] = CreateAbilityEventHandler(EventID::CHANGE_TOKUSEI_AFTER, (Il2CppMethodPointer) &Tokusei::handler_Kinchoukan_MemberIn);
@@ -956,7 +956,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_AsOne0(MethodInfo *method
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_AsOne1(MethodInfo *method)
 {
     if (sHandlerTableAsOne1 == nullptr) {
-        sHandlerTableAsOne1 = (System::Array<EventFactor_EventHandlerTable_o *> *) system_array_new(EventFactor_EventHandlerTable_Array_TypeInfo, 3);
+        sHandlerTableAsOne1 = CreateEventHandlerTable( 3);
         sHandlerTableAsOne1->m_Items[0] = CreateAbilityEventHandler(EventID::MEMBER_IN_PREV2, (Il2CppMethodPointer) &Tokusei::handler_Kinchoukan_MemberIn);
         sHandlerTableAsOne1->m_Items[1] = CreateAbilityEventHandler(EventID::DAMAGEPROC_END_HIT_REAL, (Il2CppMethodPointer) &HandlerGrimNeighDamageprocEndHitReal);
         sHandlerTableAsOne1->m_Items[2] = CreateAbilityEventHandler(EventID::CHANGE_TOKUSEI_AFTER, (Il2CppMethodPointer) &Tokusei::handler_Kinchoukan_MemberIn);
