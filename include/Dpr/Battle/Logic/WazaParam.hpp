@@ -29,6 +29,7 @@ namespace Dpr
             };
 
             struct WazaParam_o {
+                void ctor(MethodInfo *method);
                 bool canInvalidMessageDisplay(uint32_t count, MethodInfo *method);
 
                 WazaParam_c *klass;

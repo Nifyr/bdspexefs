@@ -931,9 +931,11 @@ void HandlerSkyDropCheckTameturnFail(EventFactor_EventHandlerArgs_o **args, uint
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
     auto *desc = (Section_FromEvent_FreeFallStart_Description_o *)
             malloc(sizeof(Section_FromEvent_FreeFallStart_Description_o));
+    desc->ctor(nullptr);
     desc->fields.attackerID = pokeID;
     desc->fields.targetID = Common::GetEventVar(args, EventVar::POKEID_DEF, nullptr);
     auto *wp = (WazaParam_o *) il2cpp_object_new(WazaParam_TypeInfo);
+    wp->ctor(nullptr);
     int32_t wazaID = Common::GetSubID(args, nullptr);
     (*args)->fields.pSectionContainer->fields.m_section_FromEvent_FreeFallStart->fields.super.m_pEventLauncher->
     Event_GetWazaParam(wazaID, wazaID, wazaID, 0,
