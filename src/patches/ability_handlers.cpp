@@ -42,7 +42,7 @@ extern MethodInfo * Method_handler_TetunoKobusi;
 constexpr uint8_t A = 0;
 constexpr uint8_t B = 1;
 constexpr uint8_t C = 2;
-constexpr uint8_t D = 3;
+[[maybe_unused]] constexpr uint8_t D = 3;
 constexpr uint8_t PERSIST = 4;
 
 // AbilityIDs

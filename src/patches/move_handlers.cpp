@@ -13,9 +13,12 @@
 #include "Dpr/Battle/Logic/PokeActionCategory.hpp"
 #include "Dpr/Battle/Logic/PokeID.hpp"
 #include "Dpr/Battle/Logic/PokeSet.hpp"
+#include "Dpr/Battle/Logic/Section_FreeFall_Release.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_ChangePokeType.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_CheckSpecialWazaAdditionalEffectOccur.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_ConsumeItem.hpp"
+#include "Dpr/Battle/Logic/Section_FromEvent_FreeFallStart.hpp"
+#include "Dpr/Battle/Logic/Section_FromEvent_SwapItem.hpp"
 #include "Dpr/Battle/Logic/Section_InterruptAction.hpp"
 #include "Dpr/Battle/Logic/Section_ProcessActionCore.hpp"
 #include "Dpr/Battle/Logic/Section_SideEffect_Add.hpp"
@@ -23,6 +26,7 @@
 #include "Dpr/Battle/Logic/Tables.hpp"
 #include "Dpr/Battle/Logic/WAZADATA.hpp"
 #include "Dpr/Battle/Logic/WazaFailCause.hpp"
+#include "Pml/Personal/PersonalSystem.hpp"
 #include "Pml/PokePara/Sick.hpp"
 #include "Pml/WazaData/WazaFlag.hpp"
 #include "Pml/WazaData/WazaRankEffect.hpp"
@@ -36,6 +40,7 @@
 
 using namespace Dpr::Battle::Logic;
 using namespace Dpr::Battle::Logic::Handler;
+using namespace Pml::Personal;
 using namespace Pml::PokePara;
 using namespace Pml::WazaData;
 
@@ -90,6 +95,8 @@ constexpr int32_t OMINOUS_WIND = 466;
 constexpr int32_t FLAME_BURST = 481;
 constexpr int32_t SYNCHRONOISE = 485;
 constexpr int32_t CHIP_AWAY = 498;
+constexpr int32_t SKY_DROP = 507;
+constexpr int32_t BESTOW = 516;
 constexpr int32_t VOLT_SWITCH = 521;
 constexpr int32_t PARTING_SHOT = 575;
 
@@ -115,6 +122,7 @@ constexpr uint8_t FAIRY = 17;
 constexpr uint8_t NULL_TYPE = 18;
 
 // FieldEffectIDs
+constexpr int32_t ION_DELUGE_FIELD = 6;
 constexpr int32_t MUD_SPORT_FIELD = 10;
 constexpr int32_t WATER_SPORT_FIELD = 11;
 
@@ -194,6 +202,9 @@ constexpr uint8_t NULL_WAZA_IDX = 4;
 // SideEffectIDs
 constexpr int32_t LUCKY_CHANT_SIDE = 5;
 
+// DexIDs
+constexpr uint16_t MELOETTA = 648;
+
 // HanderTables
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableJumpKick;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSonicBoom;
@@ -224,7 +235,8 @@ static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableMeFirst;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTablePunishment;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableFlameBurst;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSynchronoise;
-static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableChipAway;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSkyDrop;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableBestow;
 
 // --- EventHandler delegates ---
 uint8_t GetEnvironmentType(EventFactor_EventHandlerArgs_o **args) {
@@ -598,13 +610,13 @@ void HandlerCamouflageUncategorizeWaza(EventFactor_EventHandlerArgs_o **args, ui
 // Mud Sport
 void HandlerMudSportFieldEffectCall(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    if (!HandlerAddFieldEffect(args, pokeID, MUD_SPORT_FIELD)) return;
+    if (!HandlerAddFieldEffect(args, pokeID, MUD_SPORT_FIELD, 5)) return;
     Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
 }
 // Water Sport
 void HandlerWaterSportFieldEffectCall(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    if (!HandlerAddFieldEffect(args, pokeID, WATER_SPORT_FIELD)) return;
+    if (!HandlerAddFieldEffect(args, pokeID, WATER_SPORT_FIELD, 5)) return;
     Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
 }
 // Wake-Up Slap
@@ -914,14 +926,85 @@ void HandlerSynchronoiseNoeffectCheckL2(EventFactor_EventHandlerArgs_o **args, u
             return;
     Common::RewriteEventVar(args, EventVar::NOEFFECT_FLAG, true, nullptr);
 }
-// Chip Away
-void HandlerChipAwayWazaHitRank(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+// Sky Drop
+void HandlerSkyDropCheckTameturnFail(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    Common::RewriteEventVar(args, EventVar::AVOID_RANK, 6, nullptr);
+    auto *desc = (Section_FromEvent_FreeFallStart_Description_o *)
+            malloc(sizeof(Section_FromEvent_FreeFallStart_Description_o));
+    desc->fields.attackerID = pokeID;
+    desc->fields.targetID = Common::GetEventVar(args, EventVar::POKEID_DEF, nullptr);
+    auto *wp = (WazaParam_o *) il2cpp_object_new(WazaParam_TypeInfo);
+    int32_t wazaID = Common::GetSubID(args, nullptr);
+    (*args)->fields.pSectionContainer->fields.m_section_FromEvent_FreeFallStart->fields.super.m_pEventLauncher->
+    Event_GetWazaParam(wazaID, wazaID, wazaID, 0,
+                       Common::GetPokeParam(args, pokeID, nullptr), wp, nullptr);
+    desc->fields.wazaParam = wp;
+    if (!Common::FreeFallStart(args, &desc, nullptr))
+        Common::RewriteEventVar(args, EventVar::FAIL_FLAG, true, nullptr);
+    free(desc);
 }
-void HandlerChipAwayDefenderGuardPrev(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+void HandlerSkyDropNoeffectCheckL2(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    Common::RewriteEventVar(args, EventVar::GEN_FLAG, true, nullptr);
+    if (!Common::GetPokeParam(args, Common::GetEventVar(args, EventVar::POKEID_DEF, nullptr),
+                              nullptr)->IsMatchType(FLYING, nullptr)) return;
+    Common::RewriteEventVar(args, EventVar::NOEFFECT_FLAG, true, nullptr);
+}
+void HandlerSkyDropWazaExeStart(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    auto *desc = (Section_FreeFall_Release_Description_o *) malloc(sizeof(Section_FreeFall_Release_Description_o));
+    desc->ctor(nullptr);
+    desc->fields.attacker = Common::GetPokeParam(args, pokeID, nullptr);
+    desc->fields.canAppearSelf = true;
+    desc->fields.canAppearTarget = true;
+    Common::FreeFallRelease(args, &desc, nullptr);
+    free(desc);
+}
+// Bestow
+void HandlerBestowUncategorizeWaza(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, pokeID, nullptr);
+    uint16_t itemID = bpp->GetItem(nullptr);
+    if (itemID == NULL_ITEM) return;
+    uint8_t targetPokeID = Common::GetEventVar(args, EventVar::POKEID_TARGET1, nullptr);
+    BTL_POKEPARAM_o *targetBPP = Common::GetPokeParam(args, targetPokeID, nullptr);
+    if (targetBPP->GetItem(nullptr) != NULL_ITEM) return;
+    if (Calc::ITEM_IsMail(itemID, nullptr)) return;
+    if (Common::CheckUnbreakablePokeItem(targetBPP->GetMonsNo(nullptr), itemID, nullptr)) return;
+    if (Common::CheckUnbreakablePokeItem(bpp->GetMonsNo(nullptr), itemID, nullptr)) return;
+    system_load_typeinfo((void *)0xaa76);
+    auto *desc = (Section_FromEvent_SwapItem_Description_o *)
+            il2cpp_object_new(Section_FromEvent_SwapItem_Description_TypeInfo);
+    desc->ctor(nullptr);
+    desc->fields.userPokeID = pokeID;
+    desc->fields.targetPokeID = targetPokeID;
+    if (!Common::SwapItem(args, &desc, nullptr)) return;
+    Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
+}
+// Relic Song
+uint8_t HandlerRelicSongGetFormID(uint8_t formNo, uint8_t targetFormNo) {
+    return HighestMultiple(formNo, 2) + targetFormNo;
+}
+void Dpr_Battle_Logic_Handler_Waza_handler_InisieNoUta(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, pokeID, nullptr);
+    uint16_t dexID = bpp->GetMonsNo(nullptr);
+    if (dexID != MELOETTA) return;
+    uint8_t formNo = bpp->fields.m_formNo;
+    uint8_t form0 = HandlerRelicSongGetFormID(formNo, 0);
+    uint8_t nextForm = (formNo == form0) ? HandlerRelicSongGetFormID(formNo, 1) : form0;
+    if (nextForm >= PersonalSystem::GetPersonalData(dexID, 0, nullptr)->fields.form_max) return;
+    HandlerFormChange(args, pokeID, nextForm, false, false, true);
+}
+
+// Ion Deluge
+void HandlerIonDelugeFieldEffectCall(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    socket_log("HandlerIonDelugeFieldEffectCall called");
+    socket_log("if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;");
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    socket_log("if (!HandlerAddFieldEffect(args, pokeID, ION_DELUGE_FIELD, 1)) return;");
+    if (!HandlerAddFieldEffect(args, pokeID, ION_DELUGE_FIELD, 1)) return;
+    socket_log("Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);");
+    Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
 }
 
 EventFactor_EventHandlerTable_o * CreateMoveEventHandler(uint16_t eventID, Il2CppMethodPointer methodPointer) {
@@ -1167,13 +1250,21 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_Synchronoise(MethodInfo *
     }
     return sHandlerTableSynchronoise;
 }
-System::Array<EventFactor_EventHandlerTable_o *> * ADD_ChipAway(MethodInfo *method) {
-    if (sHandlerTableChipAway == nullptr) {
-        sHandlerTableChipAway = CreateEventHandlerTable(2);
-        sHandlerTableChipAway->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_HIT_RANK, (Il2CppMethodPointer) &HandlerChipAwayWazaHitRank);
-        sHandlerTableChipAway->m_Items[1] = CreateMoveEventHandler(EventID::DEFENDER_GUARD_PREV, (Il2CppMethodPointer) &HandlerChipAwayDefenderGuardPrev);
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_SkyDrop(MethodInfo *method) {
+    if (sHandlerTableSkyDrop == nullptr) {
+        sHandlerTableSkyDrop = CreateEventHandlerTable(3);
+        sHandlerTableSkyDrop->m_Items[0] = CreateMoveEventHandler(EventID::CHECK_TAMETURN_FAIL, (Il2CppMethodPointer) &HandlerSkyDropCheckTameturnFail);
+        sHandlerTableSkyDrop->m_Items[1] = CreateMoveEventHandler(EventID::NOEFFECT_CHECK_L2, (Il2CppMethodPointer) &HandlerSkyDropNoeffectCheckL2);
+        sHandlerTableSkyDrop->m_Items[2] = CreateMoveEventHandler(EventID::WAZA_EXE_START, (Il2CppMethodPointer) &HandlerSkyDropWazaExeStart);
     }
-    return sHandlerTableChipAway;
+    return sHandlerTableSkyDrop;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_Bestow(MethodInfo *method) {
+    if (sHandlerTableBestow == nullptr) {
+        sHandlerTableBestow = CreateEventHandlerTable(1);
+        sHandlerTableBestow->m_Items[0] = CreateMoveEventHandler(EventID::UNCATEGORIZE_WAZA, (Il2CppMethodPointer) &HandlerBestowUncategorizeWaza);
+    }
+    return sHandlerTableBestow;
 }
 
 // Adds an entry to GET_FUNC_TABLE
@@ -1188,7 +1279,7 @@ void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTab
 }
 
 // Remember to update when adding handlers
-constexpr uint32_t NEW_MOVES_COUNT = 36;
+constexpr uint32_t NEW_MOVES_COUNT = 38;
 
 // Entry point. Replaces system_array_new.
 void * Waza_system_array_new(void * typeInfo, uint32_t len) {
@@ -1236,7 +1327,9 @@ void * Waza_system_array_new(void * typeInfo, uint32_t len) {
     SetMoveFunctionTable(getFuncTable, &idx, OMINOUS_WIND, (Il2CppMethodPointer) &Waza::ADD_GensiNoTikara);
     SetMoveFunctionTable(getFuncTable, &idx, FLAME_BURST, (Il2CppMethodPointer) &ADD_FlameBurst);
     SetMoveFunctionTable(getFuncTable, &idx, SYNCHRONOISE, (Il2CppMethodPointer) &ADD_Synchronoise);
-    SetMoveFunctionTable(getFuncTable, &idx, CHIP_AWAY, (Il2CppMethodPointer) &ADD_ChipAway);
+    SetMoveFunctionTable(getFuncTable, &idx, CHIP_AWAY, (Il2CppMethodPointer) &Waza::ADD_NasiKuzusi);
+    SetMoveFunctionTable(getFuncTable, &idx, SKY_DROP, (Il2CppMethodPointer) &ADD_SkyDrop);
+    SetMoveFunctionTable(getFuncTable, &idx, BESTOW, (Il2CppMethodPointer) &ADD_Bestow);
 
     return getFuncTable;
 }

@@ -77,13 +77,13 @@ uint8_t HighestMultiple(uint8_t max, uint8_t factor) {
     uint8_t factor2 = max / factor;
     return factor * factor2;
 }
-bool HandlerAddFieldEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect) {
+bool HandlerAddFieldEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect, uint8_t turns) {
     auto *desc = (Section_FieldEffect_Add_Description_o *)
             il2cpp_object_new(Section_FieldEffect_Add_Description_TypeInfo);
     desc->ctor(nullptr);
     desc->fields.pokeID = pokeID;
     desc->fields.effect = effect;
-    desc->fields.cont = SICKCONT::MakeTurn(pokeID, 5, nullptr);
+    desc->fields.cont = SICKCONT::MakeTurn(pokeID, turns, nullptr);
     return Common::AddFieldEffect(args, &desc, nullptr);
 }
 void HandlerAddPosEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {

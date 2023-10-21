@@ -35,6 +35,8 @@ namespace Dpr
                 void *monitor;
                 WazaParam_Fields fields;
             };
+
+            extern void *WazaParam_TypeInfo;
         }
     }
 }

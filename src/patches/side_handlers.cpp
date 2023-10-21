@@ -12,7 +12,7 @@ using namespace Dpr::Battle::Logic;
 constexpr uint8_t A = 0;
 constexpr uint8_t B = 1;
 constexpr uint8_t C = 2;
-constexpr uint8_t D = 3;
+[[maybe_unused]] constexpr uint8_t D = 3;
 constexpr uint8_t E = 4;
 constexpr uint8_t WORKIDX_SICKCONT_LOW = 5;
 constexpr uint8_t WORKIDX_SICKCONT_HIGH = 6;

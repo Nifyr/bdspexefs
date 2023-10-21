@@ -27,6 +27,7 @@ namespace Dpr
                 void Event_ActProcEnd(BTL_POKEPARAM_o *bpp, int32_t actionCmd, MethodInfo *method);
                 void Event_ActProcStart(PokeAction_o *action, MethodInfo *method);
                 uint32_t Event_CheckSpecialWazaAdditionalPer(uint8_t atkPokeID, uint8_t defPokeID, uint32_t defaultPer, MethodInfo *method);
+                void Event_GetWazaParam(int32_t waza, int32_t orgWaza, int32_t gSrcWaza, int32_t wazaPri, BTL_POKEPARAM_o *attacker, WazaParam_o *param, MethodInfo *method);
             };
         }
     }

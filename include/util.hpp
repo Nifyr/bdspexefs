@@ -32,7 +32,7 @@ uint32_t GetBadgeCount();
 EventFactor_EventHandlerTable_o * CreateEventHandler(uint16_t eventID, MethodInfo * src, Il2CppMethodPointer methodPointer);
 System::Array<EventFactor_EventHandlerTable_o *> * CreateEventHandlerTable(uint32_t size);
 uint8_t HighestMultiple(uint8_t max, uint8_t factor);
-bool HandlerAddFieldEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect);
+bool HandlerAddFieldEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect, uint8_t turns);
 void HandlerAddPosEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID);
 void HandlerAddSick(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, uint8_t targetPokeID, int32_t sickID, int64_t sickCont);
 void HandlerDamage(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, uint8_t targetPokeID, uint16_t damage, bool disableDeadProcess, bool displayAbility);

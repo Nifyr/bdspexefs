@@ -15,6 +15,15 @@
 1d1cc90:
     b Dpr_Battle_Logic_EventLauncher_Event_WazaExecuteStart
 
+// Section_FromEvent_FreeFallStart$$Execute
+1fb4840:
+    mov x1, x21
+    mov x2, x22
+
+// Waza$$handler_InisieNoUta
+181df60:
+    b Dpr_Battle_Logic_Handler_Waza_handler_InisieNoUta
+
 // Handler.Pos$$.cctor
 1937290:
     bl Pos_system_array_new

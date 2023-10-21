@@ -19,6 +19,9 @@
 #include "Section_FieldEffect_Add.hpp"
 #include "Section_FromEvent_ConsumeItem.hpp"
 #include "Section_SideEffect_Add.hpp"
+#include "Section_FromEvent_FreeFallStart.hpp"
+#include "Section_FreeFall_Release.hpp"
+#include "Section_FromEvent_SwapItem.hpp"
 
 namespace Dpr
 {
@@ -42,6 +45,8 @@ namespace Dpr
                 static bool Damage(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_Damage_Description_o **desc,MethodInfo *method);
                 static uint8_t DecideWazaTargetAuto(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t wazano, MethodInfo *method);
                 static bool FormChange(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_FormChange_Description_o **desc,MethodInfo *method);
+                static void FreeFallRelease(EventFactor_EventHandlerArgs_o **args, Section_FreeFall_Release_Description_o **desc, MethodInfo *method);
+                static bool FreeFallStart(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_FreeFallStart_Description_o **desc, MethodInfo *method);
                 static uint8_t GetAllOpponentFrontPokeID(EventFactor_EventHandlerArgs_o **args, uint8_t basePokeID, System_Byte_array *dst, MethodInfo *method);
                 static int32_t GetEventVar(EventFactor_EventHandlerArgs_o **args, uint16_t label, MethodInfo *method);
                 static void * GetEventVarAddress(EventFactor_EventHandlerArgs_o **args, uint16_t label, MethodInfo *method);
@@ -66,6 +71,7 @@ namespace Dpr
                 static PokeAction_o * SearchByPokeID(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, bool isSkipGStart, bool isSkipNull, MethodInfo *method);
                 static void SetWorkValue(EventFactor_EventHandlerArgs_o **args, uint8_t workIdx, int32_t value ,MethodInfo *method);
                 static bool Shrink(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_Shrink_Description_o **desc, MethodInfo *method);
+                static bool SwapItem(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_SwapItem_Description_o **desc, MethodInfo *method);
             };
 
             extern void * Common_TypeInfo;
