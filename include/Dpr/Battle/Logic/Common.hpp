@@ -62,6 +62,7 @@ namespace Dpr
                 static bool IsFriendPokeID(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID1, uint8_t pokeID2, MethodInfo *method);
                 static void Message(EventFactor_EventHandlerArgs_o ** args, Section_FromEvent_Message::Description_o ** desc, MethodInfo * method);
                 static void MulEventVar(EventFactor_EventHandlerArgs_o **args, uint16_t label, int32_t value, MethodInfo *method);
+                static int32_t PokeIDtoOpponentSide(EventFactor_EventHandlerArgs_o **args, uint8_t *pokeID, MethodInfo *method);
                 static uint8_t PokeIDtoPokePos(EventFactor_EventHandlerArgs_o **args, uint8_t *pokeID, MethodInfo *method);
                 static int32_t PokeIDtoSide(EventFactor_EventHandlerArgs_o **args, uint8_t *pokeID, MethodInfo *method);
                 static bool RankEffect(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_RankEffect_Description_o **desc, MethodInfo *method);

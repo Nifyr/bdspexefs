@@ -111,6 +111,18 @@ void HandlerAddSick(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, uint8
     addSickDesc->fields.isFailResultDisplay = false;
     Common::AddSick(args, &addSickDesc, nullptr);
 }
+bool HandlerAddSideEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect, int32_t side, BTL_SICKCONT_o cont) {
+    system_load_typeinfo((void *)0xa8ef);
+    auto *desc = (Section_SideEffect_Add_Description_o *)
+            il2cpp_object_new(Section_SideEffect_Add_Description_TypeInfo);
+    desc->ctor(nullptr);
+    desc->fields.pokeID = pokeID;
+    desc->fields.effect = effect;
+    desc->fields.side = side;
+    desc->fields.cont = cont;
+    desc->fields.isReplaceSuccessMessageArgs0ByExpandSide = true;
+    return Common::AddSideEffect(args, &desc, nullptr);
+}
 void HandlerCureSick(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, int32_t sickID, uint8_t targetPokeID) {
     system_load_typeinfo((void *)0x893f);
     auto desc = (Section_CureSick_Description_o *)

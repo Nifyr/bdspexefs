@@ -105,3 +105,7 @@
 // Side$$handler_side_Omajinai
 1939c40:
     b Dpr_Battle_Logic_Handler_Side_handler_side_Omajinai
+
+// Side$$handler_SpotLight_TemptTarget
+193bd10:
+    b Dpr_Battle_Logic_Handler_Side_handler_SpotLight_TemptTarget

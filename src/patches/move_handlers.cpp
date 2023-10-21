@@ -22,7 +22,6 @@
 #include "Dpr/Battle/Logic/Section_FromEvent_SwapItem.hpp"
 #include "Dpr/Battle/Logic/Section_InterruptAction.hpp"
 #include "Dpr/Battle/Logic/Section_ProcessActionCore.hpp"
-#include "Dpr/Battle/Logic/Section_SideEffect_Add.hpp"
 #include "Dpr/Battle/Logic/SICKCONT.hpp"
 #include "Dpr/Battle/Logic/Tables.hpp"
 #include "Dpr/Battle/Logic/WAZADATA.hpp"
@@ -102,6 +101,9 @@ constexpr int32_t VOLT_SWITCH = 521;
 constexpr int32_t ROTOTILLER = 563;
 constexpr int32_t ION_DELUGE = 569;
 constexpr int32_t PARTING_SHOT = 575;
+constexpr int32_t SPOTLIGHT = 671;
+constexpr int32_t GUARDIAN_OF_ALOLA = 698;
+constexpr int32_t GENESIS_SUPERNOVA = 703;
 
 // TypeIDs
 constexpr uint8_t NORMAL = 0;
@@ -204,9 +206,13 @@ constexpr uint8_t NULL_WAZA_IDX = 4;
 
 // SideEffectIDs
 constexpr int32_t LUCKY_CHANT_SIDE = 5;
+constexpr int32_t SPOTLIGHT_SIDE = 18;
 
 // DexIDs
 constexpr uint16_t MELOETTA = 648;
+
+// BtlGroundIDs
+constexpr uint8_t PSYCHIC_TERRAIN_FIELD = 4;
 
 // HanderTables
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableJumpKick;
@@ -242,6 +248,9 @@ static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSkyDrop;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableBestow;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableRototiller;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableIonDeluge;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSpotlight;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableGuardianOfAlola;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableGenesisSupernova;
 
 // --- EventHandler delegates ---
 uint8_t GetEnvironmentType(EventFactor_EventHandlerArgs_o **args) {
@@ -846,16 +855,7 @@ void HandlerTrumpCardWazaPowerBase(EventFactor_EventHandlerArgs_o **args, uint8_
 // Lucky Chant
 void HandlerLuckyChantUncategorizeWazaNoTarget(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    system_load_typeinfo((void *)0xa8ef);
-    auto *desc = (Section_SideEffect_Add_Description_o *)
-            il2cpp_object_new(Section_SideEffect_Add_Description_TypeInfo);
-    desc->ctor(nullptr);
-    desc->fields.pokeID = pokeID;
-    desc->fields.effect = LUCKY_CHANT_SIDE;
-    desc->fields.side = Common::PokeIDtoSide(args, &pokeID, nullptr);
-    desc->fields.cont = SICKCONT::MakeTurn(pokeID, 5, nullptr);
-    desc->fields.isReplaceSuccessMessageArgs0ByExpandSide = true;
-    if (!Common::AddSideEffect(args, &desc, nullptr)) return;
+    if (!HandlerAddSideEffect(args, pokeID, LUCKY_CHANT_SIDE, Common::PokeIDtoSide(args, &pokeID, nullptr), SICKCONT::MakeTurn(pokeID, 5, nullptr))) return;
     Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
 }
 // Me First
@@ -1015,6 +1015,33 @@ void HandlerIonDelugeFieldEffectCall(EventFactor_EventHandlerArgs_o **args, uint
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
     if (!HandlerAddFieldEffect(args, pokeID, ION_DELUGE_FIELD, 1)) return;
     Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
+}
+// Spotlight
+void HandlerSpotlightUncategorizeWaza(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    uint8_t targetPokeID = Common::GetEventVar(args, EventVar::POKEID_TARGET1, nullptr);
+    if (!HandlerAddSideEffect(args, pokeID, SPOTLIGHT_SIDE,
+                              Common::PokeIDtoOpponentSide(args, &targetPokeID, nullptr),
+                              SICKCONT::MakePokeTurn(pokeID, targetPokeID, 1,
+                                                     nullptr))) return;
+    Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
+}
+// Guardian of Alola
+void HandlerGuardianOfAlolaWazaDmgProc1(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    auto damage = (int32_t)(Common::GetPokeParam(args, Common::GetEventVar(args, EventVar::POKEID_DEF,
+                                                                            nullptr),
+                                                  nullptr)->GetValue(BTL_POKEPARAM_ValueID::BPP_HP,
+                                                                     nullptr) * 0.75);
+    if (damage < 1)
+        damage = 1;
+    Common::RewriteEventVar(args, EventVar::FIX_DAMAGE, damage, nullptr);
+    Common::RewriteEventVar(args, EventVar::FIX_DAMAGE_FLAG, true, nullptr);
+}
+// Genesis Supernova
+void HandlerGenesisSupernovaWazaseqEnd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    Waza::handler_common_GroundSet(args, pokeID, PSYCHIC_TERRAIN_FIELD, nullptr);
 }
 
 EventFactor_EventHandlerTable_o * CreateMoveEventHandler(uint16_t eventID, Il2CppMethodPointer methodPointer) {
@@ -1291,6 +1318,27 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_IonDeluge(MethodInfo *met
     }
     return sHandlerTableIonDeluge;
 }
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_Spotlight(MethodInfo *method) {
+    if (sHandlerTableSpotlight == nullptr) {
+        sHandlerTableSpotlight = CreateEventHandlerTable(1);
+        sHandlerTableSpotlight->m_Items[0] = CreateMoveEventHandler(EventID::UNCATEGORIZE_WAZA, (Il2CppMethodPointer) &HandlerSpotlightUncategorizeWaza);
+    }
+    return sHandlerTableSpotlight;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_GuardianOfAlola(MethodInfo *method) {
+    if (sHandlerTableGuardianOfAlola == nullptr) {
+        sHandlerTableGuardianOfAlola = CreateEventHandlerTable(1);
+        sHandlerTableGuardianOfAlola->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_DMG_PROC1, (Il2CppMethodPointer) &HandlerGuardianOfAlolaWazaDmgProc1);
+    }
+    return sHandlerTableGuardianOfAlola;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_GenesisSupernova(MethodInfo *method) {
+    if (sHandlerTableGenesisSupernova == nullptr) {
+        sHandlerTableGenesisSupernova = CreateEventHandlerTable(1);
+        sHandlerTableGenesisSupernova->m_Items[0] = CreateMoveEventHandler(EventID::WAZASEQ_END, (Il2CppMethodPointer) &HandlerGenesisSupernovaWazaseqEnd);
+    }
+    return sHandlerTableGenesisSupernova;
+}
 
 // Adds an entry to GET_FUNC_TABLE
 void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTable, uint32_t * idx, int32_t wazaNo, Il2CppMethodPointer methodPointer) {
@@ -1304,7 +1352,7 @@ void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTab
 }
 
 // Remember to update when adding handlers
-constexpr uint32_t NEW_MOVES_COUNT = 40;
+constexpr uint32_t NEW_MOVES_COUNT = 43;
 
 // Entry point. Replaces system_array_new.
 void * Waza_system_array_new(void * typeInfo, uint32_t len) {
@@ -1358,6 +1406,9 @@ void * Waza_system_array_new(void * typeInfo, uint32_t len) {
     SetMoveFunctionTable(getFuncTable, &idx, ROTOTILLER, (Il2CppMethodPointer) &ADD_Rototiller);
     SetMoveFunctionTable(getFuncTable, &idx, ION_DELUGE, (Il2CppMethodPointer) &ADD_IonDeluge);
     //40
+    SetMoveFunctionTable(getFuncTable, &idx, SPOTLIGHT, (Il2CppMethodPointer) &ADD_Spotlight);
+    SetMoveFunctionTable(getFuncTable, &idx, GUARDIAN_OF_ALOLA, (Il2CppMethodPointer) &ADD_GuardianOfAlola);
+    SetMoveFunctionTable(getFuncTable, &idx, GENESIS_SUPERNOVA, (Il2CppMethodPointer) &ADD_GenesisSupernova);
 
     socket_log_fmt("%i/%i move HandlerGetFunc delegates added", NEW_MOVES_COUNT, idx - len);
 

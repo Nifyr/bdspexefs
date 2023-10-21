@@ -2,6 +2,7 @@
 
 #include <string>
 #include "il2cpp.hpp"
+#include "Dpr/Battle/Logic/BTL_SICKCONT.hpp"
 #include "Dpr/Battle/Logic/EventFactor.hpp"
 #include "System/Array.hpp"
 
@@ -35,6 +36,7 @@ uint8_t HighestMultiple(uint8_t max, uint8_t factor);
 bool HandlerAddFieldEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect, uint8_t turns);
 void HandlerAddPosEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID);
 void HandlerAddSick(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, uint8_t targetPokeID, int32_t sickID, int64_t sickCont);
+bool HandlerAddSideEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect, int32_t side, BTL_SICKCONT_o cont);
 void HandlerDamage(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, uint8_t targetPokeID, uint16_t damage, bool disableDeadProcess, bool displayAbility);
 void HandlerCureSick(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, int32_t sickID, uint8_t targetPokeID);
 void HandlerFormChange(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, uint8_t nextForm, bool persistOnSwitch, bool displayAbility, bool animationEnabled);

@@ -22,6 +22,7 @@ namespace Dpr
                     static System::Array<EventFactor_EventHandlerTable_o *> * ADD_GensiNoTikara(MethodInfo *method);
                     static void common_feint_proc(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, uint16_t strID, MethodInfo *method);
                     static void common_Korogaru_Unlock(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
+                    static void handler_common_GroundSet(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, uint8_t ground, MethodInfo *method);
                     static void handler_Jisin_checkHide(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                     static void handler_Jisin_damage(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                     static void handler_MetalBurst_Target(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);

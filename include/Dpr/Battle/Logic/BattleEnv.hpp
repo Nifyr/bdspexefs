@@ -3,6 +3,7 @@
 #include "il2cpp.hpp"
 #include "PosPoke.hpp"
 #include "WazaParam.hpp"
+#include "SideEffectStatus.hpp"
 
 namespace Dpr
 {
@@ -39,6 +40,8 @@ namespace Dpr
                 BattleEnv_c *klass;
                 void *monitor;
                 BattleEnv_Fields fields;
+
+                SideEffectStatus_o * GetSideEffectStatus(int32_t side, int32_t effect, MethodInfo *method);
             };
         }
     }
