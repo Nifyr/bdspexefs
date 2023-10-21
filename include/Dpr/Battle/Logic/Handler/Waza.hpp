@@ -25,6 +25,7 @@ namespace Dpr
                     static void handler_Jisin_checkHide(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                     static void handler_Jisin_damage(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                     static void handler_MetalBurst_Target(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
+                    static void handler_Tagayasu_CheckHide(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                     static void handler_Tatumaki_checkHide(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                     static void handler_Tobigeri_NoEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                     static void removeHandlerForce(EventSystem_o *pEventSystem, uint8_t pokeID, int32_t waza, MethodInfo *method);

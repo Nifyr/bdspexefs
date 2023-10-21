@@ -11,7 +11,7 @@ namespace Dpr
         {
             namespace Handler
             {
-                struct Pos
+                struct Field
                 {
                     static bool common_isGroundEffective(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                 };

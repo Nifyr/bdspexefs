@@ -8,6 +8,7 @@
 #include "Dpr/Battle/Logic/EventID.hpp"
 #include "Dpr/Battle/Logic/EventVar.hpp"
 #include "Dpr/Battle/Logic/Handler.hpp"
+#include "Dpr/Battle/Logic/Handler/Field.hpp"
 #include "Dpr/Battle/Logic/Handler/Waza.hpp"
 #include "Dpr/Battle/Logic/InterruptCode.hpp"
 #include "Dpr/Battle/Logic/PokeActionCategory.hpp"
@@ -98,6 +99,8 @@ constexpr int32_t CHIP_AWAY = 498;
 constexpr int32_t SKY_DROP = 507;
 constexpr int32_t BESTOW = 516;
 constexpr int32_t VOLT_SWITCH = 521;
+constexpr int32_t ROTOTILLER = 563;
+constexpr int32_t ION_DELUGE = 569;
 constexpr int32_t PARTING_SHOT = 575;
 
 // TypeIDs
@@ -237,6 +240,8 @@ static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableFlameBurs
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSynchronoise;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSkyDrop;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableBestow;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableRototiller;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableIonDeluge;
 
 // --- EventHandler delegates ---
 uint8_t GetEnvironmentType(EventFactor_EventHandlerArgs_o **args) {
@@ -997,15 +1002,18 @@ void Dpr_Battle_Logic_Handler_Waza_handler_InisieNoUta(EventFactor_EventHandlerA
     if (nextForm >= PersonalSystem::GetPersonalData(dexID, 0, nullptr)->fields.form_max) return;
     HandlerFormChange(args, pokeID, nextForm, false, false, true);
 }
-
+// Rototiller
+void HandlerRototillerNoeffectCheckL2(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    uint8_t targetPokeID = Common::GetEventVar(args, EventVar::POKEID_DEF, nullptr);
+    if (Field::common_isGroundEffective(args, targetPokeID, nullptr) &&
+    Common::GetPokeParam(args, targetPokeID, nullptr)->IsMatchType(GRASS, nullptr)) return;
+    Common::RewriteEventVar(args, EventVar::NOEFFECT_FLAG, true, nullptr);
+}
 // Ion Deluge
 void HandlerIonDelugeFieldEffectCall(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
-    socket_log("HandlerIonDelugeFieldEffectCall called");
-    socket_log("if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;");
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    socket_log("if (!HandlerAddFieldEffect(args, pokeID, ION_DELUGE_FIELD, 1)) return;");
     if (!HandlerAddFieldEffect(args, pokeID, ION_DELUGE_FIELD, 1)) return;
-    socket_log("Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);");
     Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
 }
 
@@ -1268,6 +1276,21 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_Bestow(MethodInfo *method
     }
     return sHandlerTableBestow;
 }
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_Rototiller(MethodInfo *method) {
+    if (sHandlerTableRototiller == nullptr) {
+        sHandlerTableRototiller = CreateEventHandlerTable(2);
+        sHandlerTableRototiller->m_Items[0] = CreateMoveEventHandler(EventID::NOEFFECT_CHECK_L2, (Il2CppMethodPointer) &HandlerRototillerNoeffectCheckL2);
+        sHandlerTableRototiller->m_Items[1] = CreateMoveEventHandler(EventID::CHECK_POKE_HIDE, (Il2CppMethodPointer) &Waza::handler_Tagayasu_CheckHide);
+    }
+    return sHandlerTableRototiller;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_IonDeluge(MethodInfo *method) {
+    if (sHandlerTableIonDeluge == nullptr) {
+        sHandlerTableIonDeluge = CreateEventHandlerTable(1);
+        sHandlerTableIonDeluge->m_Items[0] = CreateMoveEventHandler(EventID::FIELD_EFFECT_CALL, (Il2CppMethodPointer) &HandlerIonDelugeFieldEffectCall);
+    }
+    return sHandlerTableIonDeluge;
+}
 
 // Adds an entry to GET_FUNC_TABLE
 void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTable, uint32_t * idx, int32_t wazaNo, Il2CppMethodPointer methodPointer) {
@@ -1281,7 +1304,7 @@ void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTab
 }
 
 // Remember to update when adding handlers
-constexpr uint32_t NEW_MOVES_COUNT = 38;
+constexpr uint32_t NEW_MOVES_COUNT = 40;
 
 // Entry point. Replaces system_array_new.
 void * Waza_system_array_new(void * typeInfo, uint32_t len) {
@@ -1332,6 +1355,11 @@ void * Waza_system_array_new(void * typeInfo, uint32_t len) {
     SetMoveFunctionTable(getFuncTable, &idx, CHIP_AWAY, (Il2CppMethodPointer) &Waza::ADD_NasiKuzusi);
     SetMoveFunctionTable(getFuncTable, &idx, SKY_DROP, (Il2CppMethodPointer) &ADD_SkyDrop);
     SetMoveFunctionTable(getFuncTable, &idx, BESTOW, (Il2CppMethodPointer) &ADD_Bestow);
+    SetMoveFunctionTable(getFuncTable, &idx, ROTOTILLER, (Il2CppMethodPointer) &ADD_Rototiller);
+    SetMoveFunctionTable(getFuncTable, &idx, ION_DELUGE, (Il2CppMethodPointer) &ADD_IonDeluge);
+    //40
+
+    socket_log_fmt("%i/%i move HandlerGetFunc delegates added", NEW_MOVES_COUNT, idx - len);
 
     return getFuncTable;
 }
