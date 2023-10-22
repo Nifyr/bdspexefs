@@ -18,6 +18,7 @@
 #include "Dpr/Battle/Logic/Section_FromEvent_ChangePokeType.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_CheckSpecialWazaAdditionalEffectOccur.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_ConsumeItem.hpp"
+#include "Dpr/Battle/Logic/Section_FromEvent_FieldEffect_Remove.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_FreeFallStart.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_SwapItem.hpp"
 #include "Dpr/Battle/Logic/Section_InterruptAction.hpp"
@@ -104,6 +105,16 @@ constexpr int32_t PARTING_SHOT = 575;
 constexpr int32_t SPOTLIGHT = 671;
 constexpr int32_t GUARDIAN_OF_ALOLA = 698;
 constexpr int32_t GENESIS_SUPERNOVA = 703;
+constexpr int32_t LIGHT_THAT_BURNS_THE_SKY = 723;
+constexpr int32_t SEARING_SUNRAZE_SMASH = 724;
+constexpr int32_t MENACING_MOONRAZE_MAELSTROM = 725;
+constexpr int32_t SPLINTERED_STORMSHARDS = 727;
+constexpr int32_t PIKA_PAPOW = 732;
+constexpr int32_t GLITZY_GLOW = 736;
+constexpr int32_t BADDY_BAD = 737;
+constexpr int32_t FREEZY_FROST = 739;
+constexpr int32_t SPARKLY_SWIRL = 740;
+constexpr int32_t VEEVEE_VOLLEY = 741;
 
 // TypeIDs
 constexpr uint8_t NORMAL = 0;
@@ -128,6 +139,7 @@ constexpr uint8_t NULL_TYPE = 18;
 
 // FieldEffectIDs
 constexpr int32_t ION_DELUGE_FIELD = 6;
+constexpr int32_t TERRAIN = 8;
 constexpr int32_t MUD_SPORT_FIELD = 10;
 constexpr int32_t WATER_SPORT_FIELD = 11;
 
@@ -205,6 +217,8 @@ constexpr uint16_t MARANGA_BERRY = 688;
 constexpr uint8_t NULL_WAZA_IDX = 4;
 
 // SideEffectIDs
+constexpr int32_t REFLECT_SIDE = 0;
+constexpr int32_t LIGHT_SCREEN_SIDE = 1;
 constexpr int32_t LUCKY_CHANT_SIDE = 5;
 constexpr int32_t SPOTLIGHT_SIDE = 18;
 
@@ -251,6 +265,11 @@ static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableIonDeluge
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSpotlight;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableGuardianOfAlola;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableGenesisSupernova;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSplinteredStormshards;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableGlitzyGlow;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableBaddyBad;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableFreezyFrost;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSparklySwirl;
 
 // --- EventHandler delegates ---
 uint8_t GetEnvironmentType(EventFactor_EventHandlerArgs_o **args) {
@@ -406,18 +425,19 @@ void HandlerNightmareAddsickCheckfail(EventFactor_EventHandlerArgs_o **args, uin
 // Return
 void HandlerReturnWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    Common::RewriteEventVar(args, EventVar::WAZA_POWER,
-                            Common::GetPokeParam(args, pokeID, nullptr)->GetFriendship(nullptr) *
-                            2 / 5,
-                            nullptr);
+    auto power = (int32_t)(Common::GetPokeParam(args, pokeID, nullptr)->GetFriendship(nullptr) / 2.5);
+    if (power < 1)
+        power = 1;
+    Common::RewriteEventVar(args, EventVar::WAZA_POWER, power, nullptr);
 }
 // Frustration
 void HandlerFrustrationWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    Common::RewriteEventVar(args, EventVar::WAZA_POWER,
-                            (255 - Common::GetPokeParam(args, pokeID, nullptr)->
-                            GetFriendship(nullptr)) * 2 / 5,
-                            nullptr);
+    auto power = (int32_t)((255 - Common::GetPokeParam(args, pokeID, nullptr)->GetFriendship(nullptr)) /
+            2.5);
+    if (power < 1)
+        power = 1;
+    Common::RewriteEventVar(args, EventVar::WAZA_POWER, power, nullptr);
 }
 // Magnitude
 void HandlerMagnitudeWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
@@ -1043,6 +1063,42 @@ void HandlerGenesisSupernovaWazaseqEnd(EventFactor_EventHandlerArgs_o **args, ui
     if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
     Waza::handler_common_GroundSet(args, pokeID, PSYCHIC_TERRAIN_FIELD, nullptr);
 }
+// Splintered Stormshards
+void HandlerSplinteredStormshardsWazaseqEnd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    int32_t effType = TERRAIN;
+    if (!Common::CheckFieldEffect(args, &effType, nullptr)) return;
+    system_load_typeinfo((void *)0x89b9);
+    auto *desc = (Section_FromEvent_FieldEffect_Remove_Description_o *)
+            il2cpp_object_new(Section_FromEvent_FieldEffect_Remove_Description_TypeInfo);
+    desc->ctor(nullptr);
+    desc->fields.effect = effType;
+    Common::RemoveFieldEffect(args, &desc, nullptr);
+}
+// Glitzy Glow
+void HandlerGlitzyGlowWazaseqEnd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    HandlerAddSideEffect(args, pokeID, LIGHT_SCREEN_SIDE,
+                         Common::PokeIDtoSide(args, &pokeID, nullptr),
+                         SICKCONT::MakeTurn(pokeID, 5, nullptr));
+}
+// Baddy Bad
+void HandlerBaddyBadWazaseqEnd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    HandlerAddSideEffect(args, pokeID, REFLECT_SIDE, Common::PokeIDtoSide(args, &pokeID, nullptr),
+                         SICKCONT::MakeTurn(pokeID, 5, nullptr));
+}
+// Freezy Frost
+void HandlerFreezyFrostWazaseqEnd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    HandlerRankResetAll(args, pokeID);
+}
+// Sparkly Swirl
+void HandlerSparklySwirlWazaseqEnd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    (*args)->fields.pEventSystem->EVENTVAR_SetConstValue(EventVar::POKEID_ATK, pokeID, nullptr);
+    Waza::common_CureFriendPokeSick(args, pokeID, true, false, nullptr);
+}
 
 EventFactor_EventHandlerTable_o * CreateMoveEventHandler(uint16_t eventID, Il2CppMethodPointer methodPointer) {
     return CreateEventHandler(eventID, Handler_Karagenki_WazaPowMethodInfo, methodPointer);
@@ -1259,20 +1315,6 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_Punishment(MethodInfo *me
     }
     return sHandlerTablePunishment;
 }
-void PrintEventHandler(EventFactor_EventHandler_o *eh) {
-    socket_log_fmt("eh->fields.super.super.method_ptr: %08X", eh->fields.super.super.method_ptr);
-    socket_log_fmt("eh->fields.super.super.invoke_impl: %08X", eh->fields.super.super.invoke_impl);
-    socket_log_fmt("eh->fields.super.super.m_target: %08X", eh->fields.super.super.m_target);
-    socket_log_fmt("eh->fields.super.super.method: %08X", eh->fields.super.super.method);
-    socket_log_fmt("eh->fields.super.super.delegate_trampoline: %08X", eh->fields.super.super.delegate_trampoline);
-    socket_log_fmt("eh->fields.super.super.extra_arg: %08X", eh->fields.super.super.extra_arg);
-    socket_log_fmt("eh->fields.super.super.method_code: %08X", eh->fields.super.super.method_code);
-    socket_log_fmt("eh->fields.super.super.method_info: %08X", eh->fields.super.super.method_info);
-    socket_log_fmt("eh->fields.super.super.original_method_info: %08X", eh->fields.super.super.original_method_info);
-    socket_log_fmt("eh->fields.super.super.data: %08X", eh->fields.super.super.data);
-    socket_log_fmt("eh->fields.super.super.method_is_virtual: %08X", eh->fields.super.super.method_is_virtual);
-    socket_log_fmt("eh->fields.super.delegates: %08X", eh->fields.super.delegates);
-}
 System::Array<EventFactor_EventHandlerTable_o *> * ADD_FlameBurst(MethodInfo *method) {
     if (sHandlerTableFlameBurst == nullptr) {
         sHandlerTableFlameBurst = CreateEventHandlerTable(1);
@@ -1339,6 +1381,41 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_GenesisSupernova(MethodIn
     }
     return sHandlerTableGenesisSupernova;
 }
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_SpliteredStormshards(MethodInfo *method) {
+    if (sHandlerTableSplinteredStormshards == nullptr) {
+        sHandlerTableSplinteredStormshards = CreateEventHandlerTable(1);
+        sHandlerTableSplinteredStormshards->m_Items[0] = CreateMoveEventHandler(EventID::WAZASEQ_END, (Il2CppMethodPointer) &HandlerSplinteredStormshardsWazaseqEnd);
+    }
+    return sHandlerTableSplinteredStormshards;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_GlitzyGlow(MethodInfo *method) {
+    if (sHandlerTableGlitzyGlow == nullptr) {
+        sHandlerTableGlitzyGlow = CreateEventHandlerTable(1);
+        sHandlerTableGlitzyGlow->m_Items[0] = CreateMoveEventHandler(EventID::WAZASEQ_END, (Il2CppMethodPointer) &HandlerGlitzyGlowWazaseqEnd);
+    }
+    return sHandlerTableGlitzyGlow;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_BaddyBad(MethodInfo *method) {
+    if (sHandlerTableBaddyBad == nullptr) {
+        sHandlerTableBaddyBad = CreateEventHandlerTable(1);
+        sHandlerTableBaddyBad->m_Items[0] = CreateMoveEventHandler(EventID::WAZASEQ_END, (Il2CppMethodPointer) &HandlerBaddyBadWazaseqEnd);
+    }
+    return sHandlerTableBaddyBad;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_FreezyFrost(MethodInfo *method) {
+    if (sHandlerTableFreezyFrost == nullptr) {
+        sHandlerTableFreezyFrost = CreateEventHandlerTable(1);
+        sHandlerTableFreezyFrost->m_Items[0] = CreateMoveEventHandler(EventID::WAZASEQ_END, (Il2CppMethodPointer) &HandlerFreezyFrostWazaseqEnd);
+    }
+    return sHandlerTableFreezyFrost;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_SparklySwirl(MethodInfo *method) {
+    if (sHandlerTableSparklySwirl == nullptr) {
+        sHandlerTableSparklySwirl = CreateEventHandlerTable(1);
+        sHandlerTableSparklySwirl->m_Items[0] = CreateMoveEventHandler(EventID::WAZASEQ_END, (Il2CppMethodPointer) &HandlerSparklySwirlWazaseqEnd);
+    }
+    return sHandlerTableSparklySwirl;
+}
 
 // Adds an entry to GET_FUNC_TABLE
 void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTable, uint32_t * idx, int32_t wazaNo, Il2CppMethodPointer methodPointer) {
@@ -1352,7 +1429,7 @@ void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTab
 }
 
 // Remember to update when adding handlers
-constexpr uint32_t NEW_MOVES_COUNT = 43;
+constexpr uint32_t NEW_MOVES_COUNT = 53;
 
 // Entry point. Replaces system_array_new.
 void * Waza_system_array_new(void * typeInfo, uint32_t len) {
@@ -1409,6 +1486,17 @@ void * Waza_system_array_new(void * typeInfo, uint32_t len) {
     SetMoveFunctionTable(getFuncTable, &idx, SPOTLIGHT, (Il2CppMethodPointer) &ADD_Spotlight);
     SetMoveFunctionTable(getFuncTable, &idx, GUARDIAN_OF_ALOLA, (Il2CppMethodPointer) &ADD_GuardianOfAlola);
     SetMoveFunctionTable(getFuncTable, &idx, GENESIS_SUPERNOVA, (Il2CppMethodPointer) &ADD_GenesisSupernova);
+    SetMoveFunctionTable(getFuncTable, &idx, LIGHT_THAT_BURNS_THE_SKY, (Il2CppMethodPointer) &Waza::ADD_PhotonGeyser);
+    SetMoveFunctionTable(getFuncTable, &idx, SEARING_SUNRAZE_SMASH, (Il2CppMethodPointer) &Waza::ADD_MeteorDrive);
+    SetMoveFunctionTable(getFuncTable, &idx, MENACING_MOONRAZE_MAELSTROM, (Il2CppMethodPointer) &Waza::ADD_MeteorDrive);
+    SetMoveFunctionTable(getFuncTable, &idx, SPLINTERED_STORMSHARDS, (Il2CppMethodPointer) &ADD_SpliteredStormshards);
+    SetMoveFunctionTable(getFuncTable, &idx, PIKA_PAPOW, (Il2CppMethodPointer) &ADD_Return);
+    SetMoveFunctionTable(getFuncTable, &idx, GLITZY_GLOW, (Il2CppMethodPointer) &ADD_GlitzyGlow);
+    SetMoveFunctionTable(getFuncTable, &idx, BADDY_BAD, (Il2CppMethodPointer) &ADD_BaddyBad);
+    //50
+    SetMoveFunctionTable(getFuncTable, &idx, FREEZY_FROST, (Il2CppMethodPointer) &ADD_FreezyFrost);
+    SetMoveFunctionTable(getFuncTable, &idx, SPARKLY_SWIRL, (Il2CppMethodPointer) &ADD_SparklySwirl);
+    SetMoveFunctionTable(getFuncTable, &idx, VEEVEE_VOLLEY, (Il2CppMethodPointer) &ADD_Return);
 
     socket_log_fmt("%i/%i move HandlerGetFunc delegates added", NEW_MOVES_COUNT, idx - len);
 

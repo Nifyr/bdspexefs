@@ -43,5 +43,6 @@ void HandlerFormChange(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, ui
 void HandlerMessage(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, bool displayAbility);
 void HandlerRankEffect(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, uint8_t targetPokeID, int32_t rankType, int8_t rankVolume, bool displayAbility, bool ignoreSubstitute, bool messageOnFail);
 void HandlerRankReset(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID);
+void HandlerRankResetAll(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID);
 void HandlerShrink(EventFactor_EventHandlerArgs_o **args, uint8_t targetPokeID, uint8_t percentage);
 System_Int64_array *NewInt64Array(uint32_t len);

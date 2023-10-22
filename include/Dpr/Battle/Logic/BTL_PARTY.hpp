@@ -1,6 +1,7 @@
 #pragma once
 
 #include "il2cpp.hpp"
+#include "BTL_POKEPARAM.hpp"
 
 namespace Dpr
 {

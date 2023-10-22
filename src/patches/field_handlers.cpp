@@ -48,12 +48,12 @@ static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableWaterSpor
 // Mud Sport Field
 void HandlerMudSportFieldWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t subParam, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::WAZA_TYPE, nullptr) != ELECTRIC) return;
-    Common::MulEventVar(args, EventVar::WAZA_POWER_RATIO, 0x1000 * 0.33, nullptr);
+    Common::MulEventVar(args, EventVar::WAZA_POWER_RATIO, (int32_t)(0x1000 * 0.33), nullptr);
 }
 // Water Sport Field
 void HandlerWaterSportFieldWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t subParam, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::WAZA_TYPE, nullptr) != FIRE) return;
-    Common::MulEventVar(args, EventVar::WAZA_POWER_RATIO, 0x1000 * 0.33, nullptr);
+    Common::MulEventVar(args, EventVar::WAZA_POWER_RATIO, (int32_t)(0x1000 * 0.33), nullptr);
 }
 
 EventFactor_EventHandlerTable_o * CreateFieldEventHandler(uint16_t eventID, Il2CppMethodPointer methodPointer) {
@@ -80,7 +80,7 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_WaterSportField(MethodInf
 void SetFieldFunctionTable(System::Array<Field_GET_FUNC_TABLE_ELEM_o> * getFuncTable, uint32_t * idx, int32_t effect, Il2CppMethodPointer methodPointer) {
     MethodInfo * method = copyMethodInfo(Method_ADD_Fld_Ground, methodPointer);
     Field_GET_FUNC_TABLE_ELEM_o * elem = &getFuncTable->m_Items[*idx];
-    Field_HandlerGetFunc_o * func = (Field_HandlerGetFunc_o *) il2cpp_object_new(Field_HandlerGetFunc_TypeInfo);
+    auto * func = (Field_HandlerGetFunc_o *) il2cpp_object_new(Field_HandlerGetFunc_TypeInfo);
     func->ctor((intptr_t)methodPointer, method);
     elem->fields.effect = effect;
     elem->fields.func = func;
@@ -91,8 +91,8 @@ void SetFieldFunctionTable(System::Array<Field_GET_FUNC_TABLE_ELEM_o> * getFuncT
 constexpr uint32_t NEW_FIELD_EFFECT_COUNT = 2;
 
 // Entry point. Replaces system_array_new.
-void *Field_system_array_new(void * typeInfo, uint32_t len) {
-    System::Array<Field_GET_FUNC_TABLE_ELEM_o> * getFuncTable = (System::Array<Field_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_FIELD_EFFECT_COUNT);
+void * Field_system_array_new(void * typeInfo, uint32_t len) {
+    auto * getFuncTable = (System::Array<Field_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_FIELD_EFFECT_COUNT);
     uint32_t idx = len;
 
     //0
@@ -103,8 +103,8 @@ void *Field_system_array_new(void * typeInfo, uint32_t len) {
 }
 
 void Dpr_Battle_Logic_FieldStatus_initWork(FieldStatus_o *__this, MethodInfo *method) {
-    for (int i = 0; i < 10 + NEW_FIELD_EFFECT_COUNT; ++i)
-        __this->clearFactorWork(i, nullptr);
+    for (uint32_t i = 0; i < 10 + NEW_FIELD_EFFECT_COUNT; ++i)
+        __this->clearFactorWork((int32_t)i, nullptr);
     __this->fields.m_data->fields.weather = 0;
     __this->fields.m_data->fields.weatherTurn = 255;
     __this->fields.m_data->fields.weatherTurnCount = 0;

@@ -204,6 +204,16 @@ void HandlerRankReset(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {
     desc->fields.pokeID->m_Items[0] = pokeID;
     Common::RankReset(args, &desc, nullptr);
 }
+void HandlerRankResetAll(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {
+    system_load_typeinfo((void *)0xa9b3);
+    auto *desc = (Section_FromEvent_RankReset_Description_o *)
+            il2cpp_object_new(Section_FromEvent_RankReset_Description_TypeInfo);
+    desc->ctor(nullptr);
+    auto *exPos = (ExPokePos_o *)il2cpp_object_new(ExPokePos_TypeInfo);
+    exPos->ctor(ExPosType::FULL_ALL, Common::GetExistFrontPokePos(args, pokeID, nullptr), nullptr);
+    desc->fields.pokeCount = Common::ExpandExistPokeID(args, &exPos, desc->fields.pokeID, nullptr);
+    Common::RankReset(args, &desc, nullptr);
+}
 void HandlerShrink(EventFactor_EventHandlerArgs_o **args, uint8_t targetPokeID, uint8_t percentage) {
     system_load_typeinfo((void *)0x58b8);
     auto *desc = (Section_FromEvent_Shrink_Description_o *)
