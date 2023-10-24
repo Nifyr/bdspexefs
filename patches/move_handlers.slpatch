@@ -24,6 +24,10 @@
 181df60:
     b Dpr_Battle_Logic_Handler_Waza_handler_InisieNoUta
 
+// BTL_CLIENT$$is_unselectable_waza
+1f54b40:
+    b Dpr_Battle_Logic_BTL_CLIENT_is_unselectable_waza
+
 // Handler.Pos$$.cctor
 1937290:
     bl Pos_system_array_new

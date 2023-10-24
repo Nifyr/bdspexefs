@@ -10,11 +10,12 @@ namespace Dpr
         {
             struct WAZADATA
             {
-                static int32_t GetDamageType(int32_t id,MethodInfo *method);
+                static int32_t GetDamageType(int32_t id, MethodInfo *method);
                 static bool GetFlag(int32_t id, int32_t flag, MethodInfo *method);
                 static uint8_t GetType(int32_t id, MethodInfo *method);
                 static int32_t GetSickPer(int32_t id, MethodInfo *method);
-                static bool IsDamage(int32_t id,MethodInfo *method);
+                static bool IsDamage(int32_t id, MethodInfo *method);
+                static bool IsValid(int32_t id, MethodInfo *method);
             };
         }
     }

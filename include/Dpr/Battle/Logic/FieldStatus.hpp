@@ -15,11 +15,13 @@ namespace Dpr
             };
 
             struct FieldStatus_o {
-                void clearFactorWork(int32_t effect, MethodInfo *method);
-
                 FieldStatus_c *klass;
                 void *monitor;
                 FieldStatus_Fields fields;
+
+                bool CheckEffect(int32_t effect, MethodInfo *method);
+                bool CheckFuin(MainModule_o **mainModule, POKECON_o *pokeCon, BTL_POKEPARAM_o *attacker, int32_t waza, MethodInfo *method);
+                void clearFactorWork(int32_t effect, MethodInfo *method);
             };
 
             struct FieldStatus_Data_c;

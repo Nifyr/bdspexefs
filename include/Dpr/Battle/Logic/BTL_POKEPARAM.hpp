@@ -1,9 +1,10 @@
 #pragma once
 
 #include "il2cpp.hpp"
+#include "BTL_SICKCONT.hpp"
 #include "Pml/PokePara/CoreParam.h"
-#include "System/Array.hpp"
 #include "PokeTypePair.hpp"
+#include "System/Array.hpp"
 
 namespace Dpr
 {
@@ -71,19 +72,25 @@ namespace Dpr
                 uint8_t GetFriendship(MethodInfo *method);
                 uint8_t GetID(MethodInfo *method);
                 uint16_t GetItem(MethodInfo *method);
+                uint16_t GetItemEffective(FieldStatus_o **fldSim, MethodInfo *method);
                 uint16_t GetMonsNo(MethodInfo *method);
                 uint32_t GetPokeSick(MethodInfo *method);
                 PokeTypePair_o GetPokeType(MethodInfo *method);
+                BTL_SICKCONT_o GetSickCont(int32_t sick, MethodInfo *method);
+                uint16_t GetSickParam(int32_t sick, MethodInfo *method);
                 Pml::PokePara::CoreParam * GetSrcDataConst(MethodInfo *method);
                 int32_t GetValue(int32_t valueID,MethodInfo *method);
                 bool HENSIN_Check(MethodInfo *method);
                 bool IsDead(MethodInfo *method);
+                bool IsGMode(MethodInfo *method);
                 bool IsMatchTokusei(int32_t tokusei, MethodInfo *method);
                 bool IsMatchType(uint8_t type,MethodInfo *method);
+                bool PERMFLAG_Get(int32_t flagID, MethodInfo *method);
                 bool TURNFLAG_Get(int32_t flagID, MethodInfo *method);
                 void TURNFLAG_Set(int32_t flagID, MethodInfo *method);
                 int32_t WAZA_GetID(uint8_t idx, MethodInfo *method);
                 uint16_t WAZA_GetPP(uint8_t wazaIdx, MethodInfo *method);
+                bool WAZA_IsUsable(int32_t waza, MethodInfo *method);
                 uint8_t WAZA_SearchIdx(int32_t waza, MethodInfo *method);
             };
 

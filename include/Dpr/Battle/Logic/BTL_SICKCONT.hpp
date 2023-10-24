@@ -1,7 +1,6 @@
 #pragma once
 
 #include "il2cpp.hpp"
-#include "Dpr/Battle/Logic/BTL_POKEPARAM.hpp"
 
 namespace Dpr
 {

@@ -74,6 +74,7 @@ namespace Dpr
 
                 int32_t GetEscapeMode(MethodInfo *method);
                 bool IsFriendPokeID(uint8_t pokeID1, uint8_t pokeID2, MethodInfo *method);
+                bool IsSkyBattle(MethodInfo *method);
             };
         }
     }
