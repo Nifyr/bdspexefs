@@ -232,42 +232,24 @@ uint8_t MultitypeType(uint32_t itemNo) {
 }
 uint8_t RKSSystemType(uint32_t itemNo) {
     switch (itemNo) {
-        case FIGHTING_MEMORY:
-            return FIGHTING;
-        case FLYING_MEMORY:
-            return FLYING;
-        case POISON_MEMORY:
-            return POISON;
-        case GROUND_MEMORY:
-            return GROUND;
-        case ROCK_MEMORY:
-            return ROCK;
-        case BUG_MEMORY:
-            return BUG;
-        case GHOST_MEMORY:
-            return GHOST;
-        case STEEL_MEMORY:
-            return STEEL;
-        case FIRE_MEMORY:
-            return FIRE;
-        case WATER_MEMORY:
-            return WATER;
-        case GRASS_MEMORY:
-            return GRASS;
-        case ELECTRIC_MEMORY:
-            return ELECTRIC;
-        case PSYCHIC_MEMORY:
-            return PSYCHIC;
-        case ICE_MEMORY:
-            return ICE;
-        case DRAGON_MEMORY:
-            return DRAGON;
-        case DARK_MEMORY:
-            return DARK;
-        case FAIRY_MEMORY:
-            return FAIRY;
-        default:
-            return NORMAL;
+        case FIGHTING_MEMORY: return FIGHTING;
+        case FLYING_MEMORY: return FLYING;
+        case POISON_MEMORY: return POISON;
+        case GROUND_MEMORY: return GROUND;
+        case ROCK_MEMORY: return ROCK;
+        case BUG_MEMORY: return BUG;
+        case GHOST_MEMORY: return GHOST;
+        case STEEL_MEMORY: return STEEL;
+        case FIRE_MEMORY: return FIRE;
+        case WATER_MEMORY: return WATER;
+        case GRASS_MEMORY: return GRASS;
+        case ELECTRIC_MEMORY: return ELECTRIC;
+        case PSYCHIC_MEMORY: return PSYCHIC;
+        case ICE_MEMORY: return ICE;
+        case DRAGON_MEMORY: return DRAGON;
+        case DARK_MEMORY: return DARK;
+        case FAIRY_MEMORY: return FAIRY;
+        default: return NORMAL;
     }
 }
 uint8_t GetType(CoreParam *cp, int32_t paramID) {

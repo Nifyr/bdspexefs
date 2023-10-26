@@ -629,6 +629,26 @@ namespace Dpr
                     struct Field_GET_FUNC_TABLE_ELEM_Fields fields;
                 };
 
+                struct Side_HandlerGetFunc_Fields {
+                    System_MulticastDelegate_Fields super;
+                };
+
+                struct Side_HandlerGetFunc_o {
+                    void ctor(intptr_t m_target, MethodInfo * method);
+                    struct Side_HandlerGetFunc_c *klass;
+                    void *monitor;
+                    struct Side_HandlerGetFunc_Fields fields;
+                };
+
+                struct Side_GET_FUNC_TABLE_ELEM_Fields {
+                    int32_t eff;
+                    struct Side_HandlerGetFunc_o* func;
+                };
+
+                struct Side_GET_FUNC_TABLE_ELEM_o {
+                    struct Side_GET_FUNC_TABLE_ELEM_Fields fields;
+                };
+
                 extern Waza_c * Waza_TypeInfo;
                 // 4c5b330
 
@@ -643,6 +663,9 @@ namespace Dpr
 
                 extern void * Field_HandlerGetFunc_TypeInfo;
                 extern MethodInfo * Method_ADD_Fld_Ground;
+
+                extern void * Side_HandlerGetFunc_TypeInfo;
+                extern MethodInfo * Method_ADD_SIDE_AuroraVeil;
             }
         }
     }

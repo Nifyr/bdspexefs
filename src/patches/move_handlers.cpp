@@ -10,6 +10,7 @@
 #include "Dpr/Battle/Logic/EventID.hpp"
 #include "Dpr/Battle/Logic/EventVar.hpp"
 #include "Dpr/Battle/Logic/FieldStatus.hpp"
+#include "Dpr/Battle/Logic/GShock.hpp"
 #include "Dpr/Battle/Logic/GWaza.hpp"
 #include "Dpr/Battle/Logic/Handler.hpp"
 #include "Dpr/Battle/Logic/Handler/Field.hpp"
@@ -19,12 +20,14 @@
 #include "Dpr/Battle/Logic/PokeID.hpp"
 #include "Dpr/Battle/Logic/PokeSet.hpp"
 #include "Dpr/Battle/Logic/Section_FreeFall_Release.hpp"
+#include "Dpr/Battle/Logic/Section_FromEvent_AddViewEffect.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_ChangePokeType.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_CheckSpecialWazaAdditionalEffectOccur.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_ConsumeItem.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_FieldEffect_Remove.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_FreeFallStart.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_SwapItem.hpp"
+#include "Dpr/Battle/Logic/Section_GShockWave.hpp"
 #include "Dpr/Battle/Logic/Section_InterruptAction.hpp"
 #include "Dpr/Battle/Logic/Section_ProcessActionCore.hpp"
 #include "Dpr/Battle/Logic/SICKCONT.hpp"
@@ -34,6 +37,7 @@
 #include "Pml/Item/ItemData.hpp"
 #include "Pml/Personal/PersonalSystem.hpp"
 #include "Pml/PokePara/Sick.hpp"
+#include "Pml/WazaData/WazaDataSystem.hpp"
 #include "Pml/WazaData/WazaFlag.hpp"
 #include "Pml/WazaData/WazaRankEffect.hpp"
 #include "Pml/WazaData/WazaSick.hpp"
@@ -237,6 +241,7 @@ constexpr uint16_t MICLE_BERRY = 209;
 constexpr uint16_t CUSTAP_BERRY = 210;
 constexpr uint16_t JABOCA_BERRY = 211;
 constexpr uint16_t ROWAP_BERRY = 212;
+constexpr uint16_t HEAT_ROCK = 284;
 constexpr uint16_t ROSELI_BERRY = 686;
 constexpr uint16_t KEE_BERRY = 687;
 constexpr uint16_t MARANGA_BERRY = 688;
@@ -249,9 +254,43 @@ constexpr int32_t REFLECT_SIDE = 0;
 constexpr int32_t LIGHT_SCREEN_SIDE = 1;
 constexpr int32_t LUCKY_CHANT_SIDE = 5;
 constexpr int32_t SPOTLIGHT_SIDE = 18;
+constexpr int32_t G_MAX_CANNONADE_SIDE = 22;
+constexpr int32_t G_MAX_VINE_LASH_SIDE = 23;
 
 // DexIDs
+constexpr uint16_t VENUSAUR = 3;
+constexpr uint16_t CHARIZARD = 6;
+constexpr uint16_t BLASTOISE = 9;
+constexpr uint16_t BUTTERFREE = 12;
+constexpr uint16_t PIKACHU = 25;
+constexpr uint16_t MEOWTH = 52;
+constexpr uint16_t MACHAMP = 68;
+constexpr uint16_t GENGAR = 94;
+constexpr uint16_t KINGLER = 99;
+constexpr uint16_t LAPRAS = 131;
+constexpr uint16_t EEVEE = 133;
+constexpr uint16_t SNORLAX = 143;
+constexpr uint16_t GARBODOR = 569;
 constexpr uint16_t MELOETTA = 648;
+constexpr uint16_t MELMETAL = 809;
+constexpr uint16_t RILLABOOM = 812;
+constexpr uint16_t CINDERACE = 815;
+constexpr uint16_t INTELEON = 818;
+constexpr uint16_t CORVIKNIGHT = 823;
+constexpr uint16_t ORBEETLE = 826;
+constexpr uint16_t DREDNAW = 834;
+constexpr uint16_t COALOSSAL = 839;
+constexpr uint16_t FLAPPLE = 841;
+constexpr uint16_t APPLETUN = 842;
+constexpr uint16_t SANDACONDA = 844;
+constexpr uint16_t TOXTRICITY = 849;
+constexpr uint16_t CENTISKORCH = 851;
+constexpr uint16_t HATTERENE = 858;
+constexpr uint16_t GRIMMSNARL = 861;
+constexpr uint16_t ALCREMIE = 869;
+constexpr uint16_t COPPERAJAH = 879;
+constexpr uint16_t DURALUDON = 884;
+constexpr uint16_t URSHIFU = 892;
 
 // BtlGroundIDs
 constexpr uint8_t PSYCHIC_TERRAIN_FIELD = 4;
@@ -298,18 +337,15 @@ static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableGlitzyGlo
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableBaddyBad;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableFreezyFrost;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSparklySwirl;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableMaxMove;
 
 // --- EventHandler delegates ---
 uint8_t GetEnvironmentType(EventFactor_EventHandlerArgs_o **args) {
     switch (Common::GetGround(args, nullptr)) {
-        case BtlGround::BTL_GROUND_GRASS:
-            return GRASS;
-        case BtlGround::BTL_GROUND_MIST:
-            return FAIRY;
-        case BtlGround::BTL_GROUND_ELEKI:
-            return ELECTRIC;
-        case BtlGround::BTL_GROUND_PHYCHO:
-            return PSYCHIC;
+        case BtlGround::BTL_GROUND_GRASS: return GRASS;
+        case BtlGround::BTL_GROUND_MIST: return FAIRY;
+        case BtlGround::BTL_GROUND_ELEKI: return ELECTRIC;
+        case BtlGround::BTL_GROUND_PHYCHO: return PSYCHIC;
     }
     return WAZADATA::GetType(Common::GetFieldSituation(args, nullptr)->
     fields.bgComponent->fields.sizennotikaraWazaNo, nullptr);
@@ -710,142 +746,74 @@ struct TypePowerPair {
 };
 TypePowerPair NaturalGiftTypePower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {
     switch (Common::GetPokeParam(args, pokeID, nullptr)->GetItem(nullptr)) {
-        case CHERI_BERRY:
-            return { FIRE, 80};
-        case CHESTO_BERRY:
-            return { WATER, 80};
-        case PECHA_BERRY:
-            return { ELECTRIC, 80};
-        case RAWST_BERRY:
-            return { GRASS, 80};
-        case ASPEAR_BERRY:
-            return { ICE, 80};
-        case LEPPA_BERRY:
-            return { FIGHTING, 80};
-        case ORAN_BERRY:
-            return { POISON, 80};
-        case PERSIM_BERRY:
-            return { GROUND, 80};
-        case LUM_BERRY:
-            return { FLYING, 80};
-        case SITRUS_BERRY:
-            return { PSYCHIC, 80};
-        case FIGY_BERRY:
-            return { BUG, 80};
-        case WIKI_BERRY:
-            return { ROCK, 80};
-        case MAGO_BERRY:
-            return { GHOST, 80};
-        case AGUAV_BERRY:
-            return { DRAGON, 80};
-        case IAPAPA_BERRY:
-            return { DARK, 80};
-        case RAZZ_BERRY:
-            return { STEEL, 80};
-        case BLUK_BERRY:
-            return { FIRE, 90};
-        case NANAB_BERRY:
-            return { WATER, 90};
-        case WEPEAR_BERRY:
-            return { ELECTRIC, 90};
-        case PINAP_BERRY:
-            return { GRASS, 90};
-        case POMEG_BERRY:
-            return { ICE, 90};
-        case KELPSY_BERRY:
-            return { FIGHTING, 90};
-        case QUALOT_BERRY:
-            return { POISON, 90};
-        case HONDEW_BERRY:
-            return { GROUND, 90};
-        case GREPA_BERRY:
-            return { FLYING, 90};
-        case TAMATO_BERRY:
-            return { PSYCHIC, 90};
-        case CORNN_BERRY:
-            return { BUG, 90};
-        case MAGOST_BERRY:
-            return { ROCK, 90};
-        case RABUTA_BERRY:
-            return { GHOST, 90};
-        case NOMEL_BERRY:
-            return { DRAGON, 90};
-        case SPELON_BERRY:
-            return { DARK, 90};
-        case PAMTRE_BERRY:
-            return { STEEL, 90};
-        case WATMEL_BERRY:
-            return { FIRE, 100};
-        case DURIN_BERRY:
-            return { WATER, 100};
-        case BELUE_BERRY:
-            return { ELECTRIC, 100};
-        case OCCA_BERRY:
-            return { FIRE, 80};
-        case PASSHO_BERRY:
-            return { WATER, 80};
-        case WACAN_BERRY:
-            return { ELECTRIC, 80};
-        case RINDO_BERRY:
-            return { GRASS, 80};
-        case YACHE_BERRY:
-            return { ICE, 80};
-        case CHOPLE_BERRY:
-            return { FIGHTING, 80};
-        case KEBIA_BERRY:
-            return { POISON, 80};
-        case SHUCA_BERRY:
-            return { GROUND, 80};
-        case COBA_BERRY:
-            return { FLYING, 80};
-        case PAYAPA_BERRY:
-            return { PSYCHIC, 80};
-        case TANGA_BERRY:
-            return { BUG, 80};
-        case CHARTI_BERRY:
-            return { ROCK, 80};
-        case KASIB_BERRY:
-            return { GHOST, 80};
-        case HABAN_BERRY:
-            return { DRAGON, 80};
-        case COLBUR_BERRY:
-            return { DARK, 80};
-        case BABIRI_BERRY:
-            return { STEEL, 80};
-        case CHILAN_BERRY:
-            return { NORMAL, 80};
-        case LIECHI_BERRY:
-            return { GRASS, 100};
-        case GANLON_BERRY:
-            return { ICE, 100};
-        case SALAC_BERRY:
-            return { FIGHTING, 100};
-        case PETAYA_BERRY:
-            return { POISON, 100};
-        case APICOT_BERRY:
-            return { GROUND, 100};
-        case LANSAT_BERRY:
-            return { FLYING, 100};
-        case STARF_BERRY:
-            return { PSYCHIC, 100};
-        case ENIGMA_BERRY:
-            return { BUG, 100};
-        case MICLE_BERRY:
-            return { ROCK, 100};
-        case CUSTAP_BERRY:
-            return { GHOST, 100};
-        case JABOCA_BERRY:
-            return { DRAGON, 100};
-        case ROWAP_BERRY:
-            return { DARK, 100};
-        case ROSELI_BERRY:
-            return { FAIRY, 80};
-        case KEE_BERRY:
-            return { FAIRY, 100};
-        case MARANGA_BERRY:
-            return { DARK, 100};
-        default:
-            return { NULL_TYPE, 0};
+        case CHERI_BERRY: return { FIRE, 80};
+        case CHESTO_BERRY: return { WATER, 80};
+        case PECHA_BERRY: return { ELECTRIC, 80};
+        case RAWST_BERRY: return { GRASS, 80};
+        case ASPEAR_BERRY: return { ICE, 80};
+        case LEPPA_BERRY: return { FIGHTING, 80};
+        case ORAN_BERRY: return { POISON, 80};
+        case PERSIM_BERRY: return { GROUND, 80};
+        case LUM_BERRY: return { FLYING, 80};
+        case SITRUS_BERRY: return { PSYCHIC, 80};
+        case FIGY_BERRY: return { BUG, 80};
+        case WIKI_BERRY: return { ROCK, 80};
+        case MAGO_BERRY: return { GHOST, 80};
+        case AGUAV_BERRY: return { DRAGON, 80};
+        case IAPAPA_BERRY: return { DARK, 80};
+        case RAZZ_BERRY: return { STEEL, 80};
+        case BLUK_BERRY: return { FIRE, 90};
+        case NANAB_BERRY: return { WATER, 90};
+        case WEPEAR_BERRY: return { ELECTRIC, 90};
+        case PINAP_BERRY: return { GRASS, 90};
+        case POMEG_BERRY: return { ICE, 90};
+        case KELPSY_BERRY: return { FIGHTING, 90};
+        case QUALOT_BERRY: return { POISON, 90};
+        case HONDEW_BERRY: return { GROUND, 90};
+        case GREPA_BERRY: return { FLYING, 90};
+        case TAMATO_BERRY: return { PSYCHIC, 90};
+        case CORNN_BERRY: return { BUG, 90};
+        case MAGOST_BERRY: return { ROCK, 90};
+        case RABUTA_BERRY: return { GHOST, 90};
+        case NOMEL_BERRY: return { DRAGON, 90};
+        case SPELON_BERRY: return { DARK, 90};
+        case PAMTRE_BERRY: return { STEEL, 90};
+        case WATMEL_BERRY: return { FIRE, 100};
+        case DURIN_BERRY: return { WATER, 100};
+        case BELUE_BERRY: return { ELECTRIC, 100};
+        case OCCA_BERRY: return { FIRE, 80};
+        case PASSHO_BERRY: return { WATER, 80};
+        case WACAN_BERRY: return { ELECTRIC, 80};
+        case RINDO_BERRY: return { GRASS, 80};
+        case YACHE_BERRY: return { ICE, 80};
+        case CHOPLE_BERRY: return { FIGHTING, 80};
+        case KEBIA_BERRY: return { POISON, 80};
+        case SHUCA_BERRY: return { GROUND, 80};
+        case COBA_BERRY: return { FLYING, 80};
+        case PAYAPA_BERRY: return { PSYCHIC, 80};
+        case TANGA_BERRY: return { BUG, 80};
+        case CHARTI_BERRY: return { ROCK, 80};
+        case KASIB_BERRY: return { GHOST, 80};
+        case HABAN_BERRY: return { DRAGON, 80};
+        case COLBUR_BERRY: return { DARK, 80};
+        case BABIRI_BERRY: return { STEEL, 80};
+        case CHILAN_BERRY: return { NORMAL, 80};
+        case LIECHI_BERRY: return { GRASS, 100};
+        case GANLON_BERRY: return { ICE, 100};
+        case SALAC_BERRY: return { FIGHTING, 100};
+        case PETAYA_BERRY: return { POISON, 100};
+        case APICOT_BERRY: return { GROUND, 100};
+        case LANSAT_BERRY: return { FLYING, 100};
+        case STARF_BERRY: return { PSYCHIC, 100};
+        case ENIGMA_BERRY: return { BUG, 100};
+        case MICLE_BERRY: return { ROCK, 100};
+        case CUSTAP_BERRY: return { GHOST, 100};
+        case JABOCA_BERRY: return { DRAGON, 100};
+        case ROWAP_BERRY: return { DARK, 100};
+        case ROSELI_BERRY: return { FAIRY, 80};
+        case KEE_BERRY: return { FAIRY, 100};
+        case MARANGA_BERRY: return { DARK, 100};
+        default: return { NULL_TYPE, 0};
     }
 }
 void HandlerNaturalGiftWazaExecuteCheck3rd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
@@ -1125,6 +1093,217 @@ void HandlerFreezyFrostDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **arg
 void HandlerSparklySwirlDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
     Waza::common_CureFriendPokeSick(args, pokeID, true, false, nullptr);
+}
+// Max Guard
+bool HandlerMaxMoveIsMaxGuardBypass(BTL_POKEPARAM_o *bpp, uint8_t type) {
+    return (bpp->GetMonsNo(nullptr) == URSHIFU && bpp->fields.m_formNo == 2 && type == DARK) ||
+           (bpp->GetMonsNo(nullptr) == URSHIFU && bpp->fields.m_formNo == 3 && type == WATER);
+}
+void Dpr_Battle_Logic_Handler_Waza_handler_DaiWall_NoEffectCheck(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    system_load_typeinfo((void *)0xa91e);
+    uint8_t atkPokeID = Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr);
+    if (atkPokeID == pokeID) return;
+    if (Common::GetEventVar(args, EventVar::POKEID_DEF, nullptr) != pokeID) return;
+    if (Tables::IsDaiWallGuardDisable(Common::GetEventVar(args, EventVar::WAZAID, nullptr),
+                                      nullptr)) return;
+    if (HandlerMaxMoveIsMaxGuardBypass(Common::GetPokeParam(args, atkPokeID, nullptr),
+                                       Common::GetEventVar(args, EventVar::WAZA_TYPE, nullptr)))
+        return;
+    Common::RewriteEventVar(args, EventVar::NOEFFECT_FLAG, true, nullptr);
+    Common::RewriteEventVar(args, EventVar::GEN_FLAG, true, nullptr);
+    auto *desc = (Section_FromEvent_AddViewEffect_Description_o *)
+            il2cpp_object_new(Section_FromEvent_AddViewEffect_Description_TypeInfo);
+    desc->ctor(nullptr);
+    desc->fields.effectNo = 0xba;
+    desc->fields.pos_from = Common::PokeIDtoPokePos(args, &pokeID, nullptr);
+    desc->fields.pos_to = 5;
+    desc->fields.isMessageWindowVanish = true;
+    Common::AddViewEffect(args, &desc, nullptr);
+    auto *sp = (StrParam_o *)Common::GetEventVarAddress(args, EventVar::WORK_ADRS, nullptr);
+    sp->Setup(2, 0x2c2, nullptr);
+    sp->AddArg(pokeID, nullptr);
+}
+// Max Moves
+uint8_t Pml_WazaData_WazaDataSystem_GetGPower(int32_t id,MethodInfo *method) {
+    return WazaDataSystem::GetPower(id, nullptr);
+}
+bool HandlerMaxMoveIsPowerEffect(BTL_POKEPARAM_o *bpp, uint8_t type) {
+    return (bpp->GetMonsNo(nullptr) == RILLABOOM && bpp->fields.m_formNo == 1 && type == GRASS) ||
+           (bpp->GetMonsNo(nullptr) == CINDERACE && bpp->fields.m_formNo == 1 && type == FIRE) ||
+           (bpp->GetMonsNo(nullptr) == INTELEON && bpp->fields.m_formNo == 1 && type == WATER);
+}
+void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, pokeID, nullptr);
+    uint16_t dexID = bpp->GetMonsNo(nullptr);
+    uint16_t formID = bpp->fields.m_formNo;
+    uint8_t gShockEffect = GShock_Effect::NONE;
+    uint8_t type = Common::GetEventVar(args, EventVar::WAZA_TYPE, nullptr);
+    if (HandlerMaxMoveIsPowerEffect(bpp, type)) return;
+    if (HandlerMaxMoveIsMaxGuardBypass(bpp, type)) return;
+    switch (type) {
+        case FIRE:
+            gShockEffect = GShock_Effect::WEATHER_SHINE;
+            if (dexID == CHARIZARD && formID == 3)
+                gShockEffect = GShock_Effect::SIDE_HONOO;
+            if (dexID == CENTISKORCH && formID == 1)
+                gShockEffect = GShock_Effect::HONOONOUZU;
+            break;
+        case BUG:
+            gShockEffect = GShock_Effect::RANKDOWN_SPATK;
+            if (dexID == BUTTERFREE && formID == 1)
+                gShockEffect = GShock_Effect::SICK_DOKU_MAHI_NEMURI;
+            break;
+        case ELECTRIC:
+            gShockEffect = GShock_Effect::FIELD_ELEC;
+            if (dexID == PIKACHU && formID == 16)
+                gShockEffect = GShock_Effect::SICK_MAHI;
+            if (dexID == TOXTRICITY &&
+            (formID == 2 || formID == 3))
+                gShockEffect = GShock_Effect::SICK_DOKU_MAHI;
+            break;
+        case NORMAL:
+            gShockEffect = GShock_Effect::RANKDOWN_AGI;
+            if (dexID == EEVEE && formID == 2)
+                gShockEffect = GShock_Effect::SICK_MEROMERO;
+            if (dexID == MEOWTH && formID == 3)
+                gShockEffect = GShock_Effect::NEKONIKOBAN;
+            if (dexID == SNORLAX && formID == 1)
+                gShockEffect = GShock_Effect::SYUUKAKU;
+            break;
+        case FIGHTING:
+            gShockEffect = GShock_Effect::RANKUP_ATK;
+            if (dexID == MACHAMP && formID == 1)
+                gShockEffect = GShock_Effect::RANKUP_CRITICAL;
+            break;
+        case GHOST:
+            gShockEffect = GShock_Effect::RANKDOWN_DEF;
+            if (dexID == GENGAR && formID == 2)
+                gShockEffect = GShock_Effect::TOOSENBOU;
+            break;
+        case ICE:
+            gShockEffect = GShock_Effect::WEATHER_SNOW;
+            if (dexID == LAPRAS && formID == 1)
+                gShockEffect = GShock_Effect::AURORAVEIL;
+            break;
+        case POISON:
+            gShockEffect = GShock_Effect::RANKUP_SPATK;
+            if (dexID == GARBODOR && formID == 1)
+                gShockEffect = GShock_Effect::SICK_DOKU;
+            break;
+        case WATER:
+            gShockEffect = GShock_Effect::WEATHER_RAIN;
+            if (dexID == KINGLER && formID == 1)
+                gShockEffect = GShock_Effect::RANKDOWN_AGI2;
+            if (dexID == DREDNAW && formID == 1)
+                gShockEffect = GShock_Effect::STEALTHROCK;
+            if (dexID == BLASTOISE && formID == 2) {
+                uint8_t targetPokeID = Common::GetEventVar(args, EventVar::POKEID_TARGET1, nullptr);
+                HandlerAddSideEffect(args, pokeID, G_MAX_CANNONADE_SIDE,
+                                     Common::PokeIDtoSide(args, &targetPokeID, nullptr),
+                                     SICKCONT::MakeTurn(pokeID, 4, nullptr));
+                return;
+            }
+            break;
+        case FLYING:
+            gShockEffect = GShock_Effect::RANKUP_AGI;
+            if (dexID == CORVIKNIGHT && formID == 1)
+                gShockEffect = GShock_Effect::KIRIBARAI;
+            break;
+        case FAIRY:
+            gShockEffect = GShock_Effect::FIELD_MIST;
+            if (dexID == HATTERENE && formID == 1)
+                gShockEffect = GShock_Effect::SICK_KONRAN;
+            if (dexID == ALCREMIE && formID == 63)
+                gShockEffect = GShock_Effect::RECOVER_HP;
+            break;
+        case DRAGON:
+            gShockEffect = GShock_Effect::RANKDOWN_ATK;
+            if (dexID == DURALUDON && formID == 1)
+                gShockEffect = GShock_Effect::DECREMENT_PP;
+            break;
+        case PSYCHIC:
+            gShockEffect = GShock_Effect::FIELD_PSYCO;
+            if (dexID == ORBEETLE && formID == 1)
+                gShockEffect = GShock_Effect::JURYOKU;
+            break;
+        case ROCK:
+            gShockEffect = GShock_Effect::WEATHER_SAND;
+            if (dexID == COALOSSAL && formID == 1)
+                gShockEffect = GShock_Effect::SIDE_IWA;
+            break;
+        case GROUND:
+            gShockEffect = GShock_Effect::RANKUP_SPDEF;
+            if (dexID == SANDACONDA && formID == 1)
+                gShockEffect = GShock_Effect::SUNAZIGOKU;
+            break;
+        case DARK:
+            gShockEffect = GShock_Effect::RANKDOWN_SPDEF;
+            if (dexID == GRIMMSNARL && formID == 1)
+                gShockEffect = GShock_Effect::AKUBI;
+            break;
+        case GRASS:
+            gShockEffect = GShock_Effect::FIELD_GRASS;
+            if (dexID == FLAPPLE && formID == 1)
+                gShockEffect = GShock_Effect::RANKDOWN_AVOID;
+            if (dexID == APPLETUN && formID == 1)
+                gShockEffect = GShock_Effect::CURE_SICK;
+            if (dexID == VENUSAUR && formID == 2) {
+                uint8_t targetPokeID = Common::GetEventVar(args, EventVar::POKEID_TARGET1, nullptr);
+                HandlerAddSideEffect(args, pokeID, G_MAX_VINE_LASH_SIDE,
+                                     Common::PokeIDtoSide(args, &targetPokeID, nullptr),
+                                     SICKCONT::MakeTurn(pokeID, 4, nullptr));
+                return;
+            }
+            break;
+        case STEEL:
+            gShockEffect = GShock_Effect::RANKUP_DEF;
+            if (dexID == MELMETAL && formID == 1)
+                gShockEffect = GShock_Effect::ICHAMON;
+            if (dexID == COPPERAJAH && formID == 1)
+                gShockEffect = GShock_Effect::STEALTHROCK_HAGANE;
+            break;
+        default:
+            return;
+    }
+    system_load_typeinfo((void *)0x7823);
+    auto *param = (GShockEffectParam_SetupParam_o *) il2cpp_object_new(GShockEffectParam_SetupParam_TypeInfo);
+    param->ctor(nullptr);
+    param->fields.pMainModule = (*args)->fields.pMainModule;
+    param->fields.pBattleEnv = (*args)->fields.pBattleEnv;
+    param->fields.pActionDesc = Common::SearchByPokeID(args, pokeID, true, true, nullptr)->
+            fields.actionDesc;
+    param->fields.pAttaker = Common::GetPokeParam(args, pokeID, nullptr);
+    param->fields.pDefender =
+            Common::GetPokeParam(args, Common::GetEventVar(args, EventVar::POKEID_TARGET1, nullptr),
+                                 nullptr);
+    param->fields.gShockEffect = gShockEffect;
+    auto *pEffectParam = (GShockEffectParam_o *) il2cpp_object_new(GShockEffectParam_TypeInfo);
+    pEffectParam->ctor(&param, nullptr);
+    (*args)->fields.pSectionContainer->fields.m_section_GShockWave->applyEffect(pEffectParam, nullptr);
+}
+void HandlerMaxMoveWazaPowerBase(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, pokeID, nullptr);
+    if (!HandlerMaxMoveIsPowerEffect(bpp, Common::GetEventVar(args, EventVar::WAZA_TYPE, nullptr)))
+        return;
+    Common::RewriteEventVar(args, EventVar::WAZA_POWER, 160, nullptr);
+}
+void HandlerMaxMoveWazaseqStart(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, pokeID, nullptr);
+    if (!HandlerMaxMoveIsPowerEffect(bpp, WAZADATA::GetType(Common::GetEventVar(args, EventVar::WAZAID,
+                                                                                nullptr), nullptr)))
+        return;
+    Waza::handler_MeteorDrive_WazaSeqStart(args, pokeID, nullptr);
+}
+void HandlerMaxMoveWazaseqEnd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, pokeID, nullptr);
+    if (!HandlerMaxMoveIsPowerEffect(bpp, WAZADATA::GetType(Common::GetEventVar(args, EventVar::WAZAID,
+                                                                                nullptr), nullptr)))
+        return;
+    Waza::handler_MeteorDrive_WazaSeqEnd(args, pokeID, nullptr);
 }
 
 EventFactor_EventHandlerTable_o * CreateMoveEventHandler(uint16_t eventID, Il2CppMethodPointer methodPointer) {
@@ -1443,6 +1622,16 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_SparklySwirl(MethodInfo *
     }
     return sHandlerTableSparklySwirl;
 }
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_MaxMove(MethodInfo *method) {
+    if (sHandlerTableMaxMove == nullptr) {
+        sHandlerTableMaxMove = CreateEventHandlerTable(4);
+        sHandlerTableMaxMove->m_Items[0] = CreateMoveEventHandler(EventID::DAMAGEPROC_END_HIT_REAL, (Il2CppMethodPointer) &HandlerMaxMoveDamageprocEndHitReal);
+        sHandlerTableMaxMove->m_Items[1] = CreateMoveEventHandler(EventID::WAZA_POWER_BASE, (Il2CppMethodPointer) &HandlerMaxMoveWazaPowerBase);
+        sHandlerTableMaxMove->m_Items[2] = CreateMoveEventHandler(EventID::WAZASEQ_START, (Il2CppMethodPointer) &HandlerMaxMoveWazaseqStart);
+        sHandlerTableMaxMove->m_Items[3] = CreateMoveEventHandler(EventID::WAZASEQ_END, (Il2CppMethodPointer) &HandlerMaxMoveWazaseqEnd);
+    }
+    return sHandlerTableMaxMove;
+}
 
 // Adds an entry to GET_FUNC_TABLE
 void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTable, uint32_t * idx, int32_t wazaNo, Il2CppMethodPointer methodPointer) {
@@ -1456,7 +1645,7 @@ void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTab
 }
 
 // Remember to update when adding handlers
-constexpr uint32_t NEW_MOVES_COUNT = 53;
+constexpr uint32_t NEW_MOVES_COUNT = 71;
 
 // Entry point. Replaces system_array_new.
 void * Waza_system_array_new(void * typeInfo, uint32_t len) {
@@ -1524,6 +1713,26 @@ void * Waza_system_array_new(void * typeInfo, uint32_t len) {
     SetMoveFunctionTable(getFuncTable, &idx, FREEZY_FROST, (Il2CppMethodPointer) &ADD_FreezyFrost);
     SetMoveFunctionTable(getFuncTable, &idx, SPARKLY_SWIRL, (Il2CppMethodPointer) &ADD_SparklySwirl);
     SetMoveFunctionTable(getFuncTable, &idx, VEEVEE_VOLLEY, (Il2CppMethodPointer) &ADD_Return);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_FLARE, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_FLUTTERBY, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_LIGHTNING, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_STRIKE, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_KNUCKLE, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_PHANTASM, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_HAILSTORM, (Il2CppMethodPointer) &ADD_MaxMove);
+    //60
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_OOZE, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_GEYSER, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_AIRSTREAM, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_STARFALL, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_WYRMWIND, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_MINDSTORM, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_ROCKFALL, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_QUAKE, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_DARKNESS, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_OVERGROWTH, (Il2CppMethodPointer) &ADD_MaxMove);
+    //70
+    SetMoveFunctionTable(getFuncTable, &idx, MAX_STEELSPIKE, (Il2CppMethodPointer) &ADD_MaxMove);
 
     socket_log_fmt("%i/%i move HandlerGetFunc delegates added", NEW_MOVES_COUNT, idx - len);
 
@@ -1715,7 +1924,8 @@ bool Dpr_Battle_Logic_BTL_CLIENT_is_unselectable_waza(BTL_CLIENT_o *bc, BTL_POKE
         return SetupBTLV_STRPARAM(strParam, 0x4b4, 2, args, sizeof(args) / sizeof(*args));
     }
     if ((*fldSim)->CheckEffect(3, nullptr) && !bpp->IsGMode(nullptr) &&
-        bc->fields.m_fldSim->CheckFuin(&bc->fields.m_mainModule, bc->fields.m_pBattleEnv->fields.m_pokecon, bpp, waza,
+        bc->fields.m_fldSim->CheckFuin(&bc->fields.m_mainModule,
+                                       bc->fields.m_pBattleEnv->fields.m_pokecon, bpp, waza,
                                        nullptr)) {
         int32_t args[] = { bpp->GetID(nullptr), waza };
         return SetupBTLV_STRPARAM(strParam, 0x31a, 2, args, sizeof(args) / sizeof(*args));

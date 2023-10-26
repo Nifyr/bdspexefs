@@ -11,6 +11,7 @@
 #include "Section_CureSick.hpp"
 #include "Section_FieldEffect_Add.hpp"
 #include "Section_FreeFall_Release.hpp"
+#include "Section_FromEvent_AddViewEffect.hpp"
 #include "Section_FromEvent_ChangePokeType.hpp"
 #include "Section_FromEvent_ConsumeItem.hpp"
 #include "Section_FromEvent_Damage.hpp"
@@ -37,6 +38,7 @@ namespace Dpr
                 static bool AddPosEffect(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_PosEffect_Add_Description_o **desc, MethodInfo *method);
                 static bool AddSick(EventFactor_EventHandlerArgs_o **args, Section_AddSick_Description_o **desc,MethodInfo *method);
                 static bool AddSideEffect(EventFactor_EventHandlerArgs_o **args, Section_SideEffect_Add_Description_o **desc, MethodInfo *method);
+                static void AddViewEffect(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_AddViewEffect_Description_o **desc, MethodInfo *method);
                 static bool ChangeType(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_ChangePokeType_Description_o **desc, MethodInfo *method);
                 static bool CheckFieldEffect(EventFactor_EventHandlerArgs_o **args, int32_t *effType, MethodInfo *method);
                 static bool CheckItemUsable(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
@@ -64,6 +66,7 @@ namespace Dpr
                 static BTL_POKEPARAM_o * GetPokeParam(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                 static uint16_t GetSubID(EventFactor_EventHandlerArgs_o **args,MethodInfo *method);
                 static int32_t GetWorkValue(EventFactor_EventHandlerArgs_o **args, uint8_t workIdx, MethodInfo *method);
+                static bool IsExistPoke(EventFactor_EventHandlerArgs_o **args, uint8_t *pokeID, MethodInfo *method);
                 static bool IsFriendPokeID(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID1, uint8_t pokeID2, MethodInfo *method);
                 static void Message(EventFactor_EventHandlerArgs_o ** args, Section_FromEvent_Message::Description_o ** desc, MethodInfo * method);
                 static void MulEventVar(EventFactor_EventHandlerArgs_o **args, uint16_t label, int32_t value, MethodInfo *method);

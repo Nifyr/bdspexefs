@@ -24,6 +24,14 @@
 181df60:
     b Dpr_Battle_Logic_Handler_Waza_handler_InisieNoUta
 
+// Handler.Waza$$handler_DaiWall_NoEffectCheck
+1828030:
+    b Dpr_Battle_Logic_Handler_Waza_handler_DaiWall_NoEffectCheck
+
+// WazaDataSystem$$GetGPower
+205aeb0:
+    b Pml_WazaData_WazaDataSystem_GetGPower
+
 // BTL_CLIENT$$is_unselectable_waza
 1f54b40:
     b Dpr_Battle_Logic_BTL_CLIENT_is_unselectable_waza
@@ -105,6 +113,10 @@
 // Section_TurnCheck_Field$$Execute
 2170b2c:
     cmp w20, #0xf
+
+// Handler.Side$$.cctor
+193cbe4:
+    bl Side_system_array_new
 
 // Side$$handler_side_Omajinai
 1939c40:
