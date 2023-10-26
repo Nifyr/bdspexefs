@@ -84,6 +84,32 @@ void Dpr_Battle_Logic_Handler_Side_handler_SpotLight_TemptTarget(EventFactor_Eve
                             nullptr);
     Common::RewriteEventVar(args, EventVar::TEMPT_TARGET_CAUSE, OTHER_TEMPT_TARGET_CAUSE, nullptr);
 }
+// G-Max Wildfire
+void Dpr_Battle_Logic_Handler_Side_handler_side_GShock_Honoo(EventFactor_EventHandlerArgs_o **args, uint8_t mySide, MethodInfo *method) {
+    uint8_t pokeID = Common::GetEventVar(args, EventVar::POKEID, nullptr);
+    if (pokeID == NULL_POKEID) return;
+    if (!Common::IsExistPoke(args, &pokeID, nullptr)) return;
+    if (Common::CheckShowDown(args, nullptr)) return;
+    if (Common::PokeIDtoSide(args, &pokeID, nullptr) != mySide) return;
+    BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, pokeID, nullptr);
+    if (bpp->IsMatchType(FIRE, nullptr)) return;
+    HandlerDamage(args, NULL_POKEID, pokeID,
+                  Calc::QuotMaxHP(bpp, 6, true, nullptr), false,
+                  false);
+}
+// G-Max Volcalith
+void Dpr_Battle_Logic_Handler_Side_handler_side_GShock_Iwa(EventFactor_EventHandlerArgs_o **args, uint8_t mySide, MethodInfo *method) {
+    uint8_t pokeID = Common::GetEventVar(args, EventVar::POKEID, nullptr);
+    if (pokeID == NULL_POKEID) return;
+    if (!Common::IsExistPoke(args, &pokeID, nullptr)) return;
+    if (Common::CheckShowDown(args, nullptr)) return;
+    if (Common::PokeIDtoSide(args, &pokeID, nullptr) != mySide) return;
+    BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, pokeID, nullptr);
+    if (bpp->IsMatchType(ROCK, nullptr)) return;
+    HandlerDamage(args, NULL_POKEID, pokeID,
+                  Calc::QuotMaxHP(bpp, 6, true, nullptr), false,
+                  false);
+}
 // G-Max Cannonade
 void HandlerGMaxCannonadeSideTurncheckBegin(EventFactor_EventHandlerArgs_o **args, uint8_t mySide, MethodInfo *method) {
     uint8_t pokeID = Common::GetEventVar(args, EventVar::POKEID, nullptr);
@@ -143,16 +169,18 @@ void SetSideFunctionTable(System::Array<Side_GET_FUNC_TABLE_ELEM_o> * getFuncTab
 }
 
 // Remember to update when adding handlers
-constexpr uint32_t NEW_SIDE_EFFECT_COUNT = 0;
+constexpr uint32_t NEW_SIDE_EFFECTS_COUNT = 2;
 
 // Entry point. Replaces system_array_new.
 void * Side_system_array_new(void * typeInfo, uint32_t len) {
-    auto * getFuncTable = (System::Array<Side_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_SIDE_EFFECT_COUNT);
+    auto * getFuncTable = (System::Array<Side_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_SIDE_EFFECTS_COUNT);
     uint32_t idx = len;
 
     //0
     SetSideFunctionTable(getFuncTable, &idx, G_MAX_CANNONADE_SIDE, (Il2CppMethodPointer) &ADD_GMaxCannonadeSide);
     SetSideFunctionTable(getFuncTable, &idx, G_MAX_VINE_LASH_SIDE, (Il2CppMethodPointer) &ADD_GMaxVineLashSide);
+
+    socket_log_fmt("%i/%i side HandlerGetFunc delegates added", NEW_SIDE_EFFECTS_COUNT, idx - len);
 
     return getFuncTable;
 }

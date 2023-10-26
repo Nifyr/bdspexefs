@@ -26,6 +26,7 @@
 
 #include "il2cpp-api.h"
 #include "il2cpp.hpp"
+#include "logger.hpp"
 #include "System/Array.hpp"
 #include "util.hpp"
 
@@ -148,9 +149,6 @@ constexpr uint32_t ICE = 14;
 constexpr uint32_t DRAGON = 15;
 constexpr uint32_t DARK = 16;
 constexpr uint32_t FAIRY = 17;
-
-// Remember to update when adding handlers
-const uint32_t NEW_ABILITIES_COUNT = 18;
 
 // HandlerTables
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableZenMode;//0
@@ -958,12 +956,16 @@ void SetAbilityFunctionTable(System::Array<Tokusei_GET_FUNC_TABLE_ELEM_o> * getF
     *idx += 1;
 }
 
+// Remember to update when adding handlers
+const uint32_t NEW_ABILITIES_COUNT = 18;
+
 //Entry point. Replaces system_array_new.
 void * Tokusei_system_array_new(void * typeInfo, uint32_t len)
 {
     System::Array<Tokusei_GET_FUNC_TABLE_ELEM_o> * getFuncTable = (System::Array<Tokusei_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_ABILITIES_COUNT);
     uint32_t idx = len;
 
+    //0
     SetAbilityFunctionTable(getFuncTable, &idx, ZEN_MODE, (Il2CppMethodPointer) &ADD_ZenMode);
     SetAbilityFunctionTable(getFuncTable, &idx, STANCE_CHANGE, (Il2CppMethodPointer) &ADD_StanceChange);
     SetAbilityFunctionTable(getFuncTable, &idx, SHIELDS_DOWN, (Il2CppMethodPointer) &ADD_ShieldsDown);
@@ -974,6 +976,7 @@ void * Tokusei_system_array_new(void * typeInfo, uint32_t len)
     SetAbilityFunctionTable(getFuncTable, &idx, GULP_MISSILE, (Il2CppMethodPointer) &ADD_GulpMissile);
     SetAbilityFunctionTable(getFuncTable, &idx, ICE_FACE, (Il2CppMethodPointer) &ADD_IceFace);
     SetAbilityFunctionTable(getFuncTable, &idx, HUNGER_SWITCH, (Il2CppMethodPointer) &ADD_HungerSwitch);
+    //10
     SetAbilityFunctionTable(getFuncTable, &idx, QUICK_DRAW, (Il2CppMethodPointer) &ADD_QuickDraw);
     SetAbilityFunctionTable(getFuncTable, &idx, CURIOUS_MEDICINE, (Il2CppMethodPointer) &ADD_CuriousMedicine);
     SetAbilityFunctionTable(getFuncTable, &idx, TRANSISTOR, (Il2CppMethodPointer) &ADD_Transistor);
@@ -982,6 +985,9 @@ void * Tokusei_system_array_new(void * typeInfo, uint32_t len)
     SetAbilityFunctionTable(getFuncTable, &idx, GRIM_NEIGH, (Il2CppMethodPointer) &ADD_GrimNeigh);
     SetAbilityFunctionTable(getFuncTable, &idx, AS_ONE0, (Il2CppMethodPointer) &ADD_AsOne0);
     SetAbilityFunctionTable(getFuncTable, &idx, AS_ONE1, (Il2CppMethodPointer) &ADD_AsOne1);
+
+    socket_log_initialize();
+    socket_log_fmt("%i/%i ability HandlerGetFunc delegates added", NEW_ABILITIES_COUNT, idx - len);
 
     return getFuncTable;
 }

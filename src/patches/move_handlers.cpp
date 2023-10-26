@@ -1096,6 +1096,7 @@ void HandlerSparklySwirlDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **ar
 }
 // Max Guard
 bool HandlerMaxMoveIsMaxGuardBypass(BTL_POKEPARAM_o *bpp, uint8_t type) {
+    return type == DARK; // Test
     return (bpp->GetMonsNo(nullptr) == URSHIFU && bpp->fields.m_formNo == 2 && type == DARK) ||
            (bpp->GetMonsNo(nullptr) == URSHIFU && bpp->fields.m_formNo == 3 && type == WATER);
 }
@@ -1128,6 +1129,7 @@ uint8_t Pml_WazaData_WazaDataSystem_GetGPower(int32_t id,MethodInfo *method) {
     return WazaDataSystem::GetPower(id, nullptr);
 }
 bool HandlerMaxMoveIsPowerEffect(BTL_POKEPARAM_o *bpp, uint8_t type) {
+    return type == GRASS; // Test
     return (bpp->GetMonsNo(nullptr) == RILLABOOM && bpp->fields.m_formNo == 1 && type == GRASS) ||
            (bpp->GetMonsNo(nullptr) == CINDERACE && bpp->fields.m_formNo == 1 && type == FIRE) ||
            (bpp->GetMonsNo(nullptr) == INTELEON && bpp->fields.m_formNo == 1 && type == WATER);
@@ -1144,7 +1146,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
     switch (type) {
         case FIRE:
             gShockEffect = GShock_Effect::WEATHER_SHINE;
-            if (dexID == CHARIZARD && formID == 3)
+            if (dexID == CHARIZARD && formID == 3 || true) // Test
                 gShockEffect = GShock_Effect::SIDE_HONOO;
             if (dexID == CENTISKORCH && formID == 1)
                 gShockEffect = GShock_Effect::HONOONOUZU;
@@ -1158,8 +1160,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
             gShockEffect = GShock_Effect::FIELD_ELEC;
             if (dexID == PIKACHU && formID == 16)
                 gShockEffect = GShock_Effect::SICK_MAHI;
-            if (dexID == TOXTRICITY &&
-            (formID == 2 || formID == 3))
+            if (dexID == TOXTRICITY && (formID == 2 || formID == 3))
                 gShockEffect = GShock_Effect::SICK_DOKU_MAHI;
             break;
         case NORMAL:
@@ -1183,7 +1184,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
             break;
         case ICE:
             gShockEffect = GShock_Effect::WEATHER_SNOW;
-            if (dexID == LAPRAS && formID == 1)
+            if (dexID == LAPRAS && formID == 1 || true) // Test
                 gShockEffect = GShock_Effect::AURORAVEIL;
             break;
         case POISON:
@@ -1197,7 +1198,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
                 gShockEffect = GShock_Effect::RANKDOWN_AGI2;
             if (dexID == DREDNAW && formID == 1)
                 gShockEffect = GShock_Effect::STEALTHROCK;
-            if (dexID == BLASTOISE && formID == 2) {
+            if (dexID == BLASTOISE && formID == 2 || true) { // Test
                 uint8_t targetPokeID = Common::GetEventVar(args, EventVar::POKEID_TARGET1, nullptr);
                 HandlerAddSideEffect(args, pokeID, G_MAX_CANNONADE_SIDE,
                                      Common::PokeIDtoSide(args, &targetPokeID, nullptr),
@@ -1214,7 +1215,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
             gShockEffect = GShock_Effect::FIELD_MIST;
             if (dexID == HATTERENE && formID == 1)
                 gShockEffect = GShock_Effect::SICK_KONRAN;
-            if (dexID == ALCREMIE && formID == 63)
+            if (dexID == ALCREMIE && formID == 63 || true) // Test
                 gShockEffect = GShock_Effect::RECOVER_HP;
             break;
         case DRAGON:
@@ -1229,7 +1230,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
             break;
         case ROCK:
             gShockEffect = GShock_Effect::WEATHER_SAND;
-            if (dexID == COALOSSAL && formID == 1)
+            if (dexID == COALOSSAL && formID == 1 || true) // Test
                 gShockEffect = GShock_Effect::SIDE_IWA;
             break;
         case GROUND:
@@ -1260,7 +1261,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
             gShockEffect = GShock_Effect::RANKUP_DEF;
             if (dexID == MELMETAL && formID == 1)
                 gShockEffect = GShock_Effect::ICHAMON;
-            if (dexID == COPPERAJAH && formID == 1)
+            if (dexID == COPPERAJAH && formID == 1 || true) // Test
                 gShockEffect = GShock_Effect::STEALTHROCK_HAGANE;
             break;
         default:
@@ -1652,8 +1653,6 @@ void * Waza_system_array_new(void * typeInfo, uint32_t len) {
     auto * getFuncTable = (System::Array<Waza_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_MOVES_COUNT);
     uint32_t idx = len;
 
-    socket_log_initialize();
-
     //0
     SetMoveFunctionTable(getFuncTable, &idx, JUMP_KICK, (Il2CppMethodPointer) &ADD_JumpKick);
     SetMoveFunctionTable(getFuncTable, &idx, SONIC_BOOM, (Il2CppMethodPointer) &ADD_SonicBoom);
@@ -1734,6 +1733,7 @@ void * Waza_system_array_new(void * typeInfo, uint32_t len) {
     //70
     SetMoveFunctionTable(getFuncTable, &idx, MAX_STEELSPIKE, (Il2CppMethodPointer) &ADD_MaxMove);
 
+    socket_log_initialize();
     socket_log_fmt("%i/%i move HandlerGetFunc delegates added", NEW_MOVES_COUNT, idx - len);
 
     return getFuncTable;

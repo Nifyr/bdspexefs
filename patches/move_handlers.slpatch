@@ -32,6 +32,10 @@
 205aeb0:
     b Pml_WazaData_WazaDataSystem_GetGPower
 
+// Section_GShockWave$$effect_AuroraVeil
+1fba4a4:
+    mov w5, #0xea
+
 // BTL_CLIENT$$is_unselectable_waza
 1f54b40:
     b Dpr_Battle_Logic_BTL_CLIENT_is_unselectable_waza
@@ -118,6 +122,38 @@
 193cbe4:
     bl Side_system_array_new
 
+// SideEffectManager$$.ctor
+1f70db0:
+    mov w1, #0x20
+
+// SideEffectManager$$CopyFrom
+1f711c0:
+    cmp x8, #0x24
+1f71248:
+    cmp x8, #0x24
+
+// SideEffectManager$$CreateEffectStatusArray
+1f70f10:
+    cmp x27, #0x20
+1f70fd0:
+    cmp x28, #0x120
+
+// SideEffectManager$$DeleteEffectStatusArray
+1f710f0:
+    cmp x20, #0x20
+1f71138:
+    cmp x21, #0x120
+
+// SideEffectManager$$GetSideEffectStatusConst
+1f716a4:
+    cmp w19, #0x1f
+
+// SideEffectManager$$RemoveAllSideEffect
+1f712dc:
+    cmp w20, #0x20
+1f71330:
+    cmp w20, #0x20
+
 // Side$$handler_side_Omajinai
 1939c40:
     b Dpr_Battle_Logic_Handler_Side_handler_side_Omajinai
@@ -125,3 +161,11 @@
 // Side$$handler_SpotLight_TemptTarget
 193bd10:
     b Dpr_Battle_Logic_Handler_Side_handler_SpotLight_TemptTarget
+
+// Handler.Side$$handler_side_GShock_Honoo
+193c4a0:
+    b Dpr_Battle_Logic_Handler_Side_handler_side_GShock_Honoo
+
+// Handler.Side$$handler_side_GShock_Iwa
+193c850:
+    b Dpr_Battle_Logic_Handler_Side_handler_side_GShock_Iwa

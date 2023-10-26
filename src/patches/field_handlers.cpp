@@ -7,6 +7,7 @@
 
 #include "il2cpp-api.h"
 #include "il2cpp.hpp"
+#include "logger.hpp"
 #include "System/Array.hpp"
 #include "util.hpp"
 
@@ -88,22 +89,25 @@ void SetFieldFunctionTable(System::Array<Field_GET_FUNC_TABLE_ELEM_o> * getFuncT
 }
 
 // Remember to update when adding handlers
-constexpr uint32_t NEW_FIELD_EFFECT_COUNT = 2;
+constexpr uint32_t NEW_FIELD_EFFECTS_COUNT = 2;
 
 // Entry point. Replaces system_array_new.
 void * Field_system_array_new(void * typeInfo, uint32_t len) {
-    auto * getFuncTable = (System::Array<Field_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_FIELD_EFFECT_COUNT);
+    auto * getFuncTable = (System::Array<Field_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_FIELD_EFFECTS_COUNT);
     uint32_t idx = len;
 
     //0
     SetFieldFunctionTable(getFuncTable, &idx, MUD_SPORT_FIELD, (Il2CppMethodPointer) &ADD_MudSportField);
     SetFieldFunctionTable(getFuncTable, &idx, WATER_SPORT_FIELD, (Il2CppMethodPointer) &ADD_WaterSportField);
 
+    socket_log_initialize();
+    socket_log_fmt("%i/%i field HandlerGetFunc delegates added", NEW_FIELD_EFFECTS_COUNT, idx - len);
+
     return getFuncTable;
 }
 
 void Dpr_Battle_Logic_FieldStatus_initWork(FieldStatus_o *__this, MethodInfo *method) {
-    for (uint32_t i = 0; i < 10 + NEW_FIELD_EFFECT_COUNT; ++i)
+    for (uint32_t i = 0; i < 10 + NEW_FIELD_EFFECTS_COUNT; ++i)
         __this->clearFactorWork((int32_t)i, nullptr);
     __this->fields.m_data->fields.weather = 0;
     __this->fields.m_data->fields.weatherTurn = 255;
