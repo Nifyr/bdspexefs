@@ -36,6 +36,7 @@
 #include "Dpr/Battle/Logic/Section_GShockWave.hpp"
 #include "Dpr/Battle/Logic/Section_InterruptAction.hpp"
 #include "Dpr/Battle/Logic/Section_ProcessActionCore.hpp"
+#include "Dpr/Battle/Logic/Section_RecoverHP.hpp"
 #include "Dpr/Battle/Logic/SICKCONT.hpp"
 #include "Dpr/Battle/Logic/Tables.hpp"
 #include "Dpr/Battle/Logic/WAZADATA.hpp"
@@ -1519,12 +1520,21 @@ void HandlerTripleAxelWazaPowerBase(EventFactor_EventHandlerArgs_o **args, uint8
 void HandlerJungleHealingUncategorizeWaza(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
     int32_t targetCount = Common::GetEventVar(args, EventVar::TARGET_POKECNT, nullptr);
+    system_load_typeinfo((void *)0x4b47);
     for (int32_t i = 0; i < targetCount; ++i) {
         uint8_t targetPokeID = Common::GetEventVar(args, 6 + i, nullptr);
+        auto *desc = (Section_RecoverHP_Description_o *)
+                il2cpp_object_new(Section_RecoverHP_Description_TypeInfo);
+        desc->ctor(nullptr);
+        desc->fields.userPokeID = pokeID;
+        desc->fields.targetPokeID = targetPokeID;
+        desc->fields.recoverHP = Calc::QuotMaxHP(Common::GetPokeParam(args, targetPokeID, nullptr),
+                                                 4, true, nullptr);
+        desc->fields.isSkipFailCheckSP = false;
+        Common::RecoverHP(args, &desc, nullptr);
         uint32_t sickID = Common::CheckPokeSick(args, targetPokeID, nullptr);
-        if (sickID == Sick::MAHI || sickID == Sick::NEMURI || sickID == Sick::KOORI || sickID == Sick::YAKEDO ||
-        sickID == Sick::DOKU)
-            HandlerCureSick(args, targetPokeID, WazaSick::WAZASICK_MAX, pokeID);
+        if (sickID != Sick::NONE)
+            HandlerCureSick(args, pokeID, (int32_t)sickID, targetPokeID);
     }
     Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
 }
@@ -1545,6 +1555,7 @@ void HandlerEerieSpellDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args
         if (volume == 0) continue;
         auto *desc = (Section_FromEvent_DecrementPP_Description_o *)
                 il2cpp_object_new(Section_FromEvent_DecrementPP_Description_TypeInfo);
+        desc->ctor(nullptr);
         desc->fields.pokeID = targetPokeID;
         desc->fields.wazaIdx = wazaIdx;
         desc->fields.volume = volume;

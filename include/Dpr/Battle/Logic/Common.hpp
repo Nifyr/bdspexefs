@@ -26,6 +26,7 @@
 #include "Section_FromEvent_SetItem.hpp"
 #include "Section_FromEvent_Shrink.hpp"
 #include "Section_FromEvent_SwapItem.hpp"
+#include "Section_RecoverHP.hpp"
 #include "Section_SideEffect_Add.hpp"
 
 namespace Dpr
@@ -78,6 +79,7 @@ namespace Dpr
                 static uint8_t PokeIDtoPokePos(EventFactor_EventHandlerArgs_o **args, uint8_t *pokeID, MethodInfo *method);
                 static int32_t PokeIDtoSide(EventFactor_EventHandlerArgs_o **args, uint8_t *pokeID, MethodInfo *method);
                 static bool RankEffect(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_RankEffect_Description_o **desc, MethodInfo *method);
+                static bool RecoverHP(EventFactor_EventHandlerArgs_o **args, Section_RecoverHP_Description_o **desc, MethodInfo *method);
                 static bool RemoveFieldEffect(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_FieldEffect_Remove_Description_o **desc, MethodInfo *method);
                 static bool RankReset(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_RankReset_Description_o **desc, MethodInfo *method);
                 static bool RewriteEventVar(EventFactor_EventHandlerArgs_o **args, uint16_t label, int32_t value, MethodInfo *method);
