@@ -14,7 +14,25 @@ namespace Dpr
         {
             struct BTL_POKEPARAM_CORE_PARAM_o;
             struct BTL_POKEPARAM_BASE_PARAM_o;
-            struct BTL_POKEPARAM_VARIABLE_PARAM_o;
+
+            struct BTL_POKEPARAM_VARIABLE_PARAM_c;
+
+            struct BTL_POKEPARAM_VARIABLE_PARAM_Fields {
+                int8_t attack;
+                int8_t defence;
+                int8_t sp_attack;
+                int8_t sp_defence;
+                int8_t agility;
+                int8_t hit;
+                int8_t avoid;
+            };
+
+            struct BTL_POKEPARAM_VARIABLE_PARAM_o {
+                BTL_POKEPARAM_VARIABLE_PARAM_c *klass;
+                void *monitor;
+                BTL_POKEPARAM_VARIABLE_PARAM_Fields fields;
+            };
+
             struct BTL_POKEPARAM_DORYOKU_PARAM_o;
             struct BTL_POKEPARAM_WAZA_SET_array;
             struct BTL_POKEPARAM_WAZADMG_REC_array_array;

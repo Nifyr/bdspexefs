@@ -15,14 +15,22 @@
 1d1cc90:
     b Dpr_Battle_Logic_EventLauncher_Event_WazaExecuteStart
 
+// Handler.Waza$$handler_DarkHole
+1822f80:
+    b Dpr_Battle_Logic_Handler_Waza_handler_DarkHole
+
 // Section_FromEvent_FreeFallStart$$Execute
 1fb4840:
     mov x1, x21
     mov x2, x22
 
-// Waza$$handler_InisieNoUta
+// Handler.Waza$$handler_InisieNoUta
 181df60:
     b Dpr_Battle_Logic_Handler_Waza_handler_InisieNoUta
+
+// Handler.Waza$$handler_IjigenRush
+1822b60:
+    b Dpr_Battle_Logic_Handler_Waza_handler_IjigenRush
 
 // Handler.Waza$$handler_DaiWall_NoEffectCheck
 1828030:
@@ -32,13 +40,45 @@
 205aeb0:
     b Pml_WazaData_WazaDataSystem_GetGPower
 
+// Section_GShockWave$$effect_Juryoku
+1fba990:
+    mov w8, #0xea
+
 // Section_GShockWave$$effect_AuroraVeil
 1fba4a4:
     mov w5, #0xea
 
+// Handler.Waza$$handler_AuraGuruma
+1822d10:
+    b Dpr_Battle_Logic_Handler_Waza_handler_AuraGuruma
+
+// Handler.Waza$$handler_AuraGuruma_Waza
+1822dd0:
+    b Dpr_Battle_Logic_Handler_Waza_handler_AuraGuruma_Waza
+
+// Section_CalcActionPriority$$calcWazaPriority
+21ad7a0:
+    b Dpr_Battle_Logic_Section_CalcActionPriority_calcWazaPriority
+
+// BTL_POKEPARAM$$RankUp
+1fe05e0:
+    b Dpr_Battle_Logic_BTL_POKEPARAM_RankUp
+
+// BTL_POKEPARAM$$RankDown
+1fe07a0:
+    b Dpr_Battle_Logic_BTL_POKEPARAM_RankDown
+
 // BTL_CLIENT$$is_unselectable_waza
 1f54b40:
     b Dpr_Battle_Logic_BTL_CLIENT_is_unselectable_waza
+
+// Handler.Tokusei$$handler_Simerike
+194fd10:
+    b Dpr_Battle_Logic_Handler_Tokusei_handler_Simerike
+
+// Handler.Tokusei$$handler_MegaLauncher_Pow
+195e950:
+    b Dpr_Battle_Logic_Handler_Tokusei_handler_MegaLauncher_Pow
 
 // Handler.Pos$$.cctor
 1937290:

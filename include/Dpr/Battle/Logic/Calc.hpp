@@ -12,6 +12,7 @@ namespace Dpr
         {
             struct Calc
             {
+                static uint32_t DamageBase(uint32_t wazaPower, uint32_t atkPower, uint32_t atkLevel, uint32_t defGuard, MethodInfo *method);
                 static uint32_t GetRand(uint32_t range, MethodInfo * method);
                 static bool IsOccurPer(uint32_t per, MethodInfo *method);
                 static bool ITEM_IsMail(uint16_t item,MethodInfo *method);

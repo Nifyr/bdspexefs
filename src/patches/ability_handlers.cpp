@@ -12,6 +12,7 @@
 #include "Dpr/Battle/Logic/Section.hpp"
 #include "Dpr/Battle/Logic/Section_CheckNotEffect_Guard.hpp"
 #include "Dpr/Battle/Logic/WAZADATA.hpp"
+#include "Dpr/Battle/Logic/WazaFailCause.hpp"
 #include "Dpr/Battle/Logic/WazaParam.hpp"
 #include "Pml/Personal/ParamID.hpp"
 #include "Pml/Personal/PersonalTableExtensions.hpp"
@@ -43,7 +44,7 @@ extern MethodInfo * Method_handler_TetunoKobusi;
 constexpr uint8_t A = 0;
 constexpr uint8_t B = 1;
 constexpr uint8_t C = 2;
-[[maybe_unused]] constexpr uint8_t D = 3;
+constexpr uint8_t D = 3;
 constexpr uint8_t PERSIST = 4;
 
 // AbilityIDs
@@ -73,9 +74,19 @@ constexpr uint32_t AS_ONE1 = 267;
 
 // MoveIDs
 constexpr uint32_t SURF = 57;
+constexpr uint32_t SELF_DESTRUCT = 120;
+constexpr uint32_t EXPLOSION = 153;
 constexpr uint32_t DIVE = 291;
+constexpr uint32_t WATER_PULSE = 352;
+constexpr uint32_t AURA_SPHERE = 396;
+constexpr uint32_t DARK_PULSE = 399;
+constexpr uint32_t DRAGON_PULSE = 406;
 constexpr uint32_t KINGS_SHIELD = 588;
 constexpr uint32_t WATER_SHURIKEN = 594;
+constexpr uint32_t ORIGIN_PULSE = 618;
+constexpr uint32_t MIND_BLOWN = 720;
+constexpr uint32_t MISTY_EXPLOSION = 802;
+constexpr uint32_t TERRAIN_PULSE = 805;
 
 // ItemIDs
 constexpr uint32_t FLAME_PLATE = 298;
@@ -303,6 +314,17 @@ void Dpr_Battle_Logic_Section_CheckNotEffect_Guard_check_Mamoru(Section_CheckNot
         defender = targets->SeekNext(nullptr);
     }
 }
+// Damp
+void Dpr_Battle_Logic_Handler_Tokusei_handler_Simerike(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    Common::SetWorkValue(args, A, false, nullptr);
+    uint16_t wazaID = Common::GetEventVar(args, EventVar::WAZAID, nullptr);
+    if (wazaID != SELF_DESTRUCT && wazaID != EXPLOSION && wazaID != MIND_BLOWN && wazaID != MISTY_EXPLOSION) return;
+    if (Common::GetEventVar(args, EventVar::FAIL_CAUSE, nullptr) != WazaFailCause::NONE) return;
+    Common::SetWorkValue(args, A, Common::RewriteEventVar(args, EventVar::FAIL_CAUSE,
+                                                          WazaFailCause::TOKUSEI, nullptr),
+                         nullptr);
+    Common::SetWorkValue(args, B, wazaID, nullptr);
+}
 // Forecast
 uint8_t HandlerForecastGetFormID(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {
     uint8_t formID = HighestMultiple(Common::GetPokeParam(args, pokeID, nullptr)->fields.m_formNo, 4);
@@ -455,6 +477,14 @@ void HandlerStanceChangeWazaCallDecide(EventFactor_EventHandlerArgs_o **args, ui
     if (nextForm >= PersonalSystem::GetPersonalData(bpp->GetMonsNo(nullptr), 0,
                                                     nullptr)->fields.form_max) return;
     HandlerFormChange(args, pokeID, nextForm, false, true, true);
+}
+// Mega Launcher
+void Dpr_Battle_Logic_Handler_Tokusei_handler_MegaLauncher_Pow(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    uint16_t wazaID = Common::GetEventVar(args, EventVar::WAZAID, nullptr);
+    if (wazaID != WATER_PULSE && wazaID != AURA_SPHERE && wazaID != DARK_PULSE && wazaID != DRAGON_PULSE &&
+    wazaID != ORIGIN_PULSE && wazaID != TERRAIN_PULSE) return;
+    Common::MulEventVar(args, EventVar::WAZA_POWER_RATIO, 0x1800, nullptr);
 }
 // Shields Down
 bool HandlerShieldsDownGetAddSickFail(BTL_POKEPARAM_o *bpp) {
@@ -638,7 +668,8 @@ void HandlerGulpMissileWazaDmgReaction(EventFactor_EventHandlerArgs_o **args, ui
                       true, true);
         if (formNo == HandlerGulpMissileGetFormID(formNo, 1))
             HandlerRankEffect(args, pokeID, pokeIDAtk, WazaRankEffect::DEFENCE,
-                              -1, false, false, true);
+                              -1, false, false, true,
+                              false);
         else
             HandlerAddSick(args, pokeID, pokeIDAtk, WazaSick::WAZASICK_MAHI,
                            Calc::MakeDefaultPokeSickCont(Sick::MAHI,
@@ -763,7 +794,8 @@ void HandlerChillingNeighDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **a
     uint32_t killCount = Common::GetKillCount(args, pokeID, nullptr);
     if (killCount == 0) return;
     HandlerRankEffect(args, pokeID, pokeID, WazaRankEffect::ATTACK,
-                      killCount, true, true, false);
+                      (int8_t )killCount, true, true, false,
+                      false);
 }
 // Grim Neigh
 void HandlerGrimNeighDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID,
@@ -772,7 +804,8 @@ void HandlerGrimNeighDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args,
     uint32_t killCount = Common::GetKillCount(args, pokeID, nullptr);
     if (killCount == 0) return;
     HandlerRankEffect(args, pokeID, pokeID, WazaRankEffect::SP_ATTACK,
-                      killCount, true, true, false);
+                      (int8_t )killCount, true, true, false,
+                      false);
 }
 
 EventFactor_EventHandlerTable_o * CreateAbilityEventHandler(uint16_t eventID, Il2CppMethodPointer methodPointer) {

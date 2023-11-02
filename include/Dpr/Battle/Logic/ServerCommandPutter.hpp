@@ -25,8 +25,10 @@ namespace Dpr
                 void *monitor;
                 ServerCommandPutter_Fields fields;
 
+                bool AddWazaHandler(uint8_t pokeID, int32_t waza, uint32_t subPri, MethodInfo *method);
                 void IncBattleCount(uint8_t counterID, MethodInfo *method);
                 void InsertWazaInfo(uint8_t pokeID, bool isTokuseiWindowDisplay, StrParam_o **message, MethodInfo *method);
+                void RemoveWazaHandler(uint8_t pokeID, int32_t waza, MethodInfo *method);
                 void SetBppCounter(BTL_POKEPARAM_o *poke, int32_t counterID, uint8_t value, MethodInfo *method);
                 void SetContFlag(BTL_POKEPARAM_o *poke, int32_t flag, MethodInfo *method);
             };

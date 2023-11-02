@@ -1,4 +1,5 @@
 #include "Dpr/Battle/Logic/ActionDesc.hpp"
+#include "Dpr/Battle/Logic/ActPri.hpp"
 #include "Dpr/Battle/Logic/BTL_CLIENT.hpp"
 #include "Dpr/Battle/Logic/BtlEscapeMode.hpp"
 #include "Dpr/Battle/Logic/BtlGround.hpp"
@@ -10,6 +11,7 @@
 #include "Dpr/Battle/Logic/EventID.hpp"
 #include "Dpr/Battle/Logic/EventVar.hpp"
 #include "Dpr/Battle/Logic/FieldStatus.hpp"
+#include "Dpr/Battle/Logic/GRightsManager.hpp"
 #include "Dpr/Battle/Logic/GShock.hpp"
 #include "Dpr/Battle/Logic/GWaza.hpp"
 #include "Dpr/Battle/Logic/Handler.hpp"
@@ -19,13 +21,17 @@
 #include "Dpr/Battle/Logic/PokeActionCategory.hpp"
 #include "Dpr/Battle/Logic/PokeID.hpp"
 #include "Dpr/Battle/Logic/PokeSet.hpp"
+#include "Dpr/Battle/Logic/Section_CalcActionPriority.hpp"
+#include "Dpr/Battle/Logic/Section_CalcDamage.hpp"
 #include "Dpr/Battle/Logic/Section_FreeFall_Release.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_AddViewEffect.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_ChangePokeType.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_CheckSpecialWazaAdditionalEffectOccur.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_ConsumeItem.hpp"
+#include "Dpr/Battle/Logic/Section_FromEvent_DecrementPP.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_FieldEffect_Remove.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_FreeFallStart.hpp"
+#include "Dpr/Battle/Logic/Section_FromEvent_SetItem.hpp"
 #include "Dpr/Battle/Logic/Section_FromEvent_SwapItem.hpp"
 #include "Dpr/Battle/Logic/Section_GShockWave.hpp"
 #include "Dpr/Battle/Logic/Section_InterruptAction.hpp"
@@ -37,10 +43,12 @@
 #include "Pml/Item/ItemData.hpp"
 #include "Pml/Personal/PersonalSystem.hpp"
 #include "Pml/PokePara/Sick.hpp"
+#include "Pml/WazaData/WazaDamageType.hpp"
 #include "Pml/WazaData/WazaDataSystem.hpp"
 #include "Pml/WazaData/WazaFlag.hpp"
 #include "Pml/WazaData/WazaRankEffect.hpp"
 #include "Pml/WazaData/WazaSick.hpp"
+#include "Pml/WazaData/WazaTarget.hpp"
 
 #include "il2cpp-api.h"
 #include "il2cpp.hpp"
@@ -146,6 +154,23 @@ constexpr int32_t MAX_QUAKE = 771;
 constexpr int32_t MAX_DARKNESS = 772;
 constexpr int32_t MAX_OVERGROWTH = 773;
 constexpr int32_t MAX_STEELSPIKE = 774;
+constexpr int32_t EXPANDING_FORCE = 797;
+constexpr int32_t STEEL_ROLLER = 798;
+constexpr int32_t METEOR_BEAM = 800;
+constexpr int32_t SHELL_SIDE_ARM = 801;
+constexpr int32_t MISTY_EXPLOSION = 802;
+constexpr int32_t GRASSY_GLIDE = 803;
+constexpr int32_t RISING_VOLTAGE = 804;
+constexpr int32_t TERRAIN_PULSE = 805;
+constexpr int32_t BURNING_JEALOUSY = 807;
+constexpr int32_t LASH_OUT = 808;
+constexpr int32_t POLTERGEIST = 809;
+constexpr int32_t CORROSIVE_GAS = 810;
+constexpr int32_t FLIP_TURN = 812;
+constexpr int32_t TRIPLE_AXEL = 813;
+constexpr int32_t JUNGLE_HEALING = 816;
+constexpr int32_t DRAGON_ENERGY = 820;
+constexpr int32_t EERIE_SPELL = 826;
 constexpr int32_t GIGATON_HAMMER = 893;
 
 // TypeIDs
@@ -288,12 +313,10 @@ constexpr uint16_t CENTISKORCH = 851;
 constexpr uint16_t HATTERENE = 858;
 constexpr uint16_t GRIMMSNARL = 861;
 constexpr uint16_t ALCREMIE = 869;
+constexpr uint16_t MORPEKO = 877;
 constexpr uint16_t COPPERAJAH = 879;
 constexpr uint16_t DURALUDON = 884;
 constexpr uint16_t URSHIFU = 892;
-
-// BtlGroundIDs
-constexpr uint8_t PSYCHIC_TERRAIN_FIELD = 4;
 
 // HanderTables
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableJumpKick;
@@ -338,6 +361,21 @@ static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableBaddyBad;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableFreezyFrost;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSparklySwirl;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableMaxMove;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableExpandingForce;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableSteelRoller;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableMeteorBeam;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableShellSideArm;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableMistyExplosion;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableGrassyGlide;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableRisingVoltage;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableTerrainPulse;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableBurningJealousy;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableLashOut;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTablePoltergeist;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableCorrosiveGas;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableTripleAxel;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableJungleHealing;
+static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableEerieSpell;
 
 // --- EventHandler delegates ---
 uint8_t GetEnvironmentType(EventFactor_EventHandlerArgs_o **args) {
@@ -379,7 +417,7 @@ void HandlerRageWazaDmgReaction(EventFactor_EventHandlerArgs_o **args, uint8_t p
     if (Common::GetEventVar(args, EventVar::POKEID_DEF, nullptr) != pokeID) return;
     if (Common::GetEventVar(args, EventVar::MIGAWARI_FLAG, nullptr)) return;
     HandlerRankEffect(args, pokeID, pokeID, WazaRankEffect::ATTACK, 1,
-                      false, false, true);
+                      false, false, true, true);
 }
 void HandlerRageMemberOutFixed(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (!Common::GetWorkValue(args, PERSIST, nullptr)) return;
@@ -639,7 +677,7 @@ void HandlerSecretPowerRankEffect(EventFactor_EventHandlerArgs_o **args, uint8_t
     if (!HandlerSecretPowerIsOccur(args, defender)) return;
     HandlerRankEffect(args, Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr),
                       defender, rankType, -1, false, false,
-                      false);
+                      false, true);
 }
 void HandlerSecretPowerShrink(EventFactor_EventHandlerArgs_o **args, uint8_t defender, int32_t arg) {
     HandlerShrink(args, defender, HandlerSecretPowerGetPer(args));
@@ -744,7 +782,7 @@ struct TypePowerPair {
     int32_t type;
     int32_t power;
 };
-TypePowerPair NaturalGiftTypePower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {
+TypePowerPair HandlerNaturalGiftTypePower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {
     switch (Common::GetPokeParam(args, pokeID, nullptr)->GetItem(nullptr)) {
         case CHERI_BERRY: return { FIRE, 80};
         case CHESTO_BERRY: return { WATER, 80};
@@ -818,8 +856,8 @@ TypePowerPair NaturalGiftTypePower(EventFactor_EventHandlerArgs_o **args, uint8_
 }
 void HandlerNaturalGiftWazaExecuteCheck3rd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
-    if (NaturalGiftTypePower(args, pokeID).type == NULL_TYPE ||
-    !Common::CheckItemUsable(args, pokeID, nullptr))
+    if (HandlerNaturalGiftTypePower(args, pokeID).type == NULL_TYPE ||
+        !Common::CheckItemUsable(args, pokeID, nullptr))
         Common::RewriteEventVar_FAIL_CAUSE(args, WazaFailCause::OTHER, nullptr);
 }
 void HandlerNaturalGiftWazaExecuteDone(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
@@ -837,13 +875,13 @@ void HandlerNaturalGiftWazaExecuteDone(EventFactor_EventHandlerArgs_o **args, ui
 void HandlerNaturalGiftWazaParam(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
     if (!Common::CheckItemUsable(args, pokeID, nullptr)) return;
-    uint16_t type = NaturalGiftTypePower(args, pokeID).type;
+    uint16_t type = HandlerNaturalGiftTypePower(args, pokeID).type;
     if (type == NULL_TYPE) return;
     Common::RewriteEventVar(args, EventVar::WAZA_TYPE, type, nullptr);
 }
 void HandlerNaturalGiftWazaPowerBase(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    Common::RewriteEventVar(args, EventVar::WAZA_POWER, NaturalGiftTypePower(args, pokeID).power, nullptr);
+    Common::RewriteEventVar(args, EventVar::WAZA_POWER, HandlerNaturalGiftTypePower(args, pokeID).power, nullptr);
 }
 // Trump Card
 void HandlerTrumpCardWazaPowerBase(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
@@ -853,18 +891,10 @@ void HandlerTrumpCardWazaPowerBase(EventFactor_EventHandlerArgs_o **args, uint8_
     if (wazaIdx == NULL_WAZA_IDX) return;
     int32_t power = 40;
     switch (bpp->WAZA_GetPP(wazaIdx, nullptr)) {
-        case 0:
-            power = 200;
-            break;
-        case 1:
-            power = 80;
-            break;
-        case 2:
-            power = 60;
-            break;
-        case 3:
-            power = 50;
-            break;
+        case 0: power = 200; break;
+        case 1: power = 80; break;
+        case 2: power = 60; break;
+        case 3: power = 50; break;
     }
     Common::RewriteEventVar(args, EventVar::WAZA_POWER, power, nullptr);
 }
@@ -915,6 +945,8 @@ void HandlerPunishmentWazaPowerBase(EventFactor_EventHandlerArgs_o **args, uint8
         power = 200;
     Common::RewriteEventVar(args, EventVar::WAZA_POWER, power, nullptr);
 }
+// Dark Void
+void Dpr_Battle_Logic_Handler_Waza_handler_DarkHole(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) { }
 // Flame Burst
 void HandlerFlameBurstDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
@@ -1032,6 +1064,8 @@ void HandlerIonDelugeFieldEffectCall(EventFactor_EventHandlerArgs_o **args, uint
     if (!HandlerAddFieldEffect(args, pokeID, ION_DELUGE_FIELD, 1)) return;
     Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
 }
+// Hyperspace Fury
+void Dpr_Battle_Logic_Handler_Waza_handler_IjigenRush(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {}
 // Spotlight
 void HandlerSpotlightUncategorizeWaza(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
@@ -1057,7 +1091,7 @@ void HandlerGuardianOfAlolaWazaDmgProc1(EventFactor_EventHandlerArgs_o **args, u
 // Genesis Supernova
 void HandlerGenesisSupernovaDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
     if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
-    Waza::handler_common_GroundSet(args, pokeID, PSYCHIC_TERRAIN_FIELD, nullptr);
+    Waza::handler_common_GroundSet(args, pokeID, BtlGround::BTL_GROUND_PHYCHO, nullptr);
 }
 // Splintered Stormshards
 void HandlerSplinteredStormshardsDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
@@ -1096,7 +1130,6 @@ void HandlerSparklySwirlDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **ar
 }
 // Max Guard
 bool HandlerMaxMoveIsMaxGuardBypass(BTL_POKEPARAM_o *bpp, uint8_t type) {
-    return type == DARK; // Test
     return (bpp->GetMonsNo(nullptr) == URSHIFU && bpp->fields.m_formNo == 2 && type == DARK) ||
            (bpp->GetMonsNo(nullptr) == URSHIFU && bpp->fields.m_formNo == 3 && type == WATER);
 }
@@ -1129,7 +1162,6 @@ uint8_t Pml_WazaData_WazaDataSystem_GetGPower(int32_t id,MethodInfo *method) {
     return WazaDataSystem::GetPower(id, nullptr);
 }
 bool HandlerMaxMoveIsPowerEffect(BTL_POKEPARAM_o *bpp, uint8_t type) {
-    return type == GRASS; // Test
     return (bpp->GetMonsNo(nullptr) == RILLABOOM && bpp->fields.m_formNo == 1 && type == GRASS) ||
            (bpp->GetMonsNo(nullptr) == CINDERACE && bpp->fields.m_formNo == 1 && type == FIRE) ||
            (bpp->GetMonsNo(nullptr) == INTELEON && bpp->fields.m_formNo == 1 && type == WATER);
@@ -1146,7 +1178,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
     switch (type) {
         case FIRE:
             gShockEffect = GShock_Effect::WEATHER_SHINE;
-            if (dexID == CHARIZARD && formID == 3 || true) // Test
+            if (dexID == CHARIZARD && formID == 3)
                 gShockEffect = GShock_Effect::SIDE_HONOO;
             if (dexID == CENTISKORCH && formID == 1)
                 gShockEffect = GShock_Effect::HONOONOUZU;
@@ -1184,7 +1216,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
             break;
         case ICE:
             gShockEffect = GShock_Effect::WEATHER_SNOW;
-            if (dexID == LAPRAS && formID == 1 || true) // Test
+            if (dexID == LAPRAS && formID == 1)
                 gShockEffect = GShock_Effect::AURORAVEIL;
             break;
         case POISON:
@@ -1198,7 +1230,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
                 gShockEffect = GShock_Effect::RANKDOWN_AGI2;
             if (dexID == DREDNAW && formID == 1)
                 gShockEffect = GShock_Effect::STEALTHROCK;
-            if (dexID == BLASTOISE && formID == 2 || true) { // Test
+            if (dexID == BLASTOISE && formID == 2) {
                 uint8_t targetPokeID = Common::GetEventVar(args, EventVar::POKEID_TARGET1, nullptr);
                 HandlerAddSideEffect(args, pokeID, G_MAX_CANNONADE_SIDE,
                                      Common::PokeIDtoSide(args, &targetPokeID, nullptr),
@@ -1215,7 +1247,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
             gShockEffect = GShock_Effect::FIELD_MIST;
             if (dexID == HATTERENE && formID == 1)
                 gShockEffect = GShock_Effect::SICK_KONRAN;
-            if (dexID == ALCREMIE && formID == 63 || true) // Test
+            if (dexID == ALCREMIE && formID == 63)
                 gShockEffect = GShock_Effect::RECOVER_HP;
             break;
         case DRAGON:
@@ -1230,7 +1262,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
             break;
         case ROCK:
             gShockEffect = GShock_Effect::WEATHER_SAND;
-            if (dexID == COALOSSAL && formID == 1 || true) // Test
+            if (dexID == COALOSSAL && formID == 1)
                 gShockEffect = GShock_Effect::SIDE_IWA;
             break;
         case GROUND:
@@ -1261,7 +1293,7 @@ void HandlerMaxMoveDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, u
             gShockEffect = GShock_Effect::RANKUP_DEF;
             if (dexID == MELMETAL && formID == 1)
                 gShockEffect = GShock_Effect::ICHAMON;
-            if (dexID == COPPERAJAH && formID == 1 || true) // Test
+            if (dexID == COPPERAJAH && formID == 1)
                 gShockEffect = GShock_Effect::STEALTHROCK_HAGANE;
             break;
         default:
@@ -1305,6 +1337,219 @@ void HandlerMaxMoveWazaseqEnd(EventFactor_EventHandlerArgs_o **args, uint8_t pok
                                                                                 nullptr), nullptr)))
         return;
     Waza::handler_MeteorDrive_WazaSeqEnd(args, pokeID, nullptr);
+}
+// Aura Wheel
+uint8_t HandlerAuraWheelGetFormID(uint8_t formNo, uint8_t targetFormNo) {
+    return HighestMultiple(formNo, 2) + targetFormNo;
+}
+void Dpr_Battle_Logic_Handler_Waza_handler_AuraGuruma(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {}
+void Dpr_Battle_Logic_Handler_Waza_handler_AuraGuruma_Waza(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, pokeID, nullptr);
+    if (bpp->GetMonsNo(nullptr) != MORPEKO) return;
+    uint8_t formNo = bpp->fields.m_formNo;
+    if (formNo == HandlerAuraWheelGetFormID(formNo, 0))
+        Common::RewriteEventVar(args, EventVar::WAZA_TYPE, ELECTRIC, nullptr);
+    else
+        Common::RewriteEventVar(args, EventVar::WAZA_TYPE, DARK, nullptr);
+}
+// Expanding Force
+void HandlerExpandingForceWazaParam(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    if (Common::GetGround(args, nullptr) != BtlGround::BTL_GROUND_PHYCHO) return;
+    if (!Field::common_isGroundEffective(args, pokeID, nullptr)) return;
+    Common::RewriteEventVar(args, EventVar::TARGET_TYPE, WazaTarget::TARGET_ENEMY_ALL, nullptr);
+}
+void HandlerExpandingForceWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    if (Common::GetGround(args, nullptr) != BtlGround::BTL_GROUND_PHYCHO) return;
+    if (!Field::common_isGroundEffective(args, pokeID, nullptr)) return;
+    Common::MulEventVar(args, EventVar::WAZA_POWER_RATIO, 0x1800, nullptr);
+}
+// Steel Roller
+void HandlerSteelRollerWazaExecuteCheck3rd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    int32_t effType = TERRAIN;
+    if (Common::CheckFieldEffect(args, &effType, nullptr)) return;
+    Common::RewriteEventVar(args, EventVar::FAIL_CAUSE, WazaFailCause::OTHER, nullptr);
+}
+// Meteor Beam
+void HandlerMeteorBeamTameStartFixed(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    HandlerRankEffect(args, pokeID, pokeID, WazaRankEffect::SP_ATTACK, 1,
+                      false, false, true, true);
+}
+// Shell Side Arm
+uint32_t HandlerShellSideArmCalcDamageBase(EventLauncher_o *el, BTL_POKEPARAM_o *attacker, BTL_POKEPARAM_o *defender, WazaParam_o *wp) {
+    bool isBurnDisabled = true;
+    return Calc::DamageBase(el->Event_getWazaPower(attacker, defender, wp, nullptr),
+                            el->Event_getAttackPower(attacker, defender, wp, false,
+                                                     &isBurnDisabled, nullptr),
+                            attacker->GetValue(BTL_POKEPARAM_ValueID::BPP_LEVEL, nullptr),
+                            el->Event_getDefenderGuard(attacker, defender, wp, false,
+                                                       nullptr),
+                            nullptr);
+}
+void HandlerShellSideArmWazaParam(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    EventLauncher_o *el = (*args)->fields.pSectionContainer->fields.m_section_CalcDamage->fields.super.m_pEventLauncher;
+    BTL_POKEPARAM_o *attacker = Common::GetPokeParam(args, pokeID, nullptr);
+    PokeAction_o *pa = Common::SearchByPokeID(args, pokeID, true, true, nullptr);
+    if (pa == nullptr) return;
+    BTL_POKEPARAM_o *defender = Common::GetPokeParam(args, pa->fields.actionParam_Fight->fields.aimTargetID,
+                                                     nullptr);
+    auto *wp = (WazaParam_o *) il2cpp_object_new(WazaParam_TypeInfo);
+    wp->ctor(nullptr);
+    uint16_t wazaID = Common::GetSubID(args, nullptr);
+    wp->fields.wazaID = wazaID;
+    wp->fields.orgWazaID = wazaID;
+    wp->fields.gSrcWazaID = wazaID;
+    wp->fields.userType = attacker->GetPokeType(nullptr);
+    wp->fields.wazaType = WAZADATA::GetType(wazaID, nullptr);
+    wp->fields.damageType = WazaDamageType::PHYSIC;
+    wp->fields.touchFlag = true;
+    wp->fields.targetType = WAZADATA::GetWazaTarget(wazaID, nullptr);
+    wp->fields.wazaPri = 0;
+    wp->fields.wazaPower = WAZADATA::GetPower(wazaID, nullptr);
+    uint32_t physicalDamage = HandlerShellSideArmCalcDamageBase(el, attacker, defender, wp);
+    wp->fields.damageType = WazaDamageType::SPECIAL;
+    wp->fields.touchFlag = false;
+    uint32_t specialDamage = HandlerShellSideArmCalcDamageBase(el, attacker, defender, wp);
+    if (physicalDamage > specialDamage || (physicalDamage == specialDamage && Calc::GetRand(2, nullptr))) {
+        Common::RewriteEventVar(args, EventVar::DAMAGE_TYPE, WazaDamageType::PHYSIC, nullptr);
+        Common::RewriteEventVar(args, EventVar::WAZA_TOUCH_FLAG, true, nullptr);
+    }
+    else {
+        Common::RewriteEventVar(args, EventVar::DAMAGE_TYPE, WazaDamageType::SPECIAL, nullptr);
+        Common::RewriteEventVar(args, EventVar::WAZA_TOUCH_FLAG, false, nullptr);
+    }
+}
+// Misty Explosion
+void HandlerMistyExplosionWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    if (Common::GetGround(args, nullptr) != BtlGround::BTL_GROUND_MIST) return;
+    if (!Field::common_isGroundEffective(args, pokeID, nullptr)) return;
+    Common::MulEventVar(args, EventVar::WAZA_POWER_RATIO, 0x1800, nullptr);
+}
+// Grassy Glide
+void HandlerGrassyGlideGetWazaPri(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    if (Common::GetGround(args, nullptr) != BtlGround::BTL_GROUND_GRASS) return;
+    if (!Field::common_isGroundEffective(args, pokeID, nullptr)) return;
+    Common::RewriteEventVar(args, EventVar::WAZA_PRI, Common::GetEventVar(args, EventVar::WAZA_PRI,
+                                                                          nullptr) + 1, nullptr);
+}
+// Rising Voltage
+void HandlerRisingVoltageWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    if (Common::GetGround(args, nullptr) != BtlGround::BTL_GROUND_ELEKI) return;
+    if (!Field::common_isGroundEffective(args, Common::GetEventVar(args, EventVar::POKEID_DEF,
+                                                                   nullptr), nullptr)) return;
+    Common::MulEventVar(args, EventVar::WAZA_POWER_RATIO, 0x2000, nullptr);
+}
+// Terrain Pulse
+void HandlerTerrainPulseWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    if (Common::GetGround(args, nullptr) == BtlGround::BTL_GROUND_NONE) return;
+    if (!Field::common_isGroundEffective(args, pokeID, nullptr)) return;
+    Common::MulEventVar(args, EventVar::WAZA_POWER_RATIO, 0x2000, nullptr);
+}
+void HandlerTerrainPulseWazaParam(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    uint8_t type = NORMAL;
+    switch (Common::GetGround(args, nullptr)) {
+        case BtlGround::BTL_GROUND_GRASS: type = GRASS; break;
+        case BtlGround::BTL_GROUND_MIST: type = FAIRY; break;
+        case BtlGround::BTL_GROUND_ELEKI: type = ELECTRIC; break;
+        case BtlGround::BTL_GROUND_PHYCHO: type = PSYCHIC; break;
+    }
+    Common::RewriteEventVar(args, EventVar::WAZA_TYPE, type, nullptr);
+}
+// Burning Jealousy
+void HandlerBurningJealousyAddSick(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    if (Common::GetPokeParam(args, Common::GetEventVar(args, EventVar::POKEID_DEF, nullptr), nullptr)->TURNFLAG_Get(
+            BTL_POKEPARAM_TurnFlag::TURNFLG_RANK_UP, nullptr)) return;
+    Common::RewriteEventVar(args, EventVar::ADD_PER, 0, nullptr);
+}
+// Lash Out
+void HandlerLashOutWazaPower(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    if (!Common::GetPokeParam(args, pokeID, nullptr)->TURNFLAG_Get(
+            BTL_POKEPARAM_TurnFlag::TURNFLG_RANK_DOWN, nullptr)) return;
+    Common::RewriteEventVar(args, EventVar::WAZA_POWER_RATIO, 0x2000, nullptr);
+}
+// Poltergeist
+void HandlerPoltergeistWazaExecuteCheck3rd(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID, nullptr) != pokeID) return;
+    if (Common::GetPokeParam(args, Common::GetEventVar(args, EventVar::POKEID_TARGET1, nullptr),
+                             nullptr)->GetItem(nullptr) != NULL_ITEM) return;
+    Common::RewriteEventVar_FAIL_CAUSE(args, WazaFailCause::OTHER, nullptr);
+}
+// Corrosive Gas
+void HandlerCorrosiveGasUncategorizeWaza(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    int32_t targetCount = Common::GetEventVar(args, EventVar::TARGET_POKECNT, nullptr);
+    bool success = false;
+    system_load_typeinfo((void *)0xa965);
+    for (int32_t i = 0; i < targetCount; ++i) {
+        uint8_t targetPokeID = Common::GetEventVar(args, 6 + i, nullptr);
+        if (Common::CheckCantStealPoke(args, pokeID, targetPokeID, nullptr)) continue;
+        if (Common::GetPokeParam(args, targetPokeID, nullptr)->GetItem(nullptr) == NULL_ITEM)
+            continue;
+        auto *desc = (Section_FromEvent_SetItem_Description_o *)
+                il2cpp_object_new(Section_FromEvent_SetItem_Description_TypeInfo);
+        desc->ctor(nullptr);
+        desc->fields.userPokeID = pokeID;
+        desc->fields.targetPokeID = targetPokeID;
+        desc->fields.itemID = 0;
+        if (Common::SetItem(args, &desc, nullptr))
+            success = true;
+    }
+    Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, success, nullptr);
+}
+// Triple Axel
+void HandlerTripleAxelWazaPowerBase(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    int32_t hitCounter = Common::GetWorkValue(args, A, nullptr) + 1;
+    Common::SetWorkValue(args, A, hitCounter, nullptr);
+    Common::RewriteEventVar(args, EventVar::WAZA_POWER, hitCounter * 20, nullptr);
+}
+// Jungle Healing
+void HandlerJungleHealingUncategorizeWaza(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    int32_t targetCount = Common::GetEventVar(args, EventVar::TARGET_POKECNT, nullptr);
+    for (int32_t i = 0; i < targetCount; ++i) {
+        uint8_t targetPokeID = Common::GetEventVar(args, 6 + i, nullptr);
+        uint32_t sickID = Common::CheckPokeSick(args, targetPokeID, nullptr);
+        if (sickID == Sick::MAHI || sickID == Sick::NEMURI || sickID == Sick::KOORI || sickID == Sick::YAKEDO ||
+        sickID == Sick::DOKU)
+            HandlerCureSick(args, targetPokeID, WazaSick::WAZASICK_MAX, pokeID);
+    }
+    Common::RewriteEventVar(args, EventVar::SUCCESS_FLAG, true, nullptr);
+}
+// Eerie Spell
+void HandlerEerieSpellDamageprocEndHitReal(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    int32_t targetCount = Common::GetEventVar(args, EventVar::TARGET_POKECNT, nullptr);
+    system_load_typeinfo((void *)0xaa7b);
+    for (int32_t i = 0; i < targetCount; ++i) {
+        uint8_t targetPokeID = Common::GetEventVar(args, 6 + i, nullptr);
+        BTL_POKEPARAM_o *bpp = Common::GetPokeParam(args, targetPokeID, nullptr);
+        uint8_t wazaIdx = bpp->WAZA_SearchIdx(bpp->fields.m_prevSelectWazaID, nullptr);
+        if (wazaIdx == NULL_WAZA_IDX) continue;
+        uint16_t ppCount = bpp->WAZA_GetPP(wazaIdx, nullptr);
+        uint8_t volume = 3;
+        if (volume > ppCount)
+            volume = ppCount;
+        if (volume == 0) continue;
+        auto *desc = (Section_FromEvent_DecrementPP_Description_o *)
+                il2cpp_object_new(Section_FromEvent_DecrementPP_Description_TypeInfo);
+        desc->fields.pokeID = targetPokeID;
+        desc->fields.wazaIdx = wazaIdx;
+        desc->fields.volume = volume;
+        Common::DecrementPP(args, &desc, nullptr);
+    }
 }
 
 EventFactor_EventHandlerTable_o * CreateMoveEventHandler(uint16_t eventID, Il2CppMethodPointer methodPointer) {
@@ -1633,6 +1878,118 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_MaxMove(MethodInfo *metho
     }
     return sHandlerTableMaxMove;
 }
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_ExpandingForce(MethodInfo *method) {
+    if (sHandlerTableExpandingForce == nullptr) {
+        sHandlerTableExpandingForce = CreateEventHandlerTable(2);
+        sHandlerTableExpandingForce->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_PARAM, (Il2CppMethodPointer) &HandlerExpandingForceWazaParam);
+        sHandlerTableExpandingForce->m_Items[1] = CreateMoveEventHandler(EventID::WAZA_POWER, (Il2CppMethodPointer) &HandlerExpandingForceWazaPower);
+    }
+    return sHandlerTableExpandingForce;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_SteelRoller(MethodInfo *method) {
+    if (sHandlerTableSteelRoller == nullptr) {
+        sHandlerTableSteelRoller = CreateEventHandlerTable(2);
+        sHandlerTableSteelRoller->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_EXECUTE_CHECK_3RD, (Il2CppMethodPointer) &HandlerSteelRollerWazaExecuteCheck3rd);
+        sHandlerTableSteelRoller->m_Items[1] = CreateMoveEventHandler(EventID::DAMAGEPROC_END_HIT_REAL, (Il2CppMethodPointer) &HandlerSplinteredStormshardsDamageprocEndHitReal);
+    }
+    return sHandlerTableSteelRoller;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_MeteorBeam(MethodInfo *method) {
+    if (sHandlerTableMeteorBeam == nullptr) {
+        sHandlerTableMeteorBeam = CreateEventHandlerTable(1);
+        sHandlerTableMeteorBeam->m_Items[0] = CreateMoveEventHandler(EventID::TAME_START_FIXED, (Il2CppMethodPointer) &HandlerMeteorBeamTameStartFixed);
+    }
+    return sHandlerTableMeteorBeam;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_ShellSideArm(MethodInfo *method) {
+    if (sHandlerTableShellSideArm == nullptr) {
+        sHandlerTableShellSideArm = CreateEventHandlerTable(1);
+        sHandlerTableShellSideArm->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_PARAM, (Il2CppMethodPointer) &HandlerShellSideArmWazaParam);
+    }
+    return sHandlerTableShellSideArm;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_MistyExplosion(MethodInfo *method) {
+    if (sHandlerTableMistyExplosion == nullptr) {
+        sHandlerTableMistyExplosion = CreateEventHandlerTable(4);
+        sHandlerTableMistyExplosion->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_POWER, (Il2CppMethodPointer) &HandlerMistyExplosionWazaPower);
+        sHandlerTableMistyExplosion->m_Items[1] = CreateMoveEventHandler(EventID::WAZA_DMG_DETERMINE, (Il2CppMethodPointer) &Waza::handler_Daibakuhatsu_DmgDetermine);
+        sHandlerTableMistyExplosion->m_Items[2] = CreateMoveEventHandler(EventID::WAZA_EXECUTE_DONE, (Il2CppMethodPointer) &Waza::handler_Daibakuhatsu_ExeFix);
+        sHandlerTableMistyExplosion->m_Items[3] = CreateMoveEventHandler(EventID::WAZA_EXE_START, (Il2CppMethodPointer) &Waza::handler_Daibakuhatsu_ExeStart);
+    }
+    return sHandlerTableMistyExplosion;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_GrassyGlide(MethodInfo *method) {
+    if (sHandlerTableGrassyGlide == nullptr) {
+        sHandlerTableGrassyGlide = CreateEventHandlerTable(1);
+        sHandlerTableGrassyGlide->m_Items[0] = CreateMoveEventHandler(EventID::GET_WAZA_PRI, (Il2CppMethodPointer) &HandlerGrassyGlideGetWazaPri);
+    }
+    return sHandlerTableGrassyGlide;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_RisingVoltage(MethodInfo *method) {
+    if (sHandlerTableRisingVoltage == nullptr) {
+        sHandlerTableRisingVoltage = CreateEventHandlerTable(1);
+        sHandlerTableRisingVoltage->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_POWER, (Il2CppMethodPointer) &HandlerRisingVoltageWazaPower);
+    }
+    return sHandlerTableRisingVoltage;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_TerrainPulse(MethodInfo *method) {
+    if (sHandlerTableTerrainPulse == nullptr) {
+        sHandlerTableTerrainPulse = CreateEventHandlerTable(2);
+        sHandlerTableTerrainPulse->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_PARAM, (Il2CppMethodPointer) &HandlerTerrainPulseWazaParam);
+        sHandlerTableTerrainPulse->m_Items[1] = CreateMoveEventHandler(EventID::WAZA_POWER, (Il2CppMethodPointer) &HandlerTerrainPulseWazaPower);
+    }
+    return sHandlerTableTerrainPulse;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_BurningJealousy(MethodInfo *method) {
+    if (sHandlerTableBurningJealousy == nullptr) {
+        sHandlerTableBurningJealousy = CreateEventHandlerTable(1);
+        sHandlerTableBurningJealousy->m_Items[0] = CreateMoveEventHandler(EventID::ADD_SICK, (Il2CppMethodPointer) &HandlerBurningJealousyAddSick);
+    }
+    return sHandlerTableBurningJealousy;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_LashOut(MethodInfo *method) {
+    if (sHandlerTableLashOut == nullptr) {
+        sHandlerTableLashOut = CreateEventHandlerTable(1);
+        sHandlerTableLashOut->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_POWER, (Il2CppMethodPointer) &HandlerLashOutWazaPower);
+    }
+    return sHandlerTableLashOut;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_Poltergeist(MethodInfo *method) {
+    if (sHandlerTablePoltergeist == nullptr) {
+        sHandlerTablePoltergeist = CreateEventHandlerTable(1);
+        sHandlerTablePoltergeist->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_EXECUTE_CHECK_3RD, (Il2CppMethodPointer) &HandlerPoltergeistWazaExecuteCheck3rd);
+    }
+    return sHandlerTablePoltergeist;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_CorrosiveGas(MethodInfo *method) {
+    if (sHandlerTableCorrosiveGas == nullptr) {
+        sHandlerTableCorrosiveGas = CreateEventHandlerTable(1);
+        sHandlerTableCorrosiveGas->m_Items[0] = CreateMoveEventHandler(EventID::UNCATEGORIZE_WAZA, (Il2CppMethodPointer) &HandlerCorrosiveGasUncategorizeWaza);
+    }
+    return sHandlerTableCorrosiveGas;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_TripleAxel(MethodInfo *method) {
+    if (sHandlerTableTripleAxel == nullptr) {
+        sHandlerTableTripleAxel = CreateEventHandlerTable(2);
+        sHandlerTableTripleAxel->m_Items[0] = CreateMoveEventHandler(EventID::WAZA_POWER_BASE, (Il2CppMethodPointer) &HandlerTripleAxelWazaPowerBase);
+        sHandlerTableTripleAxel->m_Items[1] = CreateMoveEventHandler(EventID::WAZA_HIT_COUNT, (Il2CppMethodPointer) &Waza::handler_TripleKick_HitCount);
+    }
+    return sHandlerTableTripleAxel;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_JungleHealing(MethodInfo *method) {
+    if (sHandlerTableJungleHealing == nullptr) {
+        sHandlerTableJungleHealing = CreateEventHandlerTable(1);
+        sHandlerTableJungleHealing->m_Items[0] = CreateMoveEventHandler(EventID::UNCATEGORIZE_WAZA, (Il2CppMethodPointer) &HandlerJungleHealingUncategorizeWaza);
+    }
+    return sHandlerTableJungleHealing;
+}
+System::Array<EventFactor_EventHandlerTable_o *> * ADD_EerieSpell(MethodInfo *method) {
+    if (sHandlerTableEerieSpell == nullptr) {
+        sHandlerTableEerieSpell = CreateEventHandlerTable(1);
+        sHandlerTableEerieSpell->m_Items[0] = CreateMoveEventHandler(EventID::DAMAGEPROC_END_HIT_REAL, (Il2CppMethodPointer) &HandlerEerieSpellDamageprocEndHitReal);
+    }
+    return sHandlerTableEerieSpell;
+}
 
 // Adds an entry to GET_FUNC_TABLE
 void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTable, uint32_t * idx, int32_t wazaNo, Il2CppMethodPointer methodPointer) {
@@ -1646,7 +2003,7 @@ void SetMoveFunctionTable(System::Array<Waza_GET_FUNC_TABLE_ELEM_o> * getFuncTab
 }
 
 // Remember to update when adding handlers
-constexpr uint32_t NEW_MOVES_COUNT = 71;
+constexpr uint32_t NEW_MOVES_COUNT = 88;
 
 // Entry point. Replaces system_array_new.
 void * Waza_system_array_new(void * typeInfo, uint32_t len) {
@@ -1732,6 +2089,24 @@ void * Waza_system_array_new(void * typeInfo, uint32_t len) {
     SetMoveFunctionTable(getFuncTable, &idx, MAX_OVERGROWTH, (Il2CppMethodPointer) &ADD_MaxMove);
     //70
     SetMoveFunctionTable(getFuncTable, &idx, MAX_STEELSPIKE, (Il2CppMethodPointer) &ADD_MaxMove);
+    SetMoveFunctionTable(getFuncTable, &idx, EXPANDING_FORCE, (Il2CppMethodPointer) &ADD_ExpandingForce);
+    SetMoveFunctionTable(getFuncTable, &idx, STEEL_ROLLER, (Il2CppMethodPointer) &ADD_SteelRoller);
+    SetMoveFunctionTable(getFuncTable, &idx, METEOR_BEAM, (Il2CppMethodPointer) &ADD_MeteorBeam);
+    SetMoveFunctionTable(getFuncTable, &idx, SHELL_SIDE_ARM, (Il2CppMethodPointer) &ADD_ShellSideArm);
+    SetMoveFunctionTable(getFuncTable, &idx, MISTY_EXPLOSION, (Il2CppMethodPointer) &ADD_MistyExplosion);
+    SetMoveFunctionTable(getFuncTable, &idx, GRASSY_GLIDE, (Il2CppMethodPointer) &ADD_GrassyGlide);
+    SetMoveFunctionTable(getFuncTable, &idx, RISING_VOLTAGE, (Il2CppMethodPointer) &ADD_RisingVoltage);
+    SetMoveFunctionTable(getFuncTable, &idx, TERRAIN_PULSE, (Il2CppMethodPointer) &ADD_TerrainPulse);
+    SetMoveFunctionTable(getFuncTable, &idx, BURNING_JEALOUSY, (Il2CppMethodPointer) &ADD_BurningJealousy);
+    //80
+    SetMoveFunctionTable(getFuncTable, &idx, LASH_OUT, (Il2CppMethodPointer) &ADD_LashOut);
+    SetMoveFunctionTable(getFuncTable, &idx, POLTERGEIST, (Il2CppMethodPointer) &ADD_Poltergeist);
+    SetMoveFunctionTable(getFuncTable, &idx, CORROSIVE_GAS, (Il2CppMethodPointer) &ADD_CorrosiveGas);
+    SetMoveFunctionTable(getFuncTable, &idx, FLIP_TURN, (Il2CppMethodPointer) &Waza::ADD_TonboGaeri);
+    SetMoveFunctionTable(getFuncTable, &idx, TRIPLE_AXEL, (Il2CppMethodPointer) &ADD_TripleAxel);
+    SetMoveFunctionTable(getFuncTable, &idx, JUNGLE_HEALING, (Il2CppMethodPointer) &ADD_JungleHealing);
+    SetMoveFunctionTable(getFuncTable, &idx, DRAGON_ENERGY, (Il2CppMethodPointer) &Waza::ADD_Funka);
+    SetMoveFunctionTable(getFuncTable, &idx, EERIE_SPELL, (Il2CppMethodPointer) &ADD_EerieSpell);
 
     socket_log_initialize();
     socket_log_fmt("%i/%i move HandlerGetFunc delegates added", NEW_MOVES_COUNT, idx - len);
@@ -1755,7 +2130,7 @@ void PursuitProcess(Section_ProcessActionCore_o *section, PokeActionContainer_o 
     bool isFight = thisAction->fields.actionCategory == PokeActionCategory::Fight;
     if (!isPursuitTarget && isFight) {
         int32_t wazaID = thisAction->fields.actionParam_Fight->fields.waza;
-        isPursuitTarget = wazaID == U_TURN || wazaID == VOLT_SWITCH || wazaID == PARTING_SHOT;
+        isPursuitTarget = wazaID == U_TURN || wazaID == VOLT_SWITCH || wazaID == PARTING_SHOT || wazaID == FLIP_TURN;
     }
     if (!isPursuitTarget) return;
     uint8_t thisPokeID = thisAction->fields.bpp->GetID(nullptr);
@@ -1849,10 +2224,73 @@ uint8_t Dpr_Battle_Logic_EventLauncher_Event_WazaExecuteStart(EventLauncher_o *e
         pWazaEffectParams->fields.effectWazaID = effectWazaID;
     return (uint8_t)enableMode;
 }
+// Grassy Glide
+uint8_t Dpr_Battle_Logic_Section_CalcActionPriority_calcWazaPriority(Section_CalcActionPriority_o *__this, PokeAction_o **pokeAction, MethodInfo *method) {
+    PokeAction_o *pa = *pokeAction;
+    int32_t category = pa->fields.actionCategory;
+    if (category == 7) {
+        uint8_t clientID = pa->fields.clientID;
+        return __this->fields.super.m_pBattleEnv->fields.m_gRightsManager->GetGRights(__this->
+        fields.super.m_pMainModule->GetClientSide(clientID, nullptr), nullptr)->
+        GetClientOrder(clientID, nullptr);
+    }
+    if (category == 5)
+        return 7;
+    if (category == 1) {
+        ServerCommandPutter_o *scp = __this->fields.super.m_pServerCmdPutter;
+        BTL_POKEPARAM_o *bpp = pa->fields.bpp;
+        uint8_t pokeID = bpp->GetID(nullptr);
+        uint16_t wazaID = pa->fields.actionParam_Fight->fields.waza;
+        scp->AddWazaHandler(pokeID, wazaID, ActPri::ToHandlerPri(pa->
+        fields.priority, nullptr), nullptr);
+        uint8_t priority = __this->fields.super.m_pEventLauncher->Event_GetWazaPriority(PokeAction::GetWazaID(
+                pa, nullptr), bpp, nullptr);
+        scp->RemoveWazaHandler(pokeID, wazaID, nullptr);
+        return priority;
+    }
+    return 0;
+}
+int8_t * GetRankType(BTL_POKEPARAM_o *bpp, int32_t rankType) {
+    BTL_POKEPARAM_VARIABLE_PARAM_o *bppvp = bpp->fields.m_varyParam;
+    switch(rankType) {
+        case 1: return &bppvp->fields.attack;
+        case 2: return &bppvp->fields.defence;
+        case 3: return &bppvp->fields.sp_attack;
+        case 4: return &bppvp->fields.sp_defence;
+        case 5: return &bppvp->fields.agility;
+        case 6: return &bppvp->fields.hit;
+        case 7: return &bppvp->fields.avoid;
+        default: return nullptr;
+    }
+}
+// Burning Jealousy
+uint8_t Dpr_Battle_Logic_BTL_POKEPARAM_RankUp(BTL_POKEPARAM_o *__this, int32_t rankType, uint8_t volume, MethodInfo *method) {
+    int8_t *rank = GetRankType(__this, rankType);
+    if (rank == nullptr) return 0;
+    if (*rank >= 12) return 0;
+    if (*rank + volume > 12)
+        volume = 12 - *rank;
+    *rank = (int8_t)(*rank + volume);
+    __this->TURNFLAG_Set(BTL_POKEPARAM_TurnFlag::TURNFLG_RANK_UP, nullptr);
+    return volume;
+}
+// Lash Out
+uint8_t Dpr_Battle_Logic_BTL_POKEPARAM_RankDown(BTL_POKEPARAM_o *__this, int32_t rankType, uint8_t volume, MethodInfo *method) {
+    int8_t *rank = GetRankType(__this, rankType);
+    if (rank == nullptr) return 0;
+    if (*rank <= 0) return 0;
+    if (*rank < volume)
+        volume = *rank;
+    *rank = (int8_t)(*rank - volume);
+    __this->TURNFLAG_Set(BTL_POKEPARAM_TurnFlag::TURNFLG_RANK_DOWN, nullptr);
+    return volume;
+}
 // Gigaton Hammer
 bool SetupBTLV_STRPARAM(BTLV_STRPARAM_o *strParam, uint16_t strID, uint8_t strType, const int32_t args[], uint64_t argCnt) {
     if (strParam == nullptr) return true;
     strParam->fields.strType = strType;
+    strParam->fields.strID = strID;
+    strParam->fields.wait = 0;
     System_Int32_array *oldArgs = strParam->fields.args;
     for (uint64_t i = 0; i < oldArgs->max_length; ++i)
         oldArgs->m_Items[i] = 0;

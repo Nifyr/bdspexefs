@@ -15,6 +15,7 @@
 #include "Section_FromEvent_ChangePokeType.hpp"
 #include "Section_FromEvent_ConsumeItem.hpp"
 #include "Section_FromEvent_Damage.hpp"
+#include "Section_FromEvent_DecrementPP.hpp"
 #include "Section_FromEvent_FieldEffect_Remove.hpp"
 #include "Section_FromEvent_FormChange.hpp"
 #include "Section_FromEvent_FreeFallStart.hpp"
@@ -22,6 +23,7 @@
 #include "Section_FromEvent_PosEffect_Add.hpp"
 #include "Section_FromEvent_RankEffect.hpp"
 #include "Section_FromEvent_RankReset.hpp"
+#include "Section_FromEvent_SetItem.hpp"
 #include "Section_FromEvent_Shrink.hpp"
 #include "Section_FromEvent_SwapItem.hpp"
 #include "Section_SideEffect_Add.hpp"
@@ -40,6 +42,7 @@ namespace Dpr
                 static bool AddSideEffect(EventFactor_EventHandlerArgs_o **args, Section_SideEffect_Add_Description_o **desc, MethodInfo *method);
                 static void AddViewEffect(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_AddViewEffect_Description_o **desc, MethodInfo *method);
                 static bool ChangeType(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_ChangePokeType_Description_o **desc, MethodInfo *method);
+                static bool CheckCantStealPoke(EventFactor_EventHandlerArgs_o **args, uint8_t attackPokeID, uint8_t targetPokeID, MethodInfo *method);
                 static bool CheckFieldEffect(EventFactor_EventHandlerArgs_o **args, int32_t *effType, MethodInfo *method);
                 static bool CheckItemUsable(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
                 static uint32_t CheckPokeSick(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method);
@@ -49,6 +52,7 @@ namespace Dpr
                 static bool CureSick(EventFactor_EventHandlerArgs_o **args, Section_CureSick_Description_o **desc, MethodInfo *method);
                 static bool Damage(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_Damage_Description_o **desc,MethodInfo *method);
                 static uint8_t DecideWazaTargetAuto(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t wazano, MethodInfo *method);
+                static bool DecrementPP(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_DecrementPP_Description_o **desc, MethodInfo *method);
                 static uint8_t ExpandExistPokeID(EventFactor_EventHandlerArgs_o **args, ExPokePos_o **exPos, System_Byte_array *dst_pokeID, MethodInfo *method);
                 static bool FormChange(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_FormChange_Description_o **desc,MethodInfo *method);
                 static void FreeFallRelease(EventFactor_EventHandlerArgs_o **args, Section_FreeFall_Release_Description_o **desc, MethodInfo *method);
@@ -79,6 +83,7 @@ namespace Dpr
                 static bool RewriteEventVar(EventFactor_EventHandlerArgs_o **args, uint16_t label, int32_t value, MethodInfo *method);
                 static bool RewriteEventVar_FAIL_CAUSE(EventFactor_EventHandlerArgs_o **args, uint8_t value, MethodInfo *method);
                 static PokeAction_o * SearchByPokeID(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, bool isSkipGStart, bool isSkipNull, MethodInfo *method);
+                static bool SetItem(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_SetItem_Description_o **desc, MethodInfo *method);
                 static void SetWorkValue(EventFactor_EventHandlerArgs_o **args, uint8_t workIdx, int32_t value ,MethodInfo *method);
                 static bool Shrink(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_Shrink_Description_o **desc, MethodInfo *method);
                 static bool SwapItem(EventFactor_EventHandlerArgs_o **args, Section_FromEvent_SwapItem_Description_o **desc, MethodInfo *method);

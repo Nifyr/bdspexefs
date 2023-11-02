@@ -41,7 +41,7 @@ void HandlerDamage(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, u
 void HandlerCureSick(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, int32_t sickID, uint8_t targetPokeID);
 void HandlerFormChange(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, uint8_t nextForm, bool persistOnSwitch, bool displayAbility, bool animationEnabled);
 void HandlerMessage(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, bool displayAbility);
-void HandlerRankEffect(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, uint8_t targetPokeID, int32_t rankType, int8_t rankVolume, bool displayAbility, bool ignoreSubstitute, bool messageOnFail);
+void HandlerRankEffect(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, uint8_t targetPokeID, int32_t rankType, int8_t rankVolume, bool displayAbility, bool ignoreSubstitute, bool messageOnFail, bool byWazaEffect);
 void HandlerRankReset(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID);
 void HandlerRankResetAll(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID);
 void HandlerShrink(EventFactor_EventHandlerArgs_o **args, uint8_t targetPokeID, uint8_t percentage);

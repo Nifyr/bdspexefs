@@ -179,7 +179,7 @@ void HandlerMessage(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, bool 
 }
 void HandlerRankEffect(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeID, uint8_t targetPokeID,
                        int32_t rankType, int8_t rankVolume, bool displayAbility, bool ignoreSubstitute,
-                       bool messageOnFail) {
+                       bool messageOnFail, bool byWazaEffect) {
     system_load_typeinfo((void *)0x89b2);
     auto *rankEffectDesc = (Section_FromEvent_RankEffect_Description_o *)
             il2cpp_object_new(Section_FromEvent_RankEffect_Description_TypeInfo);
@@ -193,6 +193,7 @@ void HandlerRankEffect(EventFactor_EventHandlerArgs_o **args, uint8_t causePokeI
     rankEffectDesc->fields.isDisplayTokuseiWindow = displayAbility;
     rankEffectDesc->fields.isMigawariThrew = ignoreSubstitute;
     rankEffectDesc->fields.isSpFailMessageDisplay = messageOnFail;
+    rankEffectDesc->fields.byWazaEffect = byWazaEffect;
     Common::RankEffect(args,&rankEffectDesc, nullptr);
 }
 void HandlerRankReset(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID) {
