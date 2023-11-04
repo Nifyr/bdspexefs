@@ -1,0 +1,8 @@
+[target=main, version=bd_130]
+// Handler.Item$$handler_Beniironotama_Shinka
+191fe50:
+    b Dpr_Battle_Logic_Handler_Item_handler_Beniironotama_Shinka
+
+// Handler.Item$$handler_Aiironotama_Shinka
+191fdd0:
+    b Dpr_Battle_Logic_Handler_Item_handler_Aiironotama_Shinka

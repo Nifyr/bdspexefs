@@ -1,9 +1,10 @@
 #pragma once 
 
 #include "il2cpp.hpp"
+#include "POKECON.hpp"
 #include "PosPoke.hpp"
-#include "WazaParam.hpp"
 #include "SideEffectStatus.hpp"
+#include "WazaParam.hpp"
 
 namespace Dpr
 {

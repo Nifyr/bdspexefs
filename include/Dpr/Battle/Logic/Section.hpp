@@ -9,6 +9,7 @@
 #include "SectionContainer.hpp"
 #include "SectionSharedData.hpp"
 #include "ServerCommandPutter.hpp"
+#include "ServerCommandQueue.hpp"
 
 namespace Dpr
 {
@@ -34,13 +35,15 @@ namespace Dpr
             };
             
             struct Section_o {
-                int32_t CheckEncoreWazaChange(PokeAction_o *action, MethodInfo *method);
-                ActionSharedData_o * GetActionSharedData(MethodInfo *method);
-                uint8_t GetPokePos(uint8_t pokeID, MethodInfo *method);
-
                 Section_c *klass;
                 void *monitor;
                 Section_Fields fields;
+
+                int32_t CheckEncoreWazaChange(PokeAction_o *action, MethodInfo *method);
+                ActionSharedData_o * GetActionSharedData(MethodInfo *method);
+                BTL_POKEPARAM_o * GetPokeParam(uint8_t pokeID, MethodInfo *method);
+                uint8_t GetPokePos(uint8_t pokeID, MethodInfo *method);
+                int32_t GetRule(MethodInfo *method);
             };
         }
     }

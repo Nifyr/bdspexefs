@@ -12,7 +12,70 @@ namespace Dpr
     {
         namespace Logic
         {
-            struct BTL_POKEPARAM_CORE_PARAM_o;
+            struct BTL_POKEPARAM_CORE_PARAM_c;
+
+            struct BTL_POKEPARAM_GModeParam_c;
+
+            struct BTL_POKEPARAM_GModeParam_Fields {
+                bool isGMode;
+                uint8_t passedTurnCount;
+            };
+
+            struct BTL_POKEPARAM_GModeParam_o {
+                BTL_POKEPARAM_GModeParam_c *klass;
+                void *monitor;
+                BTL_POKEPARAM_GModeParam_Fields fields;
+            };
+
+            struct BTL_POKEPARAM_CORE_PARAM_Fields {
+                struct PokemonParam_o* ppSrc;
+                uint32_t personalRand;
+                uint32_t exp;
+                uint16_t monsno;
+                uint16_t formno;
+                uint16_t hpMax;
+                uint16_t hp;
+                uint16_t item;
+                uint16_t usedItem;
+                uint16_t defaultTokusei;
+                uint8_t level;
+                uint8_t myID;
+                uint8_t mons_pow;
+                uint8_t mons_agility;
+                uint8_t seikaku;
+                uint8_t native_talent_hp;
+                uint8_t native_talent_atk;
+                uint8_t native_talent_def;
+                uint8_t native_talent_spatk;
+                uint8_t native_talent_spdef;
+                uint8_t native_talent_agi;
+                uint16_t defaultFormNo;
+                bool fHensin;
+                bool fFakeEnable;
+                bool fBtlIn;
+                bool fDontResetFormByByOut;
+                bool fForceGEnable;
+                struct BTL_SICKCONT_array* sickCont;
+                struct System_Byte_array* wazaSickCounter;
+                uint8_t confrontRecCount;
+                struct System_Byte_array* confrontRec;
+                uint16_t totalTurnCount;
+                uint8_t fakeViewTargetPokeId;
+                struct DefaultPowerUpDesc_o* defaultPowerUpDesc;
+                uint8_t deadCause;
+                uint8_t deadCausePokeID;
+                uint8_t killCount;
+                bool isRaidBoss;
+                struct RaidBossParam_o* raidBossParam;
+                struct BTL_POKEPARAM_GModeParam_o* gParam;
+            };
+
+            struct BTL_POKEPARAM_CORE_PARAM_o {
+                BTL_POKEPARAM_CORE_PARAM_c *klass;
+                void *monitor;
+                BTL_POKEPARAM_CORE_PARAM_Fields fields;
+            };
+
             struct BTL_POKEPARAM_BASE_PARAM_o;
 
             struct BTL_POKEPARAM_VARIABLE_PARAM_c;
@@ -86,6 +149,7 @@ namespace Dpr
                 bool CheckNemuri(int32_t checkMode, MethodInfo *method);
                 bool CheckSick(int32_t sickType,MethodInfo *method);
                 bool CONFRONT_REC_IsMatch(uint8_t pokeID, MethodInfo *method);
+                void correctMaxHP(MethodInfo *method);
                 uint8_t COUNTER_Get(int32_t cnt, MethodInfo *method);
                 uint8_t GetFriendship(MethodInfo *method);
                 uint8_t GetID(MethodInfo *method);
@@ -104,6 +168,7 @@ namespace Dpr
                 bool IsMatchTokusei(int32_t tokusei, MethodInfo *method);
                 bool IsMatchType(uint8_t type,MethodInfo *method);
                 bool PERMFLAG_Get(int32_t flagID, MethodInfo *method);
+                void setupBySrcDataBase(bool fTypeUpdate, bool fParamUpdate, bool isGMode, MethodInfo *method);
                 bool TURNFLAG_Get(int32_t flagID, MethodInfo *method);
                 void TURNFLAG_Set(int32_t flagID, MethodInfo *method);
                 int32_t WAZA_GetID(uint8_t idx, MethodInfo *method);

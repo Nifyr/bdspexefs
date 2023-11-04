@@ -9,7 +9,22 @@ namespace Dpr
     {
         namespace Logic
         {
-            struct MainModule_c;
+            struct MainModule_RGCTXs;
+
+            struct MainModule_VTable {
+                VirtualInvokeData _0_Equals;
+                VirtualInvokeData _1_Finalize;
+                VirtualInvokeData _2_GetHashCode;
+                VirtualInvokeData _3_ToString;
+            };
+
+            struct MainModule_c {
+                Il2CppClass_1 _1;
+                struct Dpr_Battle_Logic_MainModule_StaticFields* static_fields;
+                MainModule_RGCTXs* rgctx_data;
+                Il2CppClass_2 _2;
+                MainModule_VTable vtable;
+            };
             
             struct MainModule_Fields {
                 struct Dpr_Battle_Logic_BATTLE_SETUP_PARAM_o* m_setupParam;
@@ -72,11 +87,19 @@ namespace Dpr
                 void *monitor;
                 MainModule_Fields fields;
 
+                void CalcNatsukiItemUse(BTL_POKEPARAM_o *bpp, uint16_t itemNo, MethodInfo *method);
                 int32_t GetClientSide(uint8_t clientID, MethodInfo *method);
                 int32_t GetEscapeMode(MethodInfo *method);
                 bool IsFriendPokeID(uint8_t pokeID1, uint8_t pokeID2, MethodInfo *method);
                 bool IsSkyBattle(MethodInfo *method);
+                void RegisterZukanSeeFlag(BTL_POKEPARAM_o *bpp, MethodInfo *method);
             };
+
+            struct MainModule {
+                static uint8_t PokeIDtoClientID(uint8_t pokeID, MethodInfo *method);
+            };
+
+            extern void *MainModule_TypeInfo;
         }
     }
 }

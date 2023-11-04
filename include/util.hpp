@@ -26,12 +26,15 @@ void system_load_typeinfo(void * typeInfo);
 void * system_array_new(void * typeInfo, uint32_t len);
 
 extern void * System_Int64_array_TypeInfo;
+extern void * System_Int32_array_TypeInfo;
 extern void * System_Byte_array_TypeInfo;
 
 MethodInfo * copyMethodInfo(MethodInfo * src, Il2CppMethodPointer methodPointer);
 uint32_t GetBadgeCount();
 EventFactor_EventHandlerTable_o * CreateEventHandler(uint16_t eventID, MethodInfo * src, Il2CppMethodPointer methodPointer);
 System::Array<EventFactor_EventHandlerTable_o *> * CreateEventHandlerTable(uint32_t size);
+void EnsureClassInit(void *typeInfo);
+void EnsureTypeInfoLoaded(bool *datBool, uint64_t datPtr);
 uint8_t HighestMultiple(uint8_t max, uint8_t factor);
 bool HandlerAddFieldEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect, uint8_t turns);
 void HandlerAddPosEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID);

@@ -2,7 +2,6 @@
 #include "Dpr/Battle/Logic/BtlWeather.hpp"
 #include "Dpr/Battle/Logic/Calc.hpp"
 #include "Dpr/Battle/Logic/Common.hpp"
-#include "Dpr/Battle/Logic/DmgAffRec.hpp"
 #include "Dpr/Battle/Logic/EventFactor.hpp"
 #include "Dpr/Battle/Logic/EventID.hpp"
 #include "Dpr/Battle/Logic/EventVar.hpp"
@@ -11,14 +10,14 @@
 #include "Dpr/Battle/Logic/PokeSet.hpp"
 #include "Dpr/Battle/Logic/Section.hpp"
 #include "Dpr/Battle/Logic/Section_CheckNotEffect_Guard.hpp"
+#include "Dpr/Battle/Logic/Section_FromEvent_ChangeTokusei.hpp"
 #include "Dpr/Battle/Logic/WAZADATA.hpp"
 #include "Dpr/Battle/Logic/WazaFailCause.hpp"
 #include "Dpr/Battle/Logic/WazaParam.hpp"
 #include "Pml/Personal/ParamID.hpp"
 #include "Pml/Personal/PersonalTableExtensions.hpp"
 #include "Pml/Personal/PersonalSystem.hpp"
-#include "Pml/PokePara/Accessor.h"
-#include "Pml/PokePara/CoreParam.h"
+#include "Pml/PokePara/CoreParam.hpp"
 #include "Pml/PokePara/Sick.hpp"
 #include "Pml/WazaData/WazaDamageType.hpp"
 #include "Pml/WazaData/WazaFlag.hpp"
@@ -977,12 +976,12 @@ System::Array<EventFactor_EventHandlerTable_o *> * ADD_AsOne1(MethodInfo *method
     return sHandlerTableAsOne1;
 }
 
-//Adds an additional entry to GET_FUNC_TABLE
+//Adds an entry to GET_FUNC_TABLE
 void SetAbilityFunctionTable(System::Array<Tokusei_GET_FUNC_TABLE_ELEM_o> * getFuncTable, uint32_t * idx, int32_t tokusei, Il2CppMethodPointer methodPointer)
 {
     MethodInfo * method = copyMethodInfo(Method_ADD_TetunoKobusi, methodPointer);
     Tokusei_GET_FUNC_TABLE_ELEM_o * elem = &getFuncTable->m_Items[*idx];
-    Tokusei_HandlerGetFunc_o * func = (Tokusei_HandlerGetFunc_o *) il2cpp_object_new(Tokusei_HandlerGetFunc_TypeInfo);
+    auto * func = (Tokusei_HandlerGetFunc_o *) il2cpp_object_new(Tokusei_HandlerGetFunc_TypeInfo);
     func->ctor((intptr_t) methodPointer, method);
     elem->fields.tokusei = tokusei;
     elem->fields.func = func;
@@ -995,7 +994,7 @@ const uint32_t NEW_ABILITIES_COUNT = 18;
 //Entry point. Replaces system_array_new.
 void * Tokusei_system_array_new(void * typeInfo, uint32_t len)
 {
-    System::Array<Tokusei_GET_FUNC_TABLE_ELEM_o> * getFuncTable = (System::Array<Tokusei_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_ABILITIES_COUNT);
+    auto * getFuncTable = (System::Array<Tokusei_GET_FUNC_TABLE_ELEM_o> *) system_array_new(typeInfo, len + NEW_ABILITIES_COUNT);
     uint32_t idx = len;
 
     //0
@@ -1023,4 +1022,72 @@ void * Tokusei_system_array_new(void * typeInfo, uint32_t len)
     socket_log_fmt("%i/%i ability HandlerGetFunc delegates added", NEW_ABILITIES_COUNT, idx - len);
 
     return getFuncTable;
+}
+
+// --- Other functions ---
+extern bool DAT_7104cbfd50;
+void Dpr_Battle_Logic_BTL_POKEPARAM_ChangeForm(BTL_POKEPARAM_o *__this, uint8_t formNo, bool dontResetFormByOut,
+                                               MethodInfo *method) {
+    BTL_POKEPARAM_CORE_PARAM_o *bppcp = __this->fields.m_coreParam;
+    auto *cp = (CoreParam_o *)bppcp->fields.ppSrc;
+    __this->fields.m_formNo = formNo;
+    bppcp->fields.fDontResetFormByByOut = dontResetFormByOut;
+    bool fastModeStarted = cp->StartFastMode(nullptr);
+    cp->ChangeFormNo(formNo, nullptr, nullptr);
+    __this->setupBySrcDataBase(true, true, bppcp->fields.gParam->fields.isGMode, nullptr);
+    __this->correctMaxHP(nullptr);
+    EnsureTypeInfoLoaded(&DAT_7104cbfd50, 0x1ef9);
+    EnsureClassInit(Calc_TypeInfo);
+    uint16_t monsno = bppcp->fields.monsno;
+    uint16_t weight = Calc::PERSONAL_GetParam(monsno, formNo, 0x22, nullptr);
+    if (weight == 0)
+        weight = 1;
+    __this->fields.m_weight = weight;
+    if (formNo == 0 && monsno == 0x1ec )
+        bppcp->fields.defaultFormNo = 0;
+    cp->EndFastMode(fastModeStarted, nullptr);
+}
+extern bool DAT_7104cbb66d;
+extern bool DAT_7104cbe041;
+void Dpr_Battle_Logic_Section_FromEvent_FormChange_formChange(Section_FromEvent_FormChange_o *__this,
+                                                              Section_FromEvent_FormChange_Description_o **description,
+                                                              MethodInfo *method) {
+    Section_FromEvent_FormChange_Description_o *sfrfcd = *description;
+    uint8_t pokeID = sfrfcd->fields.pokeID;
+    BTL_POKEPARAM_o *poke = ((Section_o *)__this)->GetPokeParam(pokeID, nullptr);
+    uint8_t formNo = sfrfcd->fields.formNo;
+    if (poke->fields.m_formNo == formNo) {
+        return;
+    }
+    ServerCommandPutter_o *scp = __this->fields.super.m_pServerCmdPutter;
+    bool displayTokuseiWindow = sfrfcd->fields.isDisplayTokuseiWindow;
+    if (displayTokuseiWindow)
+        scp->TokWin_In(poke, nullptr);
+    scp->ChangeForm(pokeID, formNo, sfrfcd->fields.isDontResetFormByOut, nullptr);
+    if (sfrfcd->fields.isDisplayChangeEffect) {
+        scp->Act_ChangeForm(pokeID, nullptr);
+        scp->Message(&sfrfcd->fields.successMessage, nullptr);
+    }
+    if (displayTokuseiWindow)
+        scp->TokWin_Out(poke, nullptr);
+    __this->fields.super.m_pMainModule->RegisterZukanSeeFlag(poke, nullptr);
+    uint16_t newTokusei = ((CoreParam_o *)poke->fields.m_coreParam->fields.ppSrc)->GetTokuseiNo(nullptr);
+    socket_log_fmt("bpp->fields.m_tokusei: %i", poke->fields.m_tokusei);
+    socket_log_fmt("newTokusei: %i", newTokusei);
+    if (newTokusei != poke->fields.m_tokusei) {
+        EnsureTypeInfoLoaded(&DAT_7104cbb66d, 0xa9f8);
+        EnsureTypeInfoLoaded(&DAT_7104cbe041, 0x2c33);
+        auto *result = (Section_FromEvent_ChangeTokusei_Result_o *)
+                il2cpp_object_new(Section_FromEvent_ChangeTokusei_Result_TypeInfo);
+        result->ctor(nullptr);
+        auto *desc = (Section_FromEvent_ChangeTokusei_Description_o *)
+                il2cpp_object_new(Section_FromEvent_ChangeTokusei_Description_TypeInfo);
+        desc->ctor(nullptr);
+        desc->fields.userPokeID = pokeID;
+        desc->fields.targetPokeID = pokeID;
+        desc->fields.tokuseiID = newTokusei;
+        __this->fields.super.m_pSectionContainer->fields.m_section_FromEvent_ChangeTokusei->Execute(result,
+                                                                                                    &desc,
+                                                                                                    nullptr);
+    }
 }
