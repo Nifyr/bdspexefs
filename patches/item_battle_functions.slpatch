@@ -1,4 +1,0 @@
-[target=main, version=bd_130]
-// Section_UseItem_Core$$Execute
-2175a20:
-    b Dpr_Battle_Logic_Section_UseItem_Core_Execute

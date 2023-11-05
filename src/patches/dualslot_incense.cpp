@@ -1,6 +1,5 @@
 #include "il2cpp.hpp"
 #include "il2cpp-api.h"
-#include "Dpr/Item/ItemInfo.hpp"
 #include "Dpr/UI/UIBag.hpp"
 #include "Pml/PokePara/PokemonParam.h"
 #include "System/Array.hpp"

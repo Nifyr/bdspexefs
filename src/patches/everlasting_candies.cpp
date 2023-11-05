@@ -1,5 +1,4 @@
 #include "il2cpp.hpp"
-#include "Dpr/Item/ItemInfo.hpp"
 #include "Dpr/UI/UIBag.hpp"
 #include "PlayerWork.hpp"
 #include "ItemWork.hpp"

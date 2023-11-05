@@ -6,3 +6,7 @@
 // Handler.Item$$handler_Aiironotama_Shinka
 191fdd0:
     b Dpr_Battle_Logic_Handler_Item_handler_Aiironotama_Shinka
+
+// Exp$$CalcExp
+18f7d70:
+    b Dpr_Battle_Logic_Exp_CalcExp

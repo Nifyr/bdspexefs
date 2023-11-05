@@ -19,6 +19,7 @@ namespace Dpr
                 static bool ITEM_IsBall(uint16_t itemID, MethodInfo *method);
                 static bool ITEM_IsMail(uint16_t item,MethodInfo *method);
                 static BTL_SICKCONT_o MakeDefaultPokeSickCont(uint32_t sick, uint8_t causePokeID, bool isCantUseRand, MethodInfo *method);
+                static uint32_t MulRatio(uint32_t value, int32_t ratio, MethodInfo *method);
                 static uint32_t PERSONAL_GetParam(int32_t mons_no, int32_t form_no, int32_t paramID, MethodInfo *method);
                 static uint32_t QuotMaxHP(BTL_POKEPARAM_o *bpp, uint32_t denom, bool useBeforeGParam, MethodInfo *method);
                 static uint32_t QuotMaxHP_Zero(BTL_POKEPARAM_o *bpp, uint32_t denom, bool useBeforeGParam, MethodInfo *method);

@@ -176,6 +176,7 @@ namespace Dpr
                 uint16_t WAZA_GetPP(uint8_t wazaIdx, MethodInfo *method);
                 bool WAZA_IsUsable(int32_t waza, MethodInfo *method);
                 uint8_t WAZA_SearchIdx(int32_t waza, MethodInfo *method);
+                void WAZA_UpdateID(uint8_t wazaIdx, int32_t waza, uint8_t ppMax, bool fPermenent, MethodInfo *method);
             };
 
             namespace BTL_POKEPARAM_ValueID

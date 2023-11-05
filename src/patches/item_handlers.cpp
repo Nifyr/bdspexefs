@@ -1,5 +1,8 @@
+#include "Dpr/Battle/Logic/Calc.hpp"
 #include "Dpr/Battle/Logic/Common.hpp"
 #include "Dpr/Battle/Logic/EventVar.hpp"
+#include "Dpr/Battle/Logic/Exp.hpp"
+#include "ItemWork.hpp"
 #include "Pml/Personal/PersonalSystem.hpp"
 
 #include "il2cpp-api.h"
@@ -15,6 +18,7 @@ using namespace Pml::Personal;
 // WorkIdx
 
 // ItemIDs
+constexpr uint16_t EXP_CHARM = 1587;
 
 // DexIDs
 constexpr uint16_t KYOGRE = 382;
@@ -65,3 +69,53 @@ void Dpr_Battle_Logic_Handler_Item_handler_Aiironotama_Shinka(EventFactor_EventH
 // Entry point. Replaces system_array_new.
 
 // --- Other functions ---
+// Exp. Charm
+extern bool DAT_7104cbc139;
+void Dpr_Battle_Logic_Exp_CalcExp(Exp_CalcParam_o **calcParam, Exp_CalcResult_o *pResult, MethodInfo *method) {
+    pResult->fields.exp = 0;
+    pResult->fields.byGakusyusouti = false;
+    pResult->fields.isContainBonus = false;
+    Exp_CalcParam_o *ecp = *calcParam;
+    bool isMatch = ecp->fields.isMatch;
+    if (!isMatch && !ecp->fields.isGakusyusoutiOn) return;
+    uint32_t deadPokeLevel = ecp->fields.deadPokeLevel;
+    uint32_t levelCap = ecp->fields.levelCap;
+    if (deadPokeLevel > levelCap)
+        deadPokeLevel = levelCap;
+    uint32_t exp = deadPokeLevel * ecp->fields.deadPokeExp / 5;
+    if (!isMatch) {
+        exp /= 2;
+        pResult->fields.byGakusyusouti = true;
+    }
+    if (exp < 1)
+        exp = 1;
+    exp = Exp::getexp_calc_adjust_level(exp, ecp->fields.getPokeLevel, deadPokeLevel,
+                                        nullptr);
+    EnsureTypeInfoLoaded(&DAT_7104cbc139, 0x47a5);
+    EnsureClassInit(Calc_TypeInfo);
+    if (!ecp->fields.isMyPoke) {
+        int32_t ratio = 0x1800;
+        if (ecp->fields.playerLanguageId != ecp->fields.getPokeLanguageId)
+            ratio = 0x1b33;
+        exp = Calc::MulRatio(exp, ratio, nullptr);
+        pResult->fields.isContainBonus = true;
+    }
+    if (ecp->fields.haveSiawasetamago) {
+        exp = Calc::MulRatio(exp, 0x1800, nullptr);
+        pResult->fields.isContainBonus = true;
+    }
+    if (ecp->fields.isEvoCanceledPoke) {
+        exp = Calc::MulRatio(exp,0x1333,nullptr);
+        pResult->fields.isContainBonus = true;
+    }
+    if (ecp->fields.getPokeFriendship >= 220) {
+        exp = Calc::MulRatio(exp,0x1333,nullptr);
+        pResult->fields.isContainBonus = true;
+    }
+    if (ItemWork::GetItemInfo(EXP_CHARM, nullptr)->get_count(nullptr) > 0) {
+        socket_log_initialize();
+        exp = Calc::MulRatio(exp,0x1800,nullptr);
+        pResult->fields.isContainBonus = true;
+    }
+    pResult->fields.exp = exp;
+}
