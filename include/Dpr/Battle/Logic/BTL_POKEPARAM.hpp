@@ -146,6 +146,7 @@ namespace Dpr
                 void *monitor;
                 BTL_POKEPARAM_Fields fields;
 
+                void ChangeForm(uint8_t formNo, bool dontResetFormByOut, MethodInfo *method);
                 bool CheckNemuri(int32_t checkMode, MethodInfo *method);
                 bool CheckSick(int32_t sickType,MethodInfo *method);
                 bool CONFRONT_REC_IsMatch(uint8_t pokeID, MethodInfo *method);

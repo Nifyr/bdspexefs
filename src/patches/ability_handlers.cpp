@@ -1043,8 +1043,10 @@ void Dpr_Battle_Logic_BTL_POKEPARAM_ChangeForm(BTL_POKEPARAM_o *__this, uint8_t 
     if (weight == 0)
         weight = 1;
     __this->fields.m_weight = weight;
-    if (formNo == 0 && monsno == 0x1ec )
+    if (formNo == 0 && monsno == 0x1ec ) {
         bppcp->fields.defaultFormNo = 0;
+        __this->fields.m_formNo = cp->GetTokuseiNo(nullptr);
+    }
     cp->EndFastMode(fastModeStarted, nullptr);
 }
 extern bool DAT_7104cbb66d;
@@ -1072,8 +1074,6 @@ void Dpr_Battle_Logic_Section_FromEvent_FormChange_formChange(Section_FromEvent_
         scp->TokWin_Out(poke, nullptr);
     __this->fields.super.m_pMainModule->RegisterZukanSeeFlag(poke, nullptr);
     uint16_t newTokusei = ((CoreParam_o *)poke->fields.m_coreParam->fields.ppSrc)->GetTokuseiNo(nullptr);
-    socket_log_fmt("bpp->fields.m_tokusei: %i", poke->fields.m_tokusei);
-    socket_log_fmt("newTokusei: %i", newTokusei);
     if (newTokusei != poke->fields.m_tokusei) {
         EnsureTypeInfoLoaded(&DAT_7104cbb66d, 0xa9f8);
         EnsureTypeInfoLoaded(&DAT_7104cbe041, 0x2c33);

@@ -5,9 +5,6 @@
     bl Tokusei_system_array_new
 
 // Fix ability upon form change
-// BTL_POKEPARAM$$ChangeForm
-1fe2600:
-    b Dpr_Battle_Logic_BTL_POKEPARAM_ChangeForm
 // Section_FromEvent_FormChange$$formChange
 1fb4480:
     b Dpr_Battle_Logic_Section_FromEvent_FormChange_formChange
