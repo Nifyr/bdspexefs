@@ -9,23 +9,6 @@
 namespace Dpr
 {
     namespace UI {
-        struct UIWindow_Fields {
-            UnityEngine_MonoBehaviour_Fields super;
-            struct UIInputController_o* _input;
-            struct UnityEngine_Canvas_o* _canvas;
-            struct UnityEngine_Animator_o* _animator;
-            struct UIAnimationEvent_o* _animEvent;
-            int32_t _transitionFadeType;
-            int32_t _prevWindowId;
-            struct Dpr_MsgWindow_MsgWindow_o* _messageWindow;
-            struct UIManager_UIInstance_o* instance;
-            struct UnityEngine_Events_UnityAction_UIWindow__o* onClosed;
-            struct UnityEngine_Events_UnityAction_UIWindow__o* onPreClose;
-            bool _IsClosing_k__BackingField;
-            int32_t _animStateIn;
-            int32_t _animStateOut;
-        };
-
         struct BagItemButton_c;
         struct BagItemButton_Fields {
             UnityEngine_MonoBehaviour_Fields super;
@@ -83,39 +66,7 @@ namespace Dpr
             BagItemPanel_Fields fields;
         };
 
-        struct UIBag_Fields {
-            UIWindow_Fields super;
-            struct BagItemPanel_o* bagItemPanel;
-            struct PokemonParty_o* pokemonParty;
-            struct BagWazaSelectPanel_o* wazaSelectPanel;
-            struct UnityEngine_RectTransform_o* effectRoot;
-            int32_t _animStateIn;
-            int32_t _animStateOut;
-            int32_t bootType;
-            int32_t modeType;
-            struct Pml_PokePara_PokemonParam_o* onlyViewPokemonParam;
-            int32_t onlyViewPartyIndex;
-            int32_t onlyViewBattlePokemonId;
-            struct UIBag_BattleBootParam_o battleBootParam;
-            struct System_Action_int__o* onSelectedKinomiItem;
-            struct System_Action_o* onCompleteAutoPilot;
-            struct UIMsgWindowController_o* msgWindowController;
-            struct PokemonParty_Param_o* pokemonPartyParam;
-            int32_t displayMoney;
-            bool isWaitUpdate;
-            bool isWaitPokemonParty;
-            bool isKinomiContact;
-            bool isDontBuryNuts;
-            bool isAutoPilot;
-            bool _IsOpenFromBattleTeam_k__BackingField;
-        };
-
         struct UIBag_c;
-        struct UIBag_o {
-            UIBag_c *klass;
-            void *monitor;
-            UIBag_Fields fields;
-        };
     }
 }
 

@@ -19,6 +19,10 @@ void system_load_typeinfo(void * typeInfo)
   _system_load_typeinfo(typeInfo);
 }
 
+void system_array_init(void *array) {
+    _system_array_init(array);
+}
+
 void * system_array_new(void * typeInfo, uint32_t len)
 {
   void * array = _system_array_new(typeInfo, len);
@@ -27,16 +31,14 @@ void * system_array_new(void * typeInfo, uint32_t len)
 }
 
 void EnsureTypeInfoLoaded(bool *datBool, uint64_t datPtr) {
-    if (!*datBool) {
-        system_load_typeinfo((void *)datPtr);
-        *datBool = true;
-    }
+    if (*datBool) return;
+    system_load_typeinfo((void *)datPtr);
+    *datBool = true;
 }
 
 void EnsureClassInit(void *typeInfo) {
-    // TypeInfo structs always have _2 at offset 0xc8
-    auto *_2 = (Il2CppClass_2 *)((uint64_t)typeInfo + 0xc8);
-    if ((_2->bitflags2 >> 1 & 1) != 0 && _2->cctor_finished == 0)
+    auto *c = (Il2CppClass *)typeInfo;
+    if ((c->_2.bitflags2 >> 1 & 1) != 0 && c->_2.cctor_finished == 0)
         il2cpp_runtime_class_init(typeInfo);
 }
 

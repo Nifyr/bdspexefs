@@ -76,4 +76,5 @@ namespace System
         String * Empty;
     };
 
+    struct String_o;
 }

@@ -1,3 +1,4 @@
+/*
 #include "il2cpp.hpp"
 #include "il2cpp-api.h"
 #include "Dpr/UI/UIBag.hpp"
@@ -452,3 +453,4 @@ XLSXContent::FieldEncountTable::Sheettable_o * Incense_GameManager_GetFieldEncou
 
     return inData;
 }
+*/
