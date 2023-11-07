@@ -22,6 +22,7 @@ using namespace System::Collections::Generic;
 
 // ItemIDs
 constexpr uint16_t GRACIDEA = 466;
+constexpr uint16_t DNA_SPLICERS = 628;
 constexpr uint16_t REVEAL_GLASS = 638;
 constexpr uint16_t ROTOM_CATALOG = 1278;
 
@@ -30,12 +31,38 @@ constexpr uint16_t ROTOM = 479;
 constexpr uint16_t SHAYMIN = 492;
 constexpr uint16_t TORNADUS = 641;
 constexpr uint16_t THUNDURUS = 642;
+constexpr uint16_t RESHIRAM = 643;
+constexpr uint16_t ZEKROM = 644;
 constexpr uint16_t LANDORUS = 645;
+constexpr uint16_t KYUREM = 646;
+
+constexpr uint16_t UNOWN = 201; // Testing
+constexpr uint16_t KYOGRE = 382;
+constexpr uint16_t GROUDON = 383;
+
+// MoveIDs
+constexpr int32_t SCARY_FACE = 184;
+constexpr int32_t GLACIATE = 549;
+constexpr int32_t FREEZE_SHOCK = 553;
+constexpr int32_t ICE_BURN = 554;
+constexpr int32_t FUSION_FLARE = 558;
+constexpr int32_t FUSION_BOLT = 559;
+
+// WazaIdx
+constexpr uint8_t NULL_WAZA_IDX = 4;
 
 // Reveal Glass
+// DNA Splicers
 void ConditionalAdd(List_ZoneID__o * zidl, int32_t flagNo, int32_t item) {
     if (FlagWork::GetFlag(0x530,nullptr))
         zidl->Add(0x54,List_ContextMenuID__Add);
+}
+
+void ReplaceMove(CoreParam_o *cp, int32_t oldMoveID, int32_t newMoveID) {
+    uint8_t wazaIndex = cp->GetWazaIndex(oldMoveID, nullptr);
+    if (wazaIndex == NULL_WAZA_IDX) return;
+    cp->SetWaza(wazaIndex, newMoveID, nullptr);
+    cp->SetWazaPP(wazaIndex, cp->GetWazaMaxPP(wazaIndex, nullptr), nullptr);
 }
 extern bool DAT_7104cbb9cf;
 extern String_o *StringLiteral_11712;
@@ -49,11 +76,11 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
     system_array_init(&uibdc1440->fields.__4__this);
     uibdc1440->fields.pokemonPartyItem = pokemonPartyItem;
     system_array_init(&uibdc1440->fields.pokemonPartyItem);
-    Pml::PokePara::PokemonParam_o *pp = pokemonPartyItem->fields._param->fields.pokemonParam;
+    PokemonParam_o *pp = pokemonPartyItem->fields._param->fields.pokemonParam;
     uibdc1440->fields.pokemonParam = pp;
     system_array_init(&uibdc1440->fields.pokemonParam);
     int32_t itemID = itemInfo->get_Id(nullptr);
-    CoreParam_o *cp = (CoreParam_o *)pp;
+    auto *cp = (CoreParam_o *)pp;
     UIMsgWindowController_o *uimwc = __this->fields.msgWindowController;
     int32_t dexID = cp->GetMonsNo(nullptr);
     if (itemID == ROTOM_CATALOG && dexID == ROTOM) {
@@ -96,12 +123,60 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
         auto *onComplete = (Action_PokeWalkingFormation_SheetSheet1__o *)
                 il2cpp_object_new(Action_PokemonParam__TypeInfo);
         onComplete->ctor((Il2CppObject *)__this, UIBag_ShowFormChangeResult);
-        if (pokemonPartyItem->FormChange(1 - formID, __this->fields.effectRoot, nullptr,
-                                         (Action_PokemonParam__o *)onComplete, nullptr))
-            __this->fields.isWaitUpdate = true;
-        __this->Close(__this->fields.super.onClosed, (__this->fields).super._prevWindowId,
-                      '\x01', nullptr);
+        pokemonPartyItem->FormChange(1 - formID, __this->fields.effectRoot, nullptr,
+                                     (Action_PokemonParam__o *)onComplete, nullptr);
+        __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
+                      false, nullptr);
         return;
+    }
+    if (itemID == DNA_SPLICERS && dexID == KYUREM) {
+        uint16_t nextFormID = formID;
+        if (formID == 0) {
+            List_PokemonPartyItem__o *ppil = __this->fields.pokemonParty->fields._activeItems;
+            int32_t fuseDexID = -1;
+            for (int32_t i = 0; i < ppil->fields._size; ++i) {
+                int32_t otherDexID = ((CoreParam_o *)ppil->fields._items->m_Items[i]->fields._param->fields.pokemonParam)->
+                        GetMonsNo(nullptr);
+                if (otherDexID == RESHIRAM || otherDexID == ZEKROM) {
+                    fuseDexID = otherDexID;
+                    break;
+                }
+            }
+            switch (fuseDexID) {
+                case RESHIRAM: nextFormID = 1; break;
+                case ZEKROM: nextFormID = 2; break;
+                default: break;
+            }
+        }
+        else
+            nextFormID = 0;
+        if (nextFormID != formID) {
+            auto *onComplete = (Action_PokeWalkingFormation_SheetSheet1__o *)
+                    il2cpp_object_new(Action_PokemonParam__TypeInfo);
+            onComplete->ctor((Il2CppObject *)__this, UIBag_ShowFormChangeResult);
+            pokemonPartyItem->FormChange(nextFormID, __this->fields.effectRoot, nullptr,
+                                         (Action_PokemonParam__o *)onComplete, nullptr);
+            switch (nextFormID) {
+                case 0:
+                    ReplaceMove(cp, FREEZE_SHOCK, GLACIATE);
+                    ReplaceMove(cp, ICE_BURN, GLACIATE);
+                    ReplaceMove(cp, FUSION_FLARE, SCARY_FACE);
+                    ReplaceMove(cp, FUSION_BOLT, SCARY_FACE);
+                    break;
+                case 1:
+                    ReplaceMove(cp, SCARY_FACE, FUSION_FLARE);
+                    ReplaceMove(cp, GLACIATE, ICE_BURN);
+                    break;
+                case 2:
+                    ReplaceMove(cp, SCARY_FACE, FUSION_BOLT);
+                    ReplaceMove(cp, GLACIATE, FREEZE_SHOCK);
+                    break;
+                default: break;
+            }
+            __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
+                          false, nullptr);
+            return;
+        }
     }
     auto *onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
     onCloseWindow->ctor((Il2CppObject *)__this, UIBag_EndSelectPokemonParty);

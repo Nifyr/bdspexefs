@@ -8,6 +8,7 @@
 #include "UIWindow.hpp"
 
 using namespace System;
+using namespace Pml::PokePara;
 
 namespace Dpr
 {
@@ -17,7 +18,7 @@ namespace Dpr
             int32_t TopMemberIndex;
             bool IsTrainerBattle;
             bool isDouble;
-            System::Array<bool> * SasiosaeFlags;
+            struct System_Boolean_array* SasiosaeFlags;
         };
 
         struct UIBag_BattleBootParam_o {
@@ -36,7 +37,7 @@ namespace Dpr
             int32_t _animStateOut;
             int32_t bootType;
             int32_t modeType;
-            struct PokemonParam_o* onlyViewPokemonParam;
+            PokemonParam_o* onlyViewPokemonParam;
             int32_t onlyViewPartyIndex;
             int32_t onlyViewBattlePokemonId;
             struct UIBag_BattleBootParam_o battleBootParam;
@@ -48,7 +49,9 @@ namespace Dpr
             bool isWaitUpdate;
             bool isWaitPokemonParty;
             bool isKinomiContact;
+            bool isDontBuryNuts;
             bool isAutoPilot;
+            bool _IsOpenFromBattleTeam_k__BackingField;
         };
 
         struct UIBag_o {

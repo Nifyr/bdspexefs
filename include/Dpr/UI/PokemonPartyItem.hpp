@@ -1,8 +1,10 @@
 #include "il2cpp.hpp"
 #include "Pml/PokePara/PokemonParam.hpp"
+#include "PokemonParty.hpp"
 #include "System/Action.hpp"
 
 using namespace System;
+using namespace Pml::PokePara;
 
 namespace Dpr
 {
@@ -13,7 +15,7 @@ namespace Dpr
         struct PokemonPartyItem_Param_c;
         
         struct PokemonPartyItem_Param_Fields {
-            struct Pml::PokePara::PokemonParam_o* pokemonParam;
+            PokemonParam_o* pokemonParam;
             bool showItemName;
             struct PokemonPartyItem_Param_Contest_o* contest;
             struct PokemonPartyItem_Param_Battle_o* battle;
@@ -52,6 +54,9 @@ namespace Dpr
             struct UnityEngine_Vector3_o _offsetIconPos;
             struct UnityEngine_Vector3_o _initIconPos;
             struct UnityEngine_Animator_o* _animator;
+            struct UnityEngine_Coroutine_o* _coroutine;
+            struct EffectInstance_o* _effectInstance;
+            bool _isDestroy;
         };
         
         struct PokemonPartyItem_o {
@@ -60,6 +65,13 @@ namespace Dpr
             PokemonPartyItem_Fields fields;
 
             bool FormChange(uint16_t formNo, UnityEngine_RectTransform_o *effectRoot, Action_PokemonParam__o *onChangeIcon, Action_PokemonParam__o *onComplete, MethodInfo *method);
+        };
+
+        struct PokemonPartyItem_array {
+            Il2CppObject obj;
+            Il2CppArrayBounds *bounds;
+            il2cpp_array_size_t max_length;
+            PokemonPartyItem_o* m_Items[65535];
         };
     }
 }
