@@ -67,7 +67,7 @@ namespace Dpr
 
         struct UIBag___c__DisplayClass144_0_Fields {
             struct UIBag_o *__4__this;
-            struct Pml::PokePara::PokemonParam_o *pokemonParam;
+            struct PokemonParam_o *pokemonParam;
             struct PokemonPartyItem_o *pokemonPartyItem;
         };
 
@@ -79,9 +79,42 @@ namespace Dpr
             void ctor(MethodInfo *method);
         };
 
+        struct UIBag___c__DisplayClass145_0_c;
+
+        struct UIBag___c__DisplayClass145_0_Fields {
+            struct PokemonParam_o *pokemonParam;
+            struct UIBag_o *__4__this;
+        };
+
+        struct UIBag___c__DisplayClass145_0_o {
+            struct UIBag___c__DisplayClass145_0_c *klass;
+            void *monitor;
+            struct UIBag___c__DisplayClass145_0_Fields fields;
+
+            void ctor(MethodInfo *method);
+        };
+
+        struct UIBag___c__DisplayClass145_1_c;
+
+        struct UIBag___c__DisplayClass145_1_Fields {
+            int32_t addWazaNo;
+            struct UIBag___c__DisplayClass145_0_o* CS___8__locals1;
+            struct Action_WazaNo__WazaNo__o* __9__4;
+            struct Action_int__o* __9__3;
+        };
+
+        struct UIBag___c__DisplayClass145_1_o {
+            struct UIBag___c__DisplayClass145_1_c *klass;
+            void *monitor;
+            struct UIBag___c__DisplayClass145_1_Fields fields;
+        };
+
         extern void *UIBag___c__DisplayClass144_0_TypeInfo;
+        extern void *UIBag___c__DisplayClass145_0_TypeInfo;
+        extern void *UIBag___c__DisplayClass145_1_TypeInfo;
 
         extern MethodInfo *UIBag___c__DisplayClass144_0__UseFormChangeItem_b__0;
+        extern MethodInfo *UIBag___c__DisplayClass145_1__ShowFormChangeResult_b__2;
         extern MethodInfo *UIBag_EndSelectPokemonParty;
         extern MethodInfo *UIBag_ShowFormChangeResult;
     }

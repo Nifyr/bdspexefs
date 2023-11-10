@@ -21,12 +21,22 @@ using namespace Pml::Personal;
 constexpr uint16_t EXP_CHARM = 1587;
 
 // DexIDs
+constexpr uint16_t FARFETCH_D = 83;
 constexpr uint16_t KYOGRE = 382;
 constexpr uint16_t GROUDON = 383;
+constexpr uint16_t SIRFETCH_D = 865;
 
 // HanderTables
 
 // --- EventHandler delegates ---
+// Leek
+void Dpr_Battle_Logic_Handler_Item_handler_Naganegi(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, MethodInfo *method) {
+    if (Common::GetEventVar(args, EventVar::POKEID_ATK, nullptr) != pokeID) return;
+    uint16_t dexID = Common::GetPokeParam(args, pokeID, nullptr)->GetMonsNo(nullptr);
+    if (dexID != FARFETCH_D && dexID != SIRFETCH_D) return;
+    Common::RewriteEventVar(args, EventVar::CRITICAL_RANK, Common::GetEventVar(
+            args, EventVar::CRITICAL_RANK, nullptr) + 2, nullptr);
+}
 // Red Orb
 uint8_t HandlerRedOrbGetFormID(uint8_t formNo, uint8_t targetFormNo) {
     return HighestMultiple(formNo, 2) + targetFormNo;

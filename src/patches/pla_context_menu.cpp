@@ -770,7 +770,7 @@ void nameRater(PokemonWindow_DisplayClass25_0_o * displayClass, ContextMenuItem_
             break;
     }
 
-    Dpr::Message::MessageWordSetHelper::SetPokemonNickNameWord(0, corePokeParam, true, (MethodInfo *) nullptr);
+    Dpr::Message::MessageWordSetHelper::SetPokemonNickNameWord(0, (CoreParam_o *)corePokeParam, true, (MethodInfo *) nullptr);
     socket_log_fmt("PTR_SoftwareKeyboard_Param_TypeInfo: %08X\n", PTR_SoftwareKeyboard_Param_TypeInfo);
     swKeyboardParam = (SoftwareKeyboard_Param_o *) il2cpp_object_new(*PTR_SoftwareKeyboard_Param_TypeInfo);
     swKeyboardParam->ctor((MethodInfo *) nullptr);

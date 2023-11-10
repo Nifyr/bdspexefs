@@ -1,4 +1,8 @@
 [target=main, version=bd_130]
+// Handler.Item$$handler_Naganegi
+1911260:
+    b Dpr_Battle_Logic_Handler_Item_handler_Naganegi
+
 // Handler.Item$$handler_Beniironotama_Shinka
 191fe50:
     b Dpr_Battle_Logic_Handler_Item_handler_Beniironotama_Shinka
@@ -10,3 +14,7 @@
 // Exp$$CalcExp
 18f7d70:
     b Dpr_Battle_Logic_Exp_CalcExp
+
+// UIBag$$UseFormChangeItem
+185e270:
+    b Dpr_UI_UIBag_UseFormChangeItem
