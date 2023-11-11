@@ -98,19 +98,7 @@ namespace XLSXContent
         };
     }
 
-    struct ItemTable_Fields {
-        UnityEngine_ScriptableObject_Fields super;
-        System::Array<XLSXContent::ItemTable::SheetItem_o *> * Item;
-        System::Array<XLSXContent::ItemTable::SheetWazaMachine_o *> * WazaMachine;
-    };
-
     struct ItemTable_c;
-
-    struct ItemTable_o {
-        ItemTable_c *klass;
-        void *monitor;
-        ItemTable_Fields fields;
-    };
 }
 
 using namespace XLSXContent;
@@ -141,11 +129,11 @@ HashSet_WazaNo__o * CoreParam::CollectRemindableWaza( MethodInfo *method )
     socket_log_fmt("pmlUse: %08X\n", pmlUse);
     ItemTable_o * itemTable = pmlUse->fields.itemPrmTotal;
     socket_log_fmt("itemTable: %08X\n", itemTable);
-    System::Array<SheetWazaMachine_o *> * wazaMachine = itemTable->fields.WazaMachine;
+    System::Array<ItemTable_SheetWazaMachine_o *> * wazaMachine = itemTable->fields.WazaMachine;
     socket_log_fmt("wazaMachine: %08X\n", wazaMachine);
     socket_log_fmt("this->fields.m_accessor: %08X\n", this->fields.m_accessor);
 
-    SheetWazaMachine_o * iWazaMachine;
+    ItemTable_SheetWazaMachine_o * iWazaMachine;
     for (size_t i = 0; i < wazaMachine->max_length; i++)
     {
         iWazaMachine = wazaMachine->m_Items[i];

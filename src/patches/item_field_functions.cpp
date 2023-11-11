@@ -5,6 +5,8 @@
 #include "GameManager.hpp"
 #include "ItemWork.hpp"
 #include "Pml/PokePara/CoreParam.hpp"
+#include "Pml/PmlUse.hpp"
+#include "Pml/Personal/PersonalSystem.hpp"
 #include "System/Action.hpp"
 #include "System/Collections/Generic/List.hpp"
 
@@ -13,13 +15,21 @@
 #include "logger.hpp"
 #include "util.hpp"
 
+#define MAKEUP_BAG_ENABLED true
+#define MAX_MOVE_COUNT 4
+#define MAX_EGG_MOVE_COUNT 4
+
 using namespace Dpr::Message;
 using namespace Dpr::UI;
+using namespace Pml;
+using namespace Pml::Personal;
+using namespace XLSXContent;
 
 // ItemIDs
 constexpr uint16_t GRACIDEA = 466;
 constexpr uint16_t DNA_SPLICERS = 628;
 constexpr uint16_t REVEAL_GLASS = 638;
+constexpr uint16_t MAKEUP_BAG = 706;
 constexpr uint16_t PRISON_BOTTLE = 765;
 constexpr uint16_t ZYGARDE_CUBE = 847;
 constexpr uint16_t RED_NECTAR = 853;
@@ -29,8 +39,10 @@ constexpr uint16_t PURPLE_NECTAR = 856;
 constexpr uint16_t N_SOLARIZER = 943;
 constexpr uint16_t N_LUNARIZER = 944;
 constexpr uint16_t ROTOM_CATALOG = 1278;
+constexpr uint16_t REINS_OF_UNITY = 1590;
 
 // DexIDs
+constexpr uint16_t PIKACHU = 25;
 constexpr uint16_t ROTOM = 479;
 constexpr uint16_t SHAYMIN = 492;
 constexpr uint16_t TORNADUS = 641;
@@ -39,12 +51,16 @@ constexpr uint16_t RESHIRAM = 643;
 constexpr uint16_t ZEKROM = 644;
 constexpr uint16_t LANDORUS = 645;
 constexpr uint16_t KYUREM = 646;
+constexpr uint16_t FURFROU = 676;
 constexpr uint16_t ZYGARDE = 718;
 constexpr uint16_t HOOPA = 720;
 constexpr uint16_t ORICORIO = 741;
 constexpr uint16_t SOLGALEO = 791;
 constexpr uint16_t LUNALA = 792;
 constexpr uint16_t NECROZMA = 800;
+constexpr uint16_t GLASTRIER = 896;
+constexpr uint16_t SPECTRIER = 897;
+constexpr uint16_t CALYREX = 898;
 
 constexpr uint16_t UNOWN = 201; // Testing
 constexpr uint16_t KYOGRE = 382;
@@ -52,15 +68,23 @@ constexpr uint16_t GROUDON = 383;
 
 // MoveIDs
 constexpr int32_t NULL_WAZA = 0;
+constexpr int32_t THUNDER_SHOCK = 84;
 constexpr int32_t CONFUSION = 93;
 constexpr int32_t SCARY_FACE = 184;
+constexpr int32_t METEOR_MASH = 309;
 constexpr int32_t GLACIATE = 549;
 constexpr int32_t FREEZE_SHOCK = 553;
 constexpr int32_t ICE_BURN = 554;
+constexpr int32_t ICICLE_CRASH = 556;
 constexpr int32_t FUSION_FLARE = 558;
 constexpr int32_t FUSION_BOLT = 559;
+constexpr int32_t FLYING_PRESS = 560;
+constexpr int32_t DRAINING_KISS = 577;
+constexpr int32_t ELECTRIC_TERRAIN = 604;
 constexpr int32_t SUNSTEEL_STRIKE = 713;
 constexpr int32_t MOONGEIST_BEAM = 714;
+constexpr int32_t GLACIAL_LANCE = 824;
+constexpr int32_t ASTRAL_BARRAGE = 825;
 
 // WazaIdx
 constexpr uint8_t NULL_WAZA_IDX = 4;
@@ -108,6 +132,13 @@ void ReplaceMove(CoreParam_o *cp, int32_t oldMoveID, int32_t newMoveID) {
     if (wazaIndex == NULL_WAZA_IDX) return;
     cp->SetWaza(wazaIndex, newMoveID, nullptr);
 }
+void RemoveMove(CoreParam_o *cp, int32_t removeMoveID) {
+    uint8_t wazaIndex = cp->GetWazaIndex(removeMoveID, nullptr);
+    cp->SetWaza(wazaIndex, NULL_WAZA, nullptr);
+    cp->SetWazaPPUpCount(wazaIndex, 0, nullptr);
+    cp->SetWazaPP(wazaIndex, 0, nullptr);
+    cp->CloseUpWazaPos(nullptr);
+}
 extern String_o *StringLiteral_11741;
 extern bool DAT_7104cbd69d;
 void ForgetMove(UIBag_o *uib, CoreParam_o *cp, int32_t forgetMoveID, int32_t fallbackMoveID, bool *close) {
@@ -115,12 +146,9 @@ void ForgetMove(UIBag_o *uib, CoreParam_o *cp, int32_t forgetMoveID, int32_t fal
     uint8_t wazaIndex = cp->GetWazaIndex(forgetMoveID, nullptr);
     if (wazaIndex == NULL_WAZA_IDX) return;
     *close = false;
-    cp->SetWaza(wazaIndex, NULL_WAZA, nullptr);
-    cp->SetWazaPPUpCount(wazaIndex, 0, nullptr);
-    cp->SetWazaPP(wazaIndex, 0, nullptr);
-    cp->CloseUpWazaPos(nullptr);
+    RemoveMove(cp, forgetMoveID);
     if (cp->GetWazaCount(nullptr) == 0)
-        cp->SetWaza(wazaIndex, fallbackMoveID, nullptr);
+        cp->SetWaza(0, fallbackMoveID, nullptr);
     MessageWordSetHelper::SetPokemonNickNameWord(0, cp, true, nullptr);
     MessageWordSetHelper::SetWazaNameWord(1, forgetMoveID, nullptr);
     uib->fields.msgWindowController->OpenMsgWindow(0, StringLiteral_11741, true,
@@ -137,7 +165,7 @@ void LearnMove(UIBag_o *uib, PokemonParam_o *pp, int32_t moveID, bool *close) {
     if (cp->GetWazaIndex(moveID, nullptr) != NULL_WAZA_IDX) return;
     *close = false;
     uint8_t wazaIndex = cp->GetWazaCount(nullptr);
-    if (wazaIndex < 4) {
+    if (wazaIndex < MAX_MOVE_COUNT) {
         cp->SetWaza(wazaIndex, moveID, nullptr);
         MessageWordSetHelper::SetPokemonNickNameWord(0, cp, true, nullptr);
         MessageWordSetHelper::SetWazaNameWord(1, moveID, nullptr);
@@ -167,6 +195,37 @@ void LearnMove(UIBag_o *uib, PokemonParam_o *pp, int32_t moveID, bool *close) {
     uib->fields.msgWindowController->OpenMsgWindow(0, StringLiteral_11742, true,
                                                    false, onFinishedMessage, nullptr,
                                                    nullptr);
+}
+void ReduceToLearnableMoves(UIBag_o *uib, PokemonParam_o *pp, int32_t fallbackMoveID, bool *close) {
+    auto *cp = (CoreParam_o *)pp;
+    int32_t dexID = cp->GetMonsNo(nullptr);
+    uint16_t formID = cp->GetFormNo(nullptr);
+    PersonalSystem::LoadPersonalData(dexID, formID, nullptr);
+    PersonalSystem::LoadWazaOboeData(dexID, formID, nullptr);
+    uint8_t learnSetSize = PersonalSystem::GetWazaOboeNum(nullptr);
+    Array<ItemTable_SheetWazaMachine_o *> *itswms = PmlUse_o::get_Instance((MethodInfo *) nullptr)->fields.itemPrmTotal->fields.WazaMachine;
+    uint8_t moveCount = cp->GetWazaCount(nullptr);
+    for (int i = 0; i < moveCount; ++i) {
+        int32_t moveID = cp->GetWazaNo(i, nullptr);
+        if (moveID == NULL_WAZA) continue;
+        bool keep = false;
+        for (int j = 0; j < MAX_EGG_MOVE_COUNT && !keep; ++j)
+            keep = moveID == cp->GetTamagoWazaNo(j, nullptr);
+        for (int j = 0; j < learnSetSize && !keep; ++j)
+            keep = moveID == PersonalSystem::GetWazaOboeWazaNo(j, nullptr);
+        for (int j = 0; j < itswms->max_length && !keep; ++j) {
+            ItemTable_SheetWazaMachine_o *itswm = itswms->m_Items[j];
+            if (PersonalSystem::CheckPersonalWazaMachine(itswm->fields.machineNo, (MethodInfo *) nullptr))
+                keep = moveID == itswm->fields.wazaNo;
+        }
+        if (keep) continue;
+        cp->SetWaza(i, NULL_WAZA, nullptr);
+        cp->SetWazaPPUpCount(i, 0, nullptr);
+        cp->SetWazaPP(i, 0, nullptr);
+    }
+    cp->CloseUpWazaPos(nullptr);
+    if (cp->GetWazaCount(nullptr) == 0)
+        LearnMove(uib, pp, fallbackMoveID, close);
 }
 extern bool DAT_7104cbb9cf;
 extern String_o *StringLiteral_11712;
@@ -217,9 +276,44 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
         GameManager::get_currentPeriodOfDay(nullptr) - 3 > 1 && cp->GetSick(nullptr) != 3)
             if (FormChange(__this, pokemonPartyItem, &fail, 1))
                 __this->fields.isWaitUpdate = true;
+    } else if (MAKEUP_BAG_ENABLED && itemID == MAKEUP_BAG) {
+        if (dexID == PIKACHU && formID >= 1 && formID < 7) {
+            uint16_t nextFormID = formID % 6 + 1;
+            FormChange(__this, pokemonPartyItem, &fail, nextFormID);
+            bool close = true;
+            switch (nextFormID) {
+                case 1:
+                    ForgetMove(__this, cp, FLYING_PRESS, THUNDER_SHOCK, &close);
+                    break;
+                case 2:
+                    LearnMove(__this, pp, METEOR_MASH, &close);
+                    break;
+                case 3:
+                    RemoveMove(cp, METEOR_MASH);
+                    LearnMove(__this, pp, ICICLE_CRASH, &close);
+                    break;
+                case 4:
+                    RemoveMove(cp, ICICLE_CRASH);
+                    LearnMove(__this, pp, DRAINING_KISS, &close);
+                    break;
+                case 5:
+                    RemoveMove(cp, DRAINING_KISS);
+                    LearnMove(__this, pp, ELECTRIC_TERRAIN, &close);
+                    break;
+                case 6:
+                    RemoveMove(cp, ELECTRIC_TERRAIN);
+                    LearnMove(__this, pp, FLYING_PRESS, &close);
+                    break;
+                default: break;
+            }
+            if (close)
+                __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
+                              false, nullptr);
+        } else if (dexID == FURFROU)
+            FormChangeClose(__this, pokemonPartyItem, &fail, (formID + 1) % 10);
     } else if ((itemID == REVEAL_GLASS && (dexID == TORNADUS || dexID == THUNDURUS || dexID == LANDORUS)) ||
-            (itemID == PRISON_BOTTLE && dexID == UNOWN))
-        FormChangeClose(__this, pokemonPartyItem, &fail, 1 - formID);
+            (itemID == PRISON_BOTTLE && dexID == HOOPA))
+        FormChangeClose(__this, pokemonPartyItem, &fail, (formID + 1) % 2);
     else if (itemID == DNA_SPLICERS && dexID == KYUREM) {
         uint16_t nextFormID = formID;
         if (formID == 0)
@@ -252,7 +346,7 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
             __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
                           false, nullptr);
         }
-    } else if (itemID == ZYGARDE_CUBE && dexID == UNOWN && formID < 4)
+    } else if (itemID == ZYGARDE_CUBE && dexID == ZYGARDE && formID < 4)
         FormChangeClose(__this, pokemonPartyItem, &fail, (formID + 1) % 4);
     else if (dexID == ORICORIO) {
         if (itemID == RED_NECTAR && formID != 0)
@@ -265,15 +359,15 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
             FormChangeClose(__this, pokemonPartyItem, &fail, 3);
         if (!fail)
             ItemWork::SubItem(itemID, 1, nullptr);
-    } else if (dexID == UNOWN) {
+    } else if (dexID == NECROZMA) {
         uint16_t nextFormID = formID;
         if (itemID == N_SOLARIZER) {
-            if (formID == 0 && PartyHasDexID(__this, GROUDON))
+            if (formID == 0 && PartyHasDexID(__this, SOLGALEO))
                 nextFormID = 1;
             else if (formID == 1)
                 nextFormID = 0;
         } else if (itemID == N_LUNARIZER) {
-            if (formID == 0 && PartyHasDexID(__this, KYOGRE))
+            if (formID == 0 && PartyHasDexID(__this, LUNALA))
                 nextFormID = 2;
             else if (formID == 2)
                 nextFormID = 0;
@@ -297,6 +391,35 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
             if (close)
                 __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
                               false, nullptr);
+        }
+    } else if (itemID == REINS_OF_UNITY && dexID == CALYREX) {
+        uint16_t nextFormID = formID;
+        if (formID == 0)
+            switch (GetFuseDexID(__this, GLASTRIER, SPECTRIER)) {
+                case GLASTRIER: nextFormID = 1; break;
+                case SPECTRIER: nextFormID = 2; break;
+                default: break;
+            }
+        else
+            nextFormID = 0;
+        if (nextFormID != formID) {
+            FormChange(__this, pokemonPartyItem, &fail, nextFormID);
+            bool close = true;
+            switch (nextFormID) {
+                case 0:
+                    ReduceToLearnableMoves(__this, pp, CONFUSION, &close);
+                    break;
+                case 1:
+                    LearnMove(__this, pp, GLACIAL_LANCE, &close);
+                    break;
+                case 2:
+                    LearnMove(__this, pp, ASTRAL_BARRAGE, &close);
+                    break;
+                default: break;
+            }
+            if (close)
+                __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
+                          false, nullptr);
         }
     }
     if (!fail) return;

@@ -1,53 +1,31 @@
-#pragma once
-
 #include "il2cpp.hpp"
 
-namespace XLSXContent
-{
-    struct PersonalTable_o* personalTotal;
-    struct GrowTable_o* growTableTotal;
-    struct EvolveTable_o* evolveTableTotal;
-    struct WazaOboeTable_o* wazaOboeTotal;
-    struct WazaTable_o* wazaDataTotal;
-    struct ItemTable_o* itemPrmTotal;
-    struct TamagoWazaTable_o* tamagoWazaTotal;
-    struct AddPersonalTable_o* addPersonalTotal;
-    struct SealTable_o* sealTotal;
-    struct UgItemTable_o* ugItemPrmTotal;
-    struct TamaTable_o* tamaTableTotal;
-    struct PedestalTable_o* pedestalTableTotal;
-    struct StoneStatuEeffect_o* stoneStatuEeffectTotal;
-    struct UgFatherPos_o* ugfPosTotal;
-    struct UgFatherExpansion_o* ugfExpansionTotal;
-    struct UgFatherShopTable_o* ugfShopTotal;
-}
+#include "XLSXContent/ItemTable.hpp"
+
+using namespace XLSXContent;
 
 namespace Pml
 {
-    namespace PokePara
-    {
-        struct EvolveManager_o;
-    }
 
     struct PmlUse_Fields {
         bool isAutoLoad;
-        XLSXContent::PersonalTable_o* personalTotal;
-        XLSXContent::GrowTable_o* growTableTotal;
-        XLSXContent::EvolveTable_o* evolveTableTotal;
-        XLSXContent::WazaOboeTable_o* wazaOboeTotal;
-        XLSXContent::WazaTable_o* wazaDataTotal;
-        XLSXContent::ItemTable_o* itemPrmTotal;
-        XLSXContent::TamagoWazaTable_o* tamagoWazaTotal;
-        XLSXContent::AddPersonalTable_o* addPersonalTotal;
-        XLSXContent::SealTable_o* sealTotal;
-        XLSXContent::UgItemTable_o* ugItemPrmTotal;
-        XLSXContent::TamaTable_o* tamaTableTotal;
-        XLSXContent::PedestalTable_o* pedestalTableTotal;
-        XLSXContent::StoneStatuEeffect_o* stoneStatuEeffectTotal;
-        XLSXContent::UgFatherPos_o* ugfPosTotal;
-        XLSXContent::UgFatherExpansion_o* ugfExpansionTotal;
-        XLSXContent::UgFatherShopTable_o* ugfShopTotal;
-        Pml::PokePara::EvolveManager_o* evolveManager;
+        struct XLSXContent_PersonalTable_o* personalTotal;
+        struct XLSXContent_GrowTable_o* growTableTotal;
+        struct XLSXContent_EvolveTable_o* evolveTableTotal;
+        struct XLSXContent_WazaOboeTable_o* wazaOboeTotal;
+        struct XLSXContent_WazaTable_o* wazaDataTotal;
+        ItemTable_o* itemPrmTotal;
+        struct XLSXContent_TamagoWazaTable_o* tamagoWazaTotal;
+        struct XLSXContent_AddPersonalTable_o* addPersonalTotal;
+        struct XLSXContent_SealTable_o* sealTotal;
+        struct XLSXContent_UgItemTable_o* ugItemPrmTotal;
+        struct XLSXContent_TamaTable_o* tamaTableTotal;
+        struct XLSXContent_PedestalTable_o* pedestalTableTotal;
+        struct XLSXContent_StoneStatuEeffect_o* stoneStatuEeffectTotal;
+        struct XLSXContent_UgFatherPos_o* ugfPosTotal;
+        struct XLSXContent_UgFatherExpansion_o* ugfExpansionTotal;
+        struct XLSXContent_UgFatherShopTable_o* ugfShopTotal;
+        struct Pml_PokePara_EvolveManager_o* evolveManager;
         bool isABAppended;
         bool isInitialized;
         bool _IsPersistentTiming_k__BackingField;
