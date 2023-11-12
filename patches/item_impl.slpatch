@@ -18,3 +18,11 @@
 // UIBag$$UseFormChangeItem
 185e270:
     b Dpr_UI_UIBag_UseFormChangeItem
+
+// UIBag.<>c__DisplayClass127_1$$<ShowItemContextMenu>b__11
+1bde370:
+    b Dpr_UI_UIBag___c__DisplayClass127_1__ShowItemContextMenu_b__11
+
+// MainModule$$HasPlayerGakusyuSouti
+20397f0:
+    b Dpr_Battle_Logic_MainModule_HasPlayerGakusyuSouti

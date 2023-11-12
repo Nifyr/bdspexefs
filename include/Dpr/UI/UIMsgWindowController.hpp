@@ -27,6 +27,7 @@ namespace Dpr
             UIMsgWindowController_Fields fields;
 
             void OpenMsgWindow(int32_t messageFileType, String_o *labelName, bool isWait, bool isBatchDisplay, Action_o *onFinishedMessage, Action_o *onCloseWindow, MethodInfo *method);
+            void OpenMsgWindow(String_o *messageFileName, String_o *labelName, bool isWait, bool isBatchDisplay, Action_o *onFinishedMessage, Action_o *onCloseWindow, MethodInfo *method);
         };
     }
 }

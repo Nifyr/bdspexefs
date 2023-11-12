@@ -1,14 +1,22 @@
+#include "Audio/AudioManager.hpp"
+#include "BtlTowerWork.hpp"
 #include "Dpr/Message/MessageWordSetHelper.hpp"
 #include "Dpr/UI/PokemonPartyItem.hpp"
-#include "Dpr/UI/UIBag.hpp"
+#include "Dpr/UI/UIManager.hpp"
+#include "FieldManager.hpp"
 #include "FlagWork.hpp"
 #include "GameManager.hpp"
 #include "ItemWork.hpp"
+#include "PlayerWork.hpp"
+#include "Pml/Item/ItemData.hpp"
 #include "Pml/PokePara/CoreParam.hpp"
 #include "Pml/PmlUse.hpp"
 #include "Pml/Personal/PersonalSystem.hpp"
+#include "SmartPoint/AssetAssistant/Sequencer.hpp"
+#include "SmartPoint/AssetAssistant/SingletonMonoBehaviour.hpp"
 #include "System/Action.hpp"
 #include "System/Collections/Generic/List.hpp"
+#include "ZoneWork.hpp"
 
 #include "il2cpp-api.h"
 #include "il2cpp.hpp"
@@ -19,13 +27,21 @@
 #define MAX_MOVE_COUNT 4
 #define MAX_EGG_MOVE_COUNT 4
 
+using namespace Audio;
 using namespace Dpr::Message;
 using namespace Dpr::UI;
 using namespace Pml;
+using namespace Pml::Item;
 using namespace Pml::Personal;
+using namespace SmartPoint::AssetAssistant;
 using namespace XLSXContent;
+using namespace UnityEngine::Events;
 
 // ItemIDs
+constexpr uint16_t SUPER_REPEL = 76;
+constexpr uint16_t MAX_REPEL = 77;
+constexpr uint16_t REPEL = 79;
+constexpr uint16_t EXP_SHARE = 216;
 constexpr uint16_t GRACIDEA = 466;
 constexpr uint16_t DNA_SPLICERS = 628;
 constexpr uint16_t REVEAL_GLASS = 638;
@@ -94,18 +110,13 @@ void ConditionalAdd(List_ZoneID__o * zidl, int32_t flagNo, int32_t item) {
     if (FlagWork::GetFlag(0x530,nullptr))
         zidl->Add(0x54,List_ContextMenuID__Add);
 }
-bool FormChange(UIBag_o *uib, PokemonPartyItem_o *ppi, bool *fail, uint16_t nextFormID) {
+bool FormChange(UIBag_o *uib, PokemonPartyItem_o *ppi, bool *success, uint16_t nextFormID) {
     auto *onComplete = (Action_PokeWalkingFormation_SheetSheet1__o *)
             il2cpp_object_new(Action_PokemonParam__TypeInfo);
     onComplete->ctor((Il2CppObject *)uib, UIBag_ShowFormChangeResult);
-    *fail = false;
+    *success = true;
     return ppi->FormChange(nextFormID, uib->fields.effectRoot, nullptr,
                            (Action_PokemonParam__o *)onComplete, nullptr);
-}
-void FormChangeClose(UIBag_o *uib, PokemonPartyItem_o *ppi, bool *fail, uint16_t nextFormID) {
-    FormChange(uib, ppi, fail, nextFormID);
-    uib->Close(uib->fields.super.onClosed, uib->fields.super._prevWindowId, false,
-               nullptr);
 }
 int32_t GetFuseDexID(UIBag_o *uib, uint16_t option0, uint16_t option1) {
     List_PokemonPartyItem__o *ppil = uib->fields.pokemonParty->fields._activeItems;
@@ -141,11 +152,10 @@ void RemoveMove(CoreParam_o *cp, int32_t removeMoveID) {
 }
 extern String_o *StringLiteral_11741;
 extern bool DAT_7104cbd69d;
-void ForgetMove(UIBag_o *uib, CoreParam_o *cp, int32_t forgetMoveID, int32_t fallbackMoveID, bool *close) {
+void ForgetMove(UIBag_o *uib, CoreParam_o *cp, int32_t forgetMoveID, int32_t fallbackMoveID) {
     EnsureTypeInfoLoaded(&DAT_7104cbd69d, 0x95ab);
     uint8_t wazaIndex = cp->GetWazaIndex(forgetMoveID, nullptr);
     if (wazaIndex == NULL_WAZA_IDX) return;
-    *close = false;
     RemoveMove(cp, forgetMoveID);
     if (cp->GetWazaCount(nullptr) == 0)
         cp->SetWaza(0, fallbackMoveID, nullptr);
@@ -159,11 +169,10 @@ extern String_o *StringLiteral_11737;
 extern String_o *StringLiteral_11742;
 extern bool DAT_7104cbb9d0;
 extern bool DAT_7104cbd69e;
-void LearnMove(UIBag_o *uib, PokemonParam_o *pp, int32_t moveID, bool *close) {
+void LearnMove(UIBag_o *uib, PokemonParam_o *pp, int32_t moveID) {
     EnsureTypeInfoLoaded(&DAT_7104cbb9d0, 0x9a20);
     auto *cp = (CoreParam_o *)pp;
     if (cp->GetWazaIndex(moveID, nullptr) != NULL_WAZA_IDX) return;
-    *close = false;
     uint8_t wazaIndex = cp->GetWazaCount(nullptr);
     if (wazaIndex < MAX_MOVE_COUNT) {
         cp->SetWaza(wazaIndex, moveID, nullptr);
@@ -176,14 +185,16 @@ void LearnMove(UIBag_o *uib, PokemonParam_o *pp, int32_t moveID, bool *close) {
                                                        nullptr, nullptr);
         return;
     }
-    auto *uibdc1450 = (UIBag___c__DisplayClass145_0_o *) il2cpp_object_new(UIBag___c__DisplayClass145_0_TypeInfo);
+    auto *uibdc1450 = (UIBag___c__DisplayClass145_0_o *)
+            il2cpp_object_new(UIBag___c__DisplayClass145_0_TypeInfo);
     uibdc1450->ctor(nullptr);
     uibdc1450->fields.pokemonParam = pp;
     system_array_init(&uibdc1450->fields.pokemonParam);
     uibdc1450->fields.__4__this = uib;
     system_array_init(&uibdc1450->fields.__4__this);
     EnsureTypeInfoLoaded(&DAT_7104cbd69e, 0x95ac);
-    auto *uibdc1451 = (UIBag___c__DisplayClass145_1_o *) il2cpp_object_new(UIBag___c__DisplayClass145_1_TypeInfo);
+    auto *uibdc1451 = (UIBag___c__DisplayClass145_1_o *)
+            il2cpp_object_new(UIBag___c__DisplayClass145_1_TypeInfo);
     uibdc1451->fields.CS___8__locals1 = uibdc1450;
     system_array_init(&uibdc1451->fields.CS___8__locals1);
     uibdc1451->fields.addWazaNo = moveID;
@@ -196,14 +207,15 @@ void LearnMove(UIBag_o *uib, PokemonParam_o *pp, int32_t moveID, bool *close) {
                                                    false, onFinishedMessage, nullptr,
                                                    nullptr);
 }
-void ReduceToLearnableMoves(UIBag_o *uib, PokemonParam_o *pp, int32_t fallbackMoveID, bool *close) {
+void ReduceToLearnableMoves(UIBag_o *uib, PokemonParam_o *pp, int32_t fallbackMoveID) {
     auto *cp = (CoreParam_o *)pp;
     int32_t dexID = cp->GetMonsNo(nullptr);
     uint16_t formID = cp->GetFormNo(nullptr);
     PersonalSystem::LoadPersonalData(dexID, formID, nullptr);
     PersonalSystem::LoadWazaOboeData(dexID, formID, nullptr);
     uint8_t learnSetSize = PersonalSystem::GetWazaOboeNum(nullptr);
-    Array<ItemTable_SheetWazaMachine_o *> *itswms = PmlUse_o::get_Instance((MethodInfo *) nullptr)->fields.itemPrmTotal->fields.WazaMachine;
+    Array<ItemTable_SheetWazaMachine_o *> *itswms =
+            PmlUse_o::get_Instance(nullptr)->fields.itemPrmTotal->fields.WazaMachine;
     uint8_t moveCount = cp->GetWazaCount(nullptr);
     for (int i = 0; i < moveCount; ++i) {
         int32_t moveID = cp->GetWazaNo(i, nullptr);
@@ -213,7 +225,7 @@ void ReduceToLearnableMoves(UIBag_o *uib, PokemonParam_o *pp, int32_t fallbackMo
             keep = moveID == cp->GetTamagoWazaNo(j, nullptr);
         for (int j = 0; j < learnSetSize && !keep; ++j)
             keep = moveID == PersonalSystem::GetWazaOboeWazaNo(j, nullptr);
-        for (int j = 0; j < itswms->max_length && !keep; ++j) {
+        for (uint32_t j = 0; j < itswms->max_length && !keep; ++j) {
             ItemTable_SheetWazaMachine_o *itswm = itswms->m_Items[j];
             if (PersonalSystem::CheckPersonalWazaMachine(itswm->fields.machineNo, (MethodInfo *) nullptr))
                 keep = moveID == itswm->fields.wazaNo;
@@ -225,12 +237,13 @@ void ReduceToLearnableMoves(UIBag_o *uib, PokemonParam_o *pp, int32_t fallbackMo
     }
     cp->CloseUpWazaPos(nullptr);
     if (cp->GetWazaCount(nullptr) == 0)
-        LearnMove(uib, pp, fallbackMoveID, close);
+        LearnMove(uib, pp, fallbackMoveID);
 }
 extern bool DAT_7104cbb9cf;
 extern String_o *StringLiteral_11712;
 extern String_o *StringLiteral_11693;
-void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemonPartyItem, ItemInfo_o *itemInfo, MethodInfo *method) {
+void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemonPartyItem, ItemInfo_o *itemInfo,
+                                    MethodInfo *method) {
     EnsureTypeInfoLoaded(&DAT_7104cbb9cf, 0x9a2e);
     auto *uibdc1440 = (UIBag___c__DisplayClass144_0_o *)
             il2cpp_object_new(UIBag___c__DisplayClass144_0_TypeInfo);
@@ -246,7 +259,7 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
     auto *cp = (CoreParam_o *)pp;
     UIMsgWindowController_o *uimwc = __this->fields.msgWindowController;
     int32_t dexID = cp->GetMonsNo(nullptr);
-    bool fail = true;
+    bool success = false;
     if (itemID == ROTOM_CATALOG && dexID == ROTOM) {
         auto *cmidl = (List_ZoneID__o *)
                 il2cpp_object_new(List_ContextMenuID__TypeInfo);
@@ -274,46 +287,41 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
         EnsureClassInit(GameManager_TypeInfo);
         if (dexID == SHAYMIN && formID == 0 &&
         GameManager::get_currentPeriodOfDay(nullptr) - 3 > 1 && cp->GetSick(nullptr) != 3)
-            if (FormChange(__this, pokemonPartyItem, &fail, 1))
-                __this->fields.isWaitUpdate = true;
+            FormChange(__this, pokemonPartyItem, &success, 1);
     } else if (MAKEUP_BAG_ENABLED && itemID == MAKEUP_BAG) {
         if (dexID == PIKACHU && formID >= 1 && formID < 7) {
             uint16_t nextFormID = formID % 6 + 1;
-            FormChange(__this, pokemonPartyItem, &fail, nextFormID);
-            bool close = true;
+            FormChange(__this, pokemonPartyItem, &success, nextFormID);
             switch (nextFormID) {
                 case 1:
-                    ForgetMove(__this, cp, FLYING_PRESS, THUNDER_SHOCK, &close);
+                    ForgetMove(__this, cp, FLYING_PRESS, THUNDER_SHOCK);
                     break;
                 case 2:
-                    LearnMove(__this, pp, METEOR_MASH, &close);
+                    LearnMove(__this, pp, METEOR_MASH);
                     break;
                 case 3:
                     RemoveMove(cp, METEOR_MASH);
-                    LearnMove(__this, pp, ICICLE_CRASH, &close);
+                    LearnMove(__this, pp, ICICLE_CRASH);
                     break;
                 case 4:
                     RemoveMove(cp, ICICLE_CRASH);
-                    LearnMove(__this, pp, DRAINING_KISS, &close);
+                    LearnMove(__this, pp, DRAINING_KISS);
                     break;
                 case 5:
                     RemoveMove(cp, DRAINING_KISS);
-                    LearnMove(__this, pp, ELECTRIC_TERRAIN, &close);
+                    LearnMove(__this, pp, ELECTRIC_TERRAIN);
                     break;
                 case 6:
                     RemoveMove(cp, ELECTRIC_TERRAIN);
-                    LearnMove(__this, pp, FLYING_PRESS, &close);
+                    LearnMove(__this, pp, FLYING_PRESS);
                     break;
                 default: break;
             }
-            if (close)
-                __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
-                              false, nullptr);
         } else if (dexID == FURFROU)
-            FormChangeClose(__this, pokemonPartyItem, &fail, (formID + 1) % 10);
+            FormChange(__this, pokemonPartyItem, &success, (formID + 1) % 10);
     } else if ((itemID == REVEAL_GLASS && (dexID == TORNADUS || dexID == THUNDURUS || dexID == LANDORUS)) ||
             (itemID == PRISON_BOTTLE && dexID == HOOPA))
-        FormChangeClose(__this, pokemonPartyItem, &fail, (formID + 1) % 2);
+        FormChange(__this, pokemonPartyItem, &success, (formID + 1) % 2);
     else if (itemID == DNA_SPLICERS && dexID == KYUREM) {
         uint16_t nextFormID = formID;
         if (formID == 0)
@@ -325,7 +333,7 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
         else
             nextFormID = 0;
         if (nextFormID != formID) {
-            FormChange(__this, pokemonPartyItem, &fail, nextFormID);
+            FormChange(__this, pokemonPartyItem, &success, nextFormID);
             switch (nextFormID) {
                 case 0:
                     ReplaceMove(cp, FREEZE_SHOCK, GLACIATE);
@@ -343,21 +351,19 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
                     break;
                 default: break;
             }
-            __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
-                          false, nullptr);
         }
     } else if (itemID == ZYGARDE_CUBE && dexID == ZYGARDE && formID < 4)
-        FormChangeClose(__this, pokemonPartyItem, &fail, (formID + 1) % 4);
+        FormChange(__this, pokemonPartyItem, &success, (formID + 1) % 4);
     else if (dexID == ORICORIO) {
         if (itemID == RED_NECTAR && formID != 0)
-            FormChangeClose(__this, pokemonPartyItem, &fail, 0);
+            FormChange(__this, pokemonPartyItem, &success, 0);
         else if (itemID == YELLOW_NECTAR && formID != 1)
-            FormChangeClose(__this, pokemonPartyItem, &fail, 1);
+            FormChange(__this, pokemonPartyItem, &success, 1);
         else if (itemID == PINK_NECTAR && formID != 2)
-            FormChangeClose(__this, pokemonPartyItem, &fail, 2);
+            FormChange(__this, pokemonPartyItem, &success, 2);
         else if (itemID == PURPLE_NECTAR && formID != 3)
-            FormChangeClose(__this, pokemonPartyItem, &fail, 3);
-        if (!fail)
+            FormChange(__this, pokemonPartyItem, &success, 3);
+        if (success)
             ItemWork::SubItem(itemID, 1, nullptr);
     } else if (dexID == NECROZMA) {
         uint16_t nextFormID = formID;
@@ -373,24 +379,20 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
                 nextFormID = 0;
         }
         if (formID != nextFormID) {
-            FormChange(__this, pokemonPartyItem, &fail, nextFormID);
-            bool close = true;
+            FormChange(__this, pokemonPartyItem, &success, nextFormID);
             switch (nextFormID) {
                 case 0:
-                    ForgetMove(__this, cp, SUNSTEEL_STRIKE, CONFUSION, &close);
-                    ForgetMove(__this, cp, MOONGEIST_BEAM, CONFUSION, &close);
+                    ForgetMove(__this, cp, SUNSTEEL_STRIKE, CONFUSION);
+                    ForgetMove(__this, cp, MOONGEIST_BEAM, CONFUSION);
                     break;
                 case 1:
-                    LearnMove(__this, pp, SUNSTEEL_STRIKE, &close);
+                    LearnMove(__this, pp, SUNSTEEL_STRIKE);
                     break;
                 case 2:
-                    LearnMove(__this, pp, MOONGEIST_BEAM, &close);
+                    LearnMove(__this, pp, MOONGEIST_BEAM);
                     break;
                 default: break;
             }
-            if (close)
-                __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
-                              false, nullptr);
         }
     } else if (itemID == REINS_OF_UNITY && dexID == CALYREX) {
         uint16_t nextFormID = formID;
@@ -403,27 +405,268 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
         else
             nextFormID = 0;
         if (nextFormID != formID) {
-            FormChange(__this, pokemonPartyItem, &fail, nextFormID);
-            bool close = true;
+            FormChange(__this, pokemonPartyItem, &success, nextFormID);
             switch (nextFormID) {
                 case 0:
-                    ReduceToLearnableMoves(__this, pp, CONFUSION, &close);
+                    ReduceToLearnableMoves(__this, pp, CONFUSION);
                     break;
                 case 1:
-                    LearnMove(__this, pp, GLACIAL_LANCE, &close);
+                    LearnMove(__this, pp, GLACIAL_LANCE);
                     break;
                 case 2:
-                    LearnMove(__this, pp, ASTRAL_BARRAGE, &close);
+                    LearnMove(__this, pp, ASTRAL_BARRAGE);
                     break;
                 default: break;
             }
-            if (close)
-                __this->Close(__this->fields.super.onClosed, __this->fields.super._prevWindowId,
-                          false, nullptr);
         }
     }
-    if (!fail) return;
+    if (success) {
+        pokemonPartyItem->Setup(pokemonPartyItem->fields._param, nullptr);
+        return;
+    }
     auto *onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
     onCloseWindow->ctor((Il2CppObject *)__this, UIBag_EndSelectPokemonParty);
-    uimwc->OpenMsgWindow(0, StringLiteral_11693, true, false, nullptr, onCloseWindow, nullptr);
+    uimwc->OpenMsgWindow(0, StringLiteral_11693, true, false,
+                         nullptr, onCloseWindow, nullptr);
+}
+
+// Exp Share
+// 72 externals...
+extern bool DAT_7104cbb2ca;
+extern bool DAT_7104cbd681;
+extern String_o *StringLiteral_7097;
+extern String_o *StringLiteral_11534;
+extern String_o *StringLiteral_11711;
+extern String_o *StringLiteral_11713;
+extern String_o *StringLiteral_11719;
+extern String_o *StringLiteral_11720;
+extern String_o *StringLiteral_11721;
+extern String_o *StringLiteral_11722;
+extern String_o *StringLiteral_11723;
+extern String_o *StringLiteral_11724;
+void Dpr_UI_UIBag___c__DisplayClass127_1__ShowItemContextMenu_b__11(UIBag___c__DisplayClass127_1_o *__this,
+                                                                    MethodInfo *method) {
+    EnsureTypeInfoLoaded(&DAT_7104cbd681, 0x9563);
+    EnsureTypeInfoLoaded(&DAT_7104cbb2ca, 0x6bcc);
+    int32_t fieldFuncType = __this->fields.fieldFuncType;
+    UIBag___c__DisplayClass127_0_o *uibdc1270 = __this->fields.CS___8__locals1;
+    ItemInfo_o *ii = uibdc1270->fields.item;
+    UIBag_o *uib = uibdc1270->fields.__4__this;
+    UIMsgWindowController_o *uimwc = uib->fields.msgWindowController;
+    EnsureClassInit(PlayerWork_TypeInfo);
+    EnsureClassInit(MessageWordSetHelper_TypeInfo);
+    EnsureClassInit(FieldManager_TypeInfo);
+    EnsureClassInit(ItemWork_TypeInfo);
+    EnsureClassInit(SingletonMonoBehaviour_UIManager__TypeInfo);
+    EnsureClassInit(SingletonMonoBehaviour_AudioManager__TypeInfo);
+    EnsureClassInit(UIWindow_TypeInfo);
+    EnsureClassInit(Sequencer_TypeInfo);
+    EnsureClassInit(BtlTowerWork_TypeInfo);
+    EnsureClassInit(UIManager_TypeInfo);
+    FieldWalkingManager_o *fwm = FieldManager_TypeInfo->static_fields->fwMng;
+    int32_t itemID = ii->get_Id(nullptr);
+    switch (fieldFuncType) {
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_RECOVER:
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_WAZA:
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_EVOLUTION:
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_APPLICATION:
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_KINOMI:
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_FORM_CHANGE: {
+            if (!ii->get_IsRecoveryAllDead(nullptr)) {
+                uimwc->OpenMsgWindow(
+                        0, StringLiteral_11711, false, false,
+                        nullptr, nullptr, nullptr);
+                auto *onClicked = (UnityAction_object__int__o *)
+                        il2cpp_object_new(UnityAction_PokemonPartyItem__int__TypeInfo);
+                onClicked->ctor((Il2CppObject *)uib, UIBag_OnPokemonPartyClickedToUseItem);
+                uib->StartSelectPokemonParty((UnityAction_PokemonPartyItem__int__o *)onClicked,
+                                             nullptr);
+                return;
+            }
+            auto *uibdc1275 = (UIBag___c__DisplayClass127_5_o *)il2cpp_object_new(UIBag___c__DisplayClass127_5_TypeInfo);
+            uibdc1275->fields.CS___8__locals5 = __this;
+            system_array_init(&uibdc1275->fields.CS___8__locals5);
+            auto *xmtis = (List_XMenuTopItem__o *)
+                    il2cpp_object_new(List_PokemonPartyItem__TypeInfo);
+            xmtis->ctor(List_PokemonPartyItem__ctor);
+            uibdc1275->fields.recoverPokemonItems = (List_PokemonPartyItem__o *)xmtis;
+            system_array_init(&uibdc1275->fields.recoverPokemonItems);
+            List_PokemonPartyItem__o *ppis = uib->fields.pokemonParty->fields._activeItems;
+            int32_t ppiCount = ppis->fields._size;
+            float recoverRatio = uib->GetRecoverHpRate(ii->get_RecoveryHpValue(nullptr), nullptr);
+            for (int32_t i = 0; i < ppiCount; ++i) {
+                PokemonPartyItem_o *ppi = ppis->fields._items->m_Items[i];
+                auto *cp = (CoreParam_o *)ppi->fields._param->fields.pokemonParam;
+                if (!cp->IsHpZero(nullptr))
+                    continue;
+                uint32_t maxHP = cp->GetMaxHp(nullptr);
+                uint32_t recoverHP = 1;
+                if (maxHP != 1)
+                    recoverHP = (int32_t)(recoverRatio * (float)maxHP);
+                cp->RecoverHp(recoverHP, nullptr);
+                xmtis->Add(ppi, List_PokemonPartyItem__Add);
+                fwm->CreateTurearuki(nullptr);
+            }
+            if (xmtis->fields._size != 0) {
+                auto *uibdc1276 = (UIBag___c__DisplayClass127_6_o *)
+                        il2cpp_object_new(UIBag___c__DisplayClass127_6_TypeInfo);
+                uibdc1276->fields.CS___8__locals6 = uibdc1275;
+                system_array_init(&uibdc1276->fields.CS___8__locals6);
+                uibdc1276->fields.itemIndex = 0;
+                uibdc1276->_ShowItemContextMenu_g__UpdateHp_20(nullptr);
+                return;
+            }
+            auto *onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
+            onCloseWindow->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_g__EndUseAction_0);
+            uimwc->OpenMsgWindow(0x0, StringLiteral_11693, true, false, nullptr, onCloseWindow, nullptr);
+            return;
+        }
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_BAG_MSG: {
+            auto *onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
+            onCloseWindow->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_g__EndUseAction_0);
+            if (itemID == EXP_SHARE) {
+                PlayerWork::SetBool(2198, !PlayerWork::GetBool(2198, nullptr), nullptr);
+                MessageWordSetHelper::SetPlayerNickNameWord(0, nullptr);
+                MessageWordSetHelper::SetItemWord(1, itemID, 1, nullptr);
+                uimwc->OpenMsgWindow(0, StringLiteral_11723, true, false, nullptr, onCloseWindow, nullptr);
+                return;
+            }
+            if ((itemID != SUPER_REPEL && itemID != MAX_REPEL && itemID != REPEL) || ZoneWork::IsUnderGround(PlayerWork::get_zoneID(nullptr), nullptr)) {
+                MessageWordSetHelper::SetPlayerNickNameWord(0,nullptr);
+                uimwc->OpenMsgWindow(0, StringLiteral_11713, true, false, nullptr, onCloseWindow, nullptr);
+                return;
+            }
+            uint16_t oldItemID = 0;
+            if (ItemWork::IsUseSpray(&oldItemID, nullptr)) {
+                uimwc->OpenMsgWindow(0x0,StringLiteral_11722, true, false,nullptr, onCloseWindow, nullptr);
+                return;
+            }
+            ItemWork::SetSpray(itemID, (int16_t)(ii->GetParam(ItemData_PrmID::ATTACK, nullptr) * 5), nullptr);
+            ItemWork::SubItem(itemID, 1, nullptr);
+            ((AudioManager_o *)SingletonMonoBehaviour_object_::get_Instance(
+                    SingletonMonoBehaviour_AudioManager__get_Instance))->
+                    PlaySe(0x8e8a8de1, nullptr, nullptr);
+            MessageWordSetHelper::SetPlayerNickNameWord(0, nullptr);
+            MessageWordSetHelper::SetItemWord(1, itemID, 1, nullptr);
+            onCloseWindow = uibdc1270->fields.__9__17;
+            if (onCloseWindow == nullptr) {
+                onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
+                onCloseWindow->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_b__17);
+                uibdc1270->fields.__9__17 = onCloseWindow;
+                system_array_init(&uibdc1270->fields.__9__17);
+            }
+            uimwc->OpenMsgWindow(0, StringLiteral_11723, true, false, nullptr, onCloseWindow, nullptr);
+            return;
+        }
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_BOUKENNOOTO: {
+            uib->Close(nullptr, 37, true, nullptr);
+            Action_o *action = uibdc1270->fields.__9__12;
+            if (action == nullptr) {
+                action = (Action_o *)il2cpp_object_new(Action_TypeInfo);
+                action->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_b__12);
+                uibdc1270->fields.__9__12 = action;
+                system_array_init(&uibdc1270->fields.__9__12);
+            }
+            Color_o color = { .fields = { .r = 0.0, .g = 0.0, .b = 0.0, .a = 0.0 } };
+            IEnumerator_o *routine = ((UIWindow_o *)uib)->FadeTransition_object_(color, UIWindow_TypeInfo->static_fields->TransitionFadeFillColor.fields.r,
+                                                                  action, UIWindow_FadeTransition_AdventureNoteWindow_);
+            Sequencer::Start(routine, nullptr);
+            return;
+        }
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_POFINKEESU: {
+            auto *uibdc1272 = (UIBag___c__DisplayClass127_2_o *)
+                    il2cpp_object_new(UIBag___c__DisplayClass127_2_TypeInfo);
+            uibdc1272->fields.CS___8__locals2 = __this;
+            system_array_init(&uibdc1272->fields.CS___8__locals2);
+            uibdc1272->fields.saveOnClosed = uib->fields.super.onClosed;
+            system_array_init(&uibdc1272->fields.saveOnClosed);
+            uibdc1272->fields.saveOnPreClose = uib->fields.super.onPreClose;
+            system_array_init(&uibdc1272->fields.saveOnPreClose);
+            uib->fields.super.onPreClose = nullptr;
+            system_array_init(&uib->fields.super.onPreClose);
+            auto *onClosed_ = (UnityAction_XMenuTopItem__o *)il2cpp_object_new(UnityAction_UIWindow__TypeInfo);
+            onClosed_->ctor((Il2CppObject *)uibdc1272, UIBag___c__DisplayClass127_2__ShowItemContextMenu_b__14);
+            uib->Close((UnityAction_UIWindow__o *)onClosed_, 45, true, nullptr);
+            return;
+        }
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_TENKAINOHUE: {
+            int32_t zoneID = PlayerWork::get_zoneID(nullptr);
+            if (zoneID != 0xd8 && zoneID != 0xd9) {
+                MessageWordSetHelper::SetPlayerNickNameWord(0, nullptr);
+                auto *onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
+                onCloseWindow->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_g__EndUseAction_0);
+                uimwc->OpenMsgWindow(0, StringLiteral_11713, true, false, nullptr, onCloseWindow, nullptr);
+                return;
+            }
+            auto *onCall = (UnityAction_XMenuTopItem__o *)uibdc1270->fields.__9__13;
+            if (onCall == nullptr) {
+                onCall = (UnityAction_XMenuTopItem__o *)
+                        il2cpp_object_new(UnityAction_UnityAction_UIWindow___TypeInfo);
+                onCall->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_b__13);
+                uibdc1270->fields.__9__13 = (UnityAction_UnityAction_UIWindow___o *)onCall;
+                system_array_init(&uibdc1270->fields.__9__13);
+            }
+            ((UIManager_o *)SingletonMonoBehaviour_object_::get_Instance(SingletonMonoBehaviour_UIManager__get_Instance))->CloseXMenu((UnityAction_UnityAction_UIWindow___o *)onCall,nullptr);
+            return;
+        }
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_POINTOKAADO: {
+            MessageWordSetHelper::SetDigitWord(0x0, BtlTowerWork::GetBP(nullptr),nullptr);
+            auto *onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
+            onCloseWindow->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_g__EndUseAction_0);
+            uimwc->OpenMsgWindow(0, StringLiteral_11721, true, false, nullptr, onCloseWindow, nullptr);
+            return;
+        }
+        case ItemData_FieldFunctionType::ITEMUSE_FLD_DS_PLAYER: {
+            ((UIManager_o *)SingletonMonoBehaviour_object_::get_Instance(SingletonMonoBehaviour_UIManager__get_Instance))->UseDSPlayerItem(nullptr);
+            String_o *labelName = StringLiteral_11720;
+            if (!ItemWork::IsDsPlayer(nullptr)) {
+                labelName = StringLiteral_11719;
+            }
+            auto *onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
+            onCloseWindow->ctor((Il2CppObject *)uibdc1270,UIBag___c__DisplayClass127_0__ShowItemContextMenu_g__EndUseAction_0);
+            uimwc->OpenMsgWindow(0, labelName, true, false, nullptr, onCloseWindow, nullptr);
+            return;
+        }
+        default: {
+            auto *onUseFieldItem = (Func_object__Int32Enum__o *)UIManager_TypeInfo->static_fields->onUseFieldItem;
+            if (UIManager_TypeInfo->static_fields->onUseFieldItem != nullptr) {
+                int32_t fieldUseResult = onUseFieldItem->Invoke((Il2CppObject *)ii, Func_ItemInfo__UIManager_FieldUseResult__Invoke);
+                if (fieldUseResult == 2) {
+                    fwm->SetPartnerNameToLabel(0, nullptr);
+                    auto *onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
+                    onCloseWindow->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_g__EndUseAction_0);
+                    uimwc->OpenMsgWindow(StringLiteral_7097, StringLiteral_11534, true, false,
+                             nullptr, onCloseWindow, nullptr);
+                    return;
+                }
+                if (fieldUseResult == 0) {
+                    if (!ii->get_IsNoSpend(nullptr))
+                        ItemWork::SubItem(itemID, 1, nullptr);
+                    PlayerWork_TypeInfo->static_fields->_UsedFieldItem_k__BackingField = ii;
+                    system_array_init(&PlayerWork_TypeInfo->static_fields->_UsedFieldItem_k__BackingField);
+                    auto *onCall = (UnityAction_XMenuTopItem__o *)uibdc1270->fields.__9__19;
+                    if (onCall == nullptr) {
+                        onCall = (UnityAction_XMenuTopItem__o *)il2cpp_object_new(UnityAction_UnityAction_UIWindow___TypeInfo);
+                        onCall->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_b__19);
+                        uibdc1270->fields.__9__19 = (UnityAction_UnityAction_UIWindow___o *)onCall;
+                        system_array_init(&uibdc1270->fields.__9__19);
+                    }
+                    ((UIManager_o *)SingletonMonoBehaviour_object_::get_Instance(SingletonMonoBehaviour_UIManager__get_Instance))->CloseXMenu((UnityAction_UnityAction_UIWindow___o *)onCall,nullptr);
+                    return;
+                }
+            }
+            auto *onCloseWindow = (Action_o *)il2cpp_object_new(Action_TypeInfo);
+            onCloseWindow->ctor((Il2CppObject *)uibdc1270, UIBag___c__DisplayClass127_0__ShowItemContextMenu_g__EndUseAction_0);
+            if (fieldFuncType != ItemData_FieldFunctionType::ITEMUSE_FLD_CYCLE || !PlayerWork::IsFormBicycle(nullptr)) {
+                MessageWordSetHelper::SetPlayerNickNameWord(0, nullptr);
+                uimwc->OpenMsgWindow(0, StringLiteral_11713, true, false, nullptr, onCloseWindow, nullptr);
+                return;
+            }
+            uimwc->OpenMsgWindow(0, StringLiteral_11724, true, false, nullptr, onCloseWindow, nullptr);
+            return;
+        }
+    }
+}
+bool Dpr_Battle_Logic_MainModule_HasPlayerGakusyuSouti(MainModule_o *mainModule) {
+    return !PlayerWork::GetBool(2198, nullptr);
 }

@@ -65,6 +65,7 @@ namespace Dpr
             PokemonPartyItem_Fields fields;
 
             bool FormChange(uint16_t formNo, UnityEngine_RectTransform_o *effectRoot, Action_PokemonParam__o *onChangeIcon, Action_PokemonParam__o *onComplete, MethodInfo *method);
+            void Setup(PokemonPartyItem_Param_o *param, MethodInfo *method);
         };
 
         struct PokemonPartyItem_array {

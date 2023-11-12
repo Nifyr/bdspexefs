@@ -3,11 +3,14 @@
 
 #include "il2cpp.hpp"
 
-#include "Pml/PokePara/SavePokeParty.hpp"
 #include "Dpr/BallDeco.hpp"
 #include "Dpr/Box.hpp"
 #include "Dpr/Item.hpp"
 #include "DpData.hpp"
+#include "ItemWork.hpp"
+#include "Pml/PokePara/SavePokeParty.hpp"
+
+using namespace Dpr::Item;
 
 struct AzukariyaData_Fields {
 	struct Pml::PokePara::SerializedPokemonFull_array* pokemonParam;
@@ -133,6 +136,50 @@ struct PlayerWork_VTable {
 struct PlayerWork_RGCTXs {
 };
 
+struct PlayerWork_StaticFields {
+    bool _NoSavePlayerPos_k__BackingField;
+    int32_t _capturedMonsNo_k__BackingField;
+    int32_t _capturedBallCountTvTopic_k__BackingField;
+    bool _encountEnable_k__BackingField;
+    bool _isDebugWalk_k__BackingField;
+    bool _isDebugPlayerVisible_k__BackingField;
+    bool _isDebugBattleTextView_k__BackingField;
+    bool _isPlayerInputActive;
+    bool _isPlayerInputActive_ContactEvent;
+    bool IsFieldKuruKuruStart;
+    bool IsFieldFallStart;
+    bool IsToUg;
+    bool IsFromUg;
+    bool ReserveZoneChangeNaminoriEnd;
+    struct System_String_o* _FieldWorpLinkName_k__BackingField;
+    struct System_String_o* _FieldWorpLabel_k__BackingField;
+    bool _isDebugNpcVisble_k__BackingField;
+    bool _isDebugNpcPokeVisble_k__BackingField;
+    int32_t _DebugEncountMonsNo_k__BackingField;
+    int32_t _FieldWeather_k__BackingField;
+    int32_t _DebugWeek_k__BackingField;
+    int32_t _FieldInputMode_k__BackingField;
+    bool _IsZenmetuFlag_k__BackingField;
+    bool _IsNeedUnloadOnFieldConnector_k__BackingField;
+    int32_t _Warp_k__BackingField;
+    bool _Telescope_k__BackingField;
+    bool _TelescopeReturn_k__BackingField;
+    bool _FieldCacheFlag_k__BackingField;
+    int32_t _SafariBallNum_k__BackingField;
+    int32_t _SafariStepCount_k__BackingField;
+    struct System_Collections_Generic_List_MonsNo__o* _SafariCaptureMonsNo_k__BackingField;
+    int32_t _IsCpuBoostMode_k__BackingField;
+    ItemInfo_o* _UsedFieldItem_k__BackingField;
+    int32_t _UsedFieldWazaNo_k__BackingField;
+    int32_t _UsedFieldWazaTemotiNo_k__BackingField;
+    bool _Flash_k__BackingField;
+    struct System_Collections_Generic_List_WazaNo__o* UsedFieldWazaInArea;
+    bool _PoketchOpen_k__BackingField;
+    int32_t _MovePokemonIndex_k__BackingField;
+    bool _IsD26Key_k__BackingField;
+    bool isNeedFixPokemonExp;
+};
+
 struct PlayerWork_c {
 	Il2CppClass_1 _1;
 	struct PlayerWork_StaticFields* static_fields;
@@ -237,55 +284,37 @@ struct PlayerWork_Fields {
 	float _autosaveWindowCloseOpenTime;
 };
 
-class PlayerWork
+struct PlayerWork
 {
-public:
-  // void ToBytes<T>(T obj, System_Byte_array ** bytes); // void ToBytes<T>(T obj, ref byte[] bytes);
-  void ToBytes(PlayerWork_SaveData_o * obj, System_Byte_array ** bytes, uint64_t param_4);
-  // 
-  void LoadBytes(System_Byte_array *bytes, PlayerWork_SaveData_o *obj, MethodInfo *method);
-  void Initialization(MethodInfo *method);
-  
-  // 023775a0
-  bool VerifySaveData(System_Byte_array *byteArray,MethodInfo *method);
-
-  void makeSaveDataHash(System_Byte_array ** buf, MethodInfo *method);
-  static DPData::TR_BATTLE_DATA_array * get_tr_battleData();
-  static void set_tr_battleData(DPData::TR_BATTLE_DATA_array * tr_battleData);
-  bool CustomSaveAsyncOperation(MethodInfo *method);
-  // 0x02377aa0
-  bool CustomSaveOperation(MethodInfo *method);
-  bool CustomLoadAsyncOperation(MethodInfo *method);
-  void OnPreSave(MethodInfo *method);
-
-  static int32_t get_defaultPokeNo(MethodInfo *method);
-
-  static int32_t get_rivalPokeNo(MethodInfo *method);
-
-  static int32_t get_supportPokeNo(MethodInfo *method);
-
-  static int32_t get_rivalPokeType(MethodInfo *method);
-
-
-  static int32_t get_zoneID(MethodInfo *method);
-
-  static DPData::ZUKAN_WORK_o get_zukan(DPData::ZUKAN_WORK_o *__return_storage_ptr__, MethodInfo * method);
-
-  // 0236e9f0
-  static int32_t GetInt(int32_t index, MethodInfo *method);
-  // 02379290
-  static void SetInt(int32_t index, int32_t value, MethodInfo *method);
-  // 0236fa10
-  static bool GetBool(int32_t index, MethodInfo *method);
-  // 023793a0
-  static bool GetSytemFlag(int32_t index, MethodInfo *method);
-  PlayerWork_c *klass;
-  void *monitor;
-  PlayerWork_Fields fields;
+    static int32_t get_defaultPokeNo(MethodInfo *method);
+    static int32_t get_rivalPokeNo(MethodInfo *method);
+    static int32_t get_rivalPokeType(MethodInfo *method);
+    static int32_t get_supportPokeNo(MethodInfo *method);
+    static DPData::TR_BATTLE_DATA_array * get_tr_battleData();
+    static int32_t get_zoneID(MethodInfo *method);
+    static DPData::ZUKAN_WORK_o get_zukan(DPData::ZUKAN_WORK_o *__return_storage_ptr__, MethodInfo * method);
+    static bool GetBool(int32_t index, MethodInfo *method);
+    static int32_t GetInt(int32_t index, MethodInfo *method);
+    static bool GetSytemFlag(int32_t index, MethodInfo *method);
+    static bool IsFormBicycle(MethodInfo *method);
+    static void set_tr_battleData(DPData::TR_BATTLE_DATA_array * tr_battleData);
+    static void SetBool(int32_t index, bool value, MethodInfo *method);
+    static void SetInt(int32_t index, int32_t value, MethodInfo *method);
+    bool CustomLoadAsyncOperation(MethodInfo *method);
+    bool CustomSaveAsyncOperation(MethodInfo *method);
+    bool CustomSaveOperation(MethodInfo *method);
+    void Initialization(MethodInfo *method);
+    void LoadBytes(System_Byte_array *bytes, PlayerWork_SaveData_o *obj, MethodInfo *method);
+    void makeSaveDataHash(System_Byte_array ** buf, MethodInfo *method);
+    void OnPreSave(MethodInfo *method);
+    void ToBytes(PlayerWork_SaveData_o * obj, System_Byte_array ** bytes, uint64_t param_4);
+    bool VerifySaveData(System_Byte_array *byteArray,MethodInfo *method);
+    PlayerWork_c *klass;
+    PlayerWork_Fields fields;
 };
 
 // 04e4ec58
-extern void * PlayerWork_TypeInfo;
+extern PlayerWork_c * PlayerWork_TypeInfo;
 
 extern "C"
 {

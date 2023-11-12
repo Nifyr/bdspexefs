@@ -37,12 +37,34 @@ namespace System
                 List_PokemonPartyItem__Fields fields;
             };
 
+            struct List_XMenuTopItem__c;
+
+            struct List_XMenuTopItem__Fields {
+                struct XMenuTopItem_array* _items;
+                int32_t _size;
+                int32_t _version;
+                Il2CppObject* _syncRoot;
+            };
+
+            struct List_XMenuTopItem__o {
+                List_XMenuTopItem__c *klass;
+                void *monitor;
+                List_XMenuTopItem__Fields fields;
+
+                void ctor(MethodInfo *method);
+
+                void Add(void *item, MethodInfo *method);
+            };
+
             extern void *List_ContextMenuID__TypeInfo;
+            extern void *List_PokemonPartyItem__TypeInfo;
 
             extern MethodInfo *List_ContextMenuID__ctor;
+            extern MethodInfo *List_PokemonPartyItem__ctor;
 
             extern MethodInfo *List_ContextMenuID__Add;
             extern MethodInfo *List_ContextMenuID__ToArray;
+            extern MethodInfo *List_PokemonPartyItem__Add;
         }
     }
 }
