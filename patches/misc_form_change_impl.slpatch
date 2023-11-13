@@ -1,0 +1,12 @@
+[target=main, version=bd_130]
+// POKECON$$addPokeParam
+204132c:
+    bl Dpr_Battle_Logic_POKECON_setupPokeParam
+
+// CoreParam$$SetWaza
+20464e0:
+    b Pml_PokePara_CoreParam_SetWaza
+
+// CoreParam$$RemoveWaza
+20461e0:
+    b Pml_PokePara_CoreParam_RemoveWaza

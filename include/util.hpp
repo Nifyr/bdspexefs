@@ -30,6 +30,8 @@ extern void * System_Byte_array_TypeInfo;
 
 MethodInfo * copyMethodInfo(MethodInfo * src, Il2CppMethodPointer methodPointer);
 uint32_t GetBadgeCount();
+uint8_t RKSSystemType(uint32_t itemNo);
+uint8_t MultitypeType(uint32_t itemNo);
 EventFactor_EventHandlerTable_o * CreateEventHandler(uint16_t eventID, MethodInfo * src, Il2CppMethodPointer methodPointer);
 System::Array<EventFactor_EventHandlerTable_o *> * CreateEventHandlerTable(uint32_t size);
 void EnsureClassInit(void *typeInfo);

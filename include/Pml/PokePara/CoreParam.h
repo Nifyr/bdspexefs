@@ -25,7 +25,7 @@ namespace Pml
         struct CoreParam_Fields {
             System_Byte_array* m_coreData;
             System_Byte_array* m_calcData;
-            Accessor * m_accessor;
+            Accessor_o * m_accessor;
         };
 
         struct CoreParam_FormChangeResult_o;

@@ -1,4 +1,0 @@
-[target=main, version=bd_130]
-// POKECON$$addPokeParam
-204132c:
-    bl Dpr_Battle_Logic_POKECON_setupPokeParam

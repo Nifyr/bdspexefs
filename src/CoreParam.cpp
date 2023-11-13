@@ -116,7 +116,6 @@ HashSet_WazaNo__o * CoreParam::CollectRemindableWaza( MethodInfo *method )
     // I have no idea why I was loading this but it is probably important
     // system_load_typeinfo(*PTR_DAT_04bdc5f0);
     socket_log_fmt("CollectRemindableWaza\n");
-    socket_log_fmt("&Pml::PokePara::Accessor::GetWazaNo: %08X\n", &Pml::PokePara::Accessor::GetWazaNo);
 
     int32_t monsNo = this->GetMonsNo((MethodInfo *) nullptr);
     uint16_t formNo = this->GetFormNo((MethodInfo *) nullptr);

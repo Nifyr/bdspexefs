@@ -1,4 +1,25 @@
 [target=main, version=bd_130]
+24aeb90:
+    b Pml_PokePara_CalcTool_DecideFormNoFromHoldItem
+1d0d938:
+    b Dpr_Battle_Logic_Common_CheckUnbreakablePokeItem
+1d0db44:
+    b Dpr_Battle_Logic_Common_CheckUnbreakablePokeItem
+1954440:
+    bl Dpr_Battle_Logic_Common_CheckUnbreakablePokeItem
+195fa0c:
+    bl Dpr_Battle_Logic_Common_CheckUnbreakablePokeItem
+195fa48:
+    bl Dpr_Battle_Logic_Common_CheckUnbreakablePokeItem
+1808174:
+    bl Dpr_Battle_Logic_Common_CheckUnbreakablePokeItem
+18081a0:
+    bl Dpr_Battle_Logic_Common_CheckUnbreakablePokeItem
+18081cc:
+    bl Dpr_Battle_Logic_Common_CheckUnbreakablePokeItem
+18081f8:
+    bl Dpr_Battle_Logic_Common_CheckUnbreakablePokeItem
+
 // Handler.Item$$handler_Naganegi
 1911260:
     b Dpr_Battle_Logic_Handler_Item_handler_Naganegi

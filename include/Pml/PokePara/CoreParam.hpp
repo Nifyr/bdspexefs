@@ -1,6 +1,7 @@
 #pragma once
 
 #include "il2cpp.hpp"
+#include "Pml/PokePara/CoreParam.h"
 #include "System/Collections/Generic/HashSet.hpp"
 
 using namespace System::Collections::Generic;
@@ -12,6 +13,10 @@ namespace Pml
         struct CoreParam_FormChangeResult_o;
 
         struct CoreParam_o {
+            CoreParam_c *klass;
+            void *monitor;
+            CoreParam_Fields fields;
+
             void ChangeFormNo(uint16_t nextFormno, CoreParam_FormChangeResult_o *pResult, MethodInfo *method);
             void CloseUpWazaPos(MethodInfo *method);
             bool EndFastMode(bool validFlag, MethodInfo *method);
@@ -31,6 +36,7 @@ namespace Pml
             void SetWazaPP(uint8_t wazaIndex, uint8_t value, MethodInfo *method);
             void SetWazaPPUpCount(uint8_t wazaIndex, uint8_t value, MethodInfo *method);
             bool StartFastMode(MethodInfo *method);
+            void UpdateCalcDatas(bool keepDead, MethodInfo *method);
         };
     }
 }

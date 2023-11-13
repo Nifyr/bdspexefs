@@ -87,59 +87,6 @@ constexpr uint32_t MIND_BLOWN = 720;
 constexpr uint32_t MISTY_EXPLOSION = 802;
 constexpr uint32_t TERRAIN_PULSE = 805;
 
-// ItemIDs
-constexpr uint32_t FLAME_PLATE = 298;
-constexpr uint32_t SPLASH_PLATE = 299;
-constexpr uint32_t ZAP_PLATE = 300;
-constexpr uint32_t MEADOW_PLATE = 301;
-constexpr uint32_t ICICLE_PLATE = 302;
-constexpr uint32_t FIST_PLATE = 303;
-constexpr uint32_t TOXIC_PLATE = 304;
-constexpr uint32_t EARTH_PLATE = 305;
-constexpr uint32_t SKY_PLATE = 306;
-constexpr uint32_t MIND_PLATE = 307;
-constexpr uint32_t INSECT_PLATE = 308;
-constexpr uint32_t STONE_PLATE = 309;
-constexpr uint32_t SPOOKY_PLATE = 310;
-constexpr uint32_t DRACO_PLATE = 311;
-constexpr uint32_t DREAD_PLATE = 312;
-constexpr uint32_t IRON_PLATE = 313;
-constexpr uint32_t PIXIE_PLATE = 644;
-constexpr uint32_t FIRIUM_Z = 777;
-constexpr uint32_t WATERIUM_Z = 778;
-constexpr uint32_t ELECTRIUM_Z = 779;
-constexpr uint32_t GRASSIUM_Z = 780;
-constexpr uint32_t ICIUM_Z = 781;
-constexpr uint32_t FIGHTINIUM_Z = 782;
-constexpr uint32_t POISONIUM_Z = 783;
-constexpr uint32_t GROUNDIUM_Z = 784;
-constexpr uint32_t FLYINIUM_Z = 785;
-constexpr uint32_t PSYCHIUM_Z = 786;
-constexpr uint32_t BUGINIUM_Z = 787;
-constexpr uint32_t ROCKIUM_Z = 788;
-constexpr uint32_t GHOSTIUM_Z = 789;
-constexpr uint32_t DRAGONIUM_Z = 790;
-constexpr uint32_t DARKINIUM_Z = 791;
-constexpr uint32_t STEELIUM_Z = 792;
-constexpr uint32_t FAIRIUM_Z = 793;
-constexpr uint32_t FIGHTING_MEMORY = 904;
-constexpr uint32_t FLYING_MEMORY = 905;
-constexpr uint32_t POISON_MEMORY = 906;
-constexpr uint32_t GROUND_MEMORY = 907;
-constexpr uint32_t ROCK_MEMORY = 908;
-constexpr uint32_t BUG_MEMORY = 909;
-constexpr uint32_t GHOST_MEMORY = 910;
-constexpr uint32_t STEEL_MEMORY = 911;
-constexpr uint32_t FIRE_MEMORY = 912;
-constexpr uint32_t WATER_MEMORY = 913;
-constexpr uint32_t GRASS_MEMORY = 914;
-constexpr uint32_t ELECTRIC_MEMORY = 915;
-constexpr uint32_t PSYCHIC_MEMORY = 916;
-constexpr uint32_t ICE_MEMORY = 917;
-constexpr uint32_t DRAGON_MEMORY = 918;
-constexpr uint32_t DARK_MEMORY = 919;
-constexpr uint32_t FAIRY_MEMORY = 920;
-
 // TypeIDs
 constexpr uint32_t NORMAL = 0;
 constexpr uint32_t FIGHTING = 1;
@@ -181,93 +128,18 @@ static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableAsOne0;
 static System::Array<EventFactor_EventHandlerTable_o *> * sHandlerTableAsOne1;
 
 // --- EventHandler delegates ---
-uint8_t MultitypeType(uint32_t itemNo) {
-    switch (itemNo) {
-        case FIST_PLATE:
-        case FIGHTINIUM_Z:
-            return FIGHTING;
-        case SKY_PLATE:
-        case FLYINIUM_Z:
-            return FLYING;
-        case TOXIC_PLATE:
-        case POISONIUM_Z:
-            return POISON;
-        case EARTH_PLATE:
-        case GROUNDIUM_Z:
-            return GROUND;
-        case STONE_PLATE:
-        case ROCKIUM_Z:
-            return ROCK;
-        case INSECT_PLATE:
-        case BUGINIUM_Z:
-            return BUG;
-        case SPOOKY_PLATE:
-        case GHOSTIUM_Z:
-            return GHOST;
-        case IRON_PLATE:
-        case STEELIUM_Z:
-            return STEEL;
-        case FLAME_PLATE:
-        case FIRIUM_Z:
-            return FIRE;
-        case SPLASH_PLATE:
-        case WATERIUM_Z:
-            return WATER;
-        case MEADOW_PLATE:
-        case GRASSIUM_Z:
-            return GRASS;
-        case ZAP_PLATE:
-        case ELECTRIUM_Z:
-            return ELECTRIC;
-        case MIND_PLATE:
-        case PSYCHIUM_Z:
-            return PSYCHIC;
-        case ICICLE_PLATE:
-        case ICIUM_Z:
-            return ICE;
-        case DRACO_PLATE:
-        case DRAGONIUM_Z:
-            return DRAGON;
-        case DREAD_PLATE:
-        case DARKINIUM_Z:
-            return DARK;
-        case PIXIE_PLATE:
-        case FAIRIUM_Z:
-            return FAIRY;
-        default:
-            return NORMAL;
-    }
-}
-uint8_t RKSSystemType(uint32_t itemNo) {
-    switch (itemNo) {
-        case FIGHTING_MEMORY: return FIGHTING;
-        case FLYING_MEMORY: return FLYING;
-        case POISON_MEMORY: return POISON;
-        case GROUND_MEMORY: return GROUND;
-        case ROCK_MEMORY: return ROCK;
-        case BUG_MEMORY: return BUG;
-        case GHOST_MEMORY: return GHOST;
-        case STEEL_MEMORY: return STEEL;
-        case FIRE_MEMORY: return FIRE;
-        case WATER_MEMORY: return WATER;
-        case GRASS_MEMORY: return GRASS;
-        case ELECTRIC_MEMORY: return ELECTRIC;
-        case PSYCHIC_MEMORY: return PSYCHIC;
-        case ICE_MEMORY: return ICE;
-        case DRAGON_MEMORY: return DRAGON;
-        case DARK_MEMORY: return DARK;
-        case FAIRY_MEMORY: return FAIRY;
-        default: return NORMAL;
-    }
-}
 uint8_t GetType(CoreParam *cp, int32_t paramID) {
-    Accessor *a = cp->fields.m_accessor;
+    Accessor_o *a = cp->fields.m_accessor;
     int32_t tokuseiNo = a->GetTokuseiNo(nullptr);
     uint32_t itemNo = a->GetItemNo(nullptr);
-    if (tokuseiNo == MULTITYPE)
-        return MultitypeType(itemNo);
-    if (tokuseiNo == RKS_SYSTEM)
-        return RKSSystemType(itemNo);
+    if (tokuseiNo == MULTITYPE) {
+        uint8_t type = MultitypeType(itemNo);
+        if (type != NORMAL) return type;
+    }
+    if (tokuseiNo == RKS_SYSTEM) {
+        uint8_t type = RKSSystemType(itemNo);
+        if (type != NORMAL) return type;
+    }
     return PersonalTableExtensions::GetParam(
             PersonalSystem::GetPersonalData(a->GetMonsNo(nullptr),
                                             a->GetFormNo(nullptr),
