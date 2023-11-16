@@ -1,7 +1,10 @@
-#pragma once 
-
 #include "il2cpp.hpp"
+
+#include "BATTLE_SETUP_PARAM.hpp"
 #include "Dpr/BallDeco.hpp"
+#include "System/Collections/IEnumerator.hpp"
+
+using namespace System::Collections;
 
 namespace Dpr
 {
@@ -88,11 +91,18 @@ namespace Dpr
                 MainModule_Fields fields;
 
                 void CalcNatsukiItemUse(BTL_POKEPARAM_o *bpp, uint16_t itemNo, MethodInfo *method);
+                IEnumerator_o * FinalizeCoroutine(MethodInfo *method);
                 int32_t GetClientSide(uint8_t clientID, MethodInfo *method);
                 int32_t GetEscapeMode(MethodInfo *method);
+                IEnumerator_o * LeavenOnErrorCoroutine(MethodInfo *method);
                 bool IsFriendPokeID(uint8_t pokeID1, uint8_t pokeID2, MethodInfo *method);
                 bool IsSkyBattle(MethodInfo *method);
                 void RegisterZukanSeeFlag(BTL_POKEPARAM_o *bpp, MethodInfo *method);
+                void setSrcPartyToBattleEnv(BattleEnv_o *battleEnv, uint8_t clientID, bool forServer, MethodInfo *method);
+                void setSubProcForSetup(BATTLE_SETUP_PARAM_o *setup_param, MethodInfo *method);
+                void setup_raid_srcParty(MethodInfo *method);
+                void setup_raid_trainerParam(MethodInfo *method);
+                void setup_raid_boss(BattleEnv_o *env, MethodInfo *method);
             };
 
             struct MainModule {

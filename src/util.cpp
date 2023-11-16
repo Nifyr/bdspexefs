@@ -103,7 +103,7 @@ void * system_array_new(void * typeInfo, uint32_t len)
   return array;
 }
 
-void EnsureTypeInfoLoaded(bool *datBool, uint64_t datPtr) {
+void EnsureTypeInfoInit(bool *datBool, uint64_t datPtr) {
     if (*datBool) return;
     system_load_typeinfo((void *)datPtr);
     *datBool = true;

@@ -2,6 +2,7 @@
 
 #include "UnityEngine/Color.hpp"
 #include "System/Collections/IEnumerator.hpp"
+#include "System/Action.hpp"
 
 using namespace UnityEngine;
 using namespace System::Collections;

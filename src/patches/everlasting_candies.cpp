@@ -1,6 +1,5 @@
 #include "il2cpp.hpp"
 #include "Dpr/UI/UIBag.hpp"
-#include "PlayerWork.hpp"
 #include "level_cap.hpp"
 #include "logger.hpp"
 #include "util.hpp"

@@ -9,8 +9,14 @@
 #include "DpData.hpp"
 #include "ItemWork.hpp"
 #include "Pml/PokePara/SavePokeParty.hpp"
+#include "Pml/PokeParty.hpp"
+#include "System/Collections/Generic/List.hpp"
 
 using namespace Dpr::Item;
+using namespace DPData;
+using namespace Pml;
+using namespace Pml::PokePara;
+using namespace System::Collections::Generic;
 
 struct AzukariyaData_Fields {
 	struct Pml::PokePara::SerializedPokemonFull_array* pokemonParam;
@@ -286,17 +292,24 @@ struct PlayerWork_Fields {
 
 struct PlayerWork
 {
+    static PokemonParam_o * get_capturedPokemon(MethodInfo *method);
     static int32_t get_defaultPokeNo(MethodInfo *method);
+    static List_EvolveDemoTools_Param__o * get_evolveRequets(MethodInfo *method);
+    static PokeParty_o * get_playerParty(MethodInfo *method);
+    static PLAYER_SAVE_DATA_o get_PlayerSaveData(MethodInfo *method);
+    static MYSTATUS_o * get_playerStatus(MethodInfo *method);
     static int32_t get_rivalPokeNo(MethodInfo *method);
     static int32_t get_rivalPokeType(MethodInfo *method);
     static int32_t get_supportPokeNo(MethodInfo *method);
     static DPData::TR_BATTLE_DATA_array * get_tr_battleData();
+    static UgSaveData_o get_ugSaveData(MethodInfo *method);
     static int32_t get_zoneID(MethodInfo *method);
     static DPData::ZUKAN_WORK_o get_zukan(DPData::ZUKAN_WORK_o *__return_storage_ptr__, MethodInfo * method);
     static bool GetBool(int32_t index, MethodInfo *method);
     static int32_t GetInt(int32_t index, MethodInfo *method);
     static bool GetSytemFlag(int32_t index, MethodInfo *method);
     static bool IsFormBicycle(MethodInfo *method);
+    static void set_capturedPokemon(PokemonParam_o *value, MethodInfo *method);
     static void set_tr_battleData(DPData::TR_BATTLE_DATA_array * tr_battleData);
     static void SetBool(int32_t index, bool value, MethodInfo *method);
     static void SetInt(int32_t index, int32_t value, MethodInfo *method);

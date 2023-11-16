@@ -2,12 +2,13 @@
 #include "System/Array.hpp"
 
 #include "ContextMenuID.hpp"
+#include "Dpr/UnderGround/UgFieldManager.hpp"
 #include "PlayerWork.hpp"
 #include "Pml/PokePara/PokemonParam.hpp"
+#include "SmartPoint/Components/Fader.hpp"
 #include "System/Action.hpp"
 #include "System/Collections/Generic/List.hpp"
 #include "UIMsgWindowController.hpp"
-#include "UIWindow.hpp"
 #include "UnityEngine/Events/UnityAction.hpp"
 
 using namespace Dpr::Item;

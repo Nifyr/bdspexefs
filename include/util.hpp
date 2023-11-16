@@ -35,7 +35,7 @@ uint8_t MultitypeType(uint32_t itemNo);
 EventFactor_EventHandlerTable_o * CreateEventHandler(uint16_t eventID, MethodInfo * src, Il2CppMethodPointer methodPointer);
 System::Array<EventFactor_EventHandlerTable_o *> * CreateEventHandlerTable(uint32_t size);
 void EnsureClassInit(void *typeInfo);
-void EnsureTypeInfoLoaded(bool *datBool, uint64_t datPtr);
+void EnsureTypeInfoInit(bool *datBool, uint64_t datPtr);
 uint8_t HighestMultiple(uint8_t max, uint8_t factor);
 bool HandlerAddFieldEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID, int32_t effect, uint8_t turns);
 void HandlerAddPosEffect(EventFactor_EventHandlerArgs_o **args, uint8_t pokeID);

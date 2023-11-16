@@ -1,6 +1,8 @@
 #ifndef _GUARD_HPP_
 #define _GUARD_HPP_
 
+#include "Pml/PokePara/SavePokeParty.hpp"
+#include "poketool/poke_memo/poketool_poke_memo.hpp"
 #include "System/Array.hpp"
 #include "System/String.hpp"
 #include "il2cpp.hpp"
@@ -107,30 +109,6 @@ namespace DPData
         CONFIG_Fields fields;
     };
 
-    struct MYSTATUS_Fields {
-        System::String * name;
-        uint32_t id;
-        int32_t gold;
-        bool sex;
-        uint8_t region_code;
-        uint8_t badge;
-        uint8_t trainer_view;
-        uint8_t rom_code;
-        bool dp_clear;
-        uint8_t body_type;
-        uint8_t fashion;
-        int32_t defaultPokeType;
-        bool dsPlayerFlag;
-        int32_t turewalkMemberIndex;
-        struct UnityEngine_Vector2Int_o grid;
-        float height;
-        float rotation;
-    };
-
-    struct MYSTATUS_o {
-        MYSTATUS_Fields fields;
-    };
-
     struct PLAYTIME_Fields {
         uint16_t hour;
         uint8_t minute;
@@ -228,7 +206,7 @@ namespace DPData
 
     struct PLAYER_DATA_Fields {
         struct CONFIG_o config;
-        struct MYSTATUS_o mystatus;
+        MYSTATUS_o mystatus;
         struct PLAYTIME_o playtime;
         struct CONTEST_DATA_o contestdata;
     };

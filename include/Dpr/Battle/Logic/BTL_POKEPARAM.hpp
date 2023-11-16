@@ -3,8 +3,11 @@
 #include "il2cpp.hpp"
 #include "BTL_SICKCONT.hpp"
 #include "Pml/PokePara/CoreParam.h"
+#include "Pml/PokePara/PokemonParam.hpp"
 #include "PokeTypePair.hpp"
 #include "System/Array.hpp"
+
+using namespace Pml::PokePara;
 
 namespace Dpr
 {
@@ -28,7 +31,7 @@ namespace Dpr
             };
 
             struct BTL_POKEPARAM_CORE_PARAM_Fields {
-                struct PokemonParam_o* ppSrc;
+                PokemonParam_o* ppSrc;
                 uint32_t personalRand;
                 uint32_t exp;
                 uint16_t monsno;

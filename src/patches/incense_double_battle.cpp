@@ -66,7 +66,7 @@ void BATTLE_SETUP_Wild_DBIncense(Dpr::Battle::Logic::BATTLE_SETUP_PARAM_o *bp,
 
 struct Dpr_Battle_Logic_MainModule_o;
 // Stub this to see if it fixes the clone
-void setup_alone_double_multi_04(Dpr_Battle_Logic_MainModule_o *__this,int32_t *seq,MethodInfo *method)
+void setup_alone_double_multi_04(MainModule_o *__this,int32_t *seq,MethodInfo *method)
 {
     return;
 }

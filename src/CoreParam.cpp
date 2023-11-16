@@ -1,5 +1,4 @@
 #include "il2cpp.hpp"
-#include "il2cpp-api.h"
 #include "Pml/PokePara/CoreParam.h"
 #include "Pml/PmlUse.hpp"
 #include "Pml/Personal/PersonalSystem.hpp"

@@ -1,7 +1,7 @@
 #pragma once 
 
 #include "il2cpp.hpp"
-#include "POKECON.hpp"
+#include "Dpr/Battle/Logic/Setup.hpp"
 #include "PosPoke.hpp"
 #include "SideEffectStatus.hpp"
 #include "WazaParam.hpp"

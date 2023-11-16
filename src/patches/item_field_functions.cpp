@@ -115,8 +115,6 @@ constexpr uint16_t ROTOM_CATALOG = 1278;
 constexpr uint16_t REINS_OF_UNITY = 1590;
 
 // DexIDs
-constexpr uint16_t UNOWN = 201;
-
 constexpr uint16_t VENUSAUR = 3;
 constexpr uint16_t CHARIZARD = 6;
 constexpr uint16_t BLASTOISE = 9;
@@ -308,13 +306,8 @@ extern String_o *StringLiteral_11723;
 extern String_o *StringLiteral_11724;
 void Dpr_UI_UIBag___c__DisplayClass127_1__ShowItemContextMenu_b__11(UIBag___c__DisplayClass127_1_o *__this,
                                                                     MethodInfo *method) {
-    EnsureTypeInfoLoaded(&DAT_7104cbd681, 0x9563);
-    EnsureTypeInfoLoaded(&DAT_7104cbb2ca, 0x6bcc);
-    int32_t fieldFuncType = __this->fields.fieldFuncType;
-    UIBag___c__DisplayClass127_0_o *uibdc1270 = __this->fields.CS___8__locals1;
-    ItemInfo_o *ii = uibdc1270->fields.item;
-    UIBag_o *uib = uibdc1270->fields.__4__this;
-    UIMsgWindowController_o *uimwc = uib->fields.msgWindowController;
+    EnsureTypeInfoInit(&DAT_7104cbd681, 0x9563);
+    EnsureTypeInfoInit(&DAT_7104cbb2ca, 0x6bcc);
     EnsureClassInit(PlayerWork_TypeInfo);
     EnsureClassInit(MessageWordSetHelper_TypeInfo);
     EnsureClassInit(FieldManager_TypeInfo);
@@ -325,8 +318,15 @@ void Dpr_UI_UIBag___c__DisplayClass127_1__ShowItemContextMenu_b__11(UIBag___c__D
     EnsureClassInit(Sequencer_TypeInfo);
     EnsureClassInit(BtlTowerWork_TypeInfo);
     EnsureClassInit(UIManager_TypeInfo);
+    int32_t fieldFuncType = __this->fields.fieldFuncType;
+    UIBag___c__DisplayClass127_0_o *uibdc1270 = __this->fields.CS___8__locals1;
+    ItemInfo_o *ii = uibdc1270->fields.item;
+    UIBag_o *uib = uibdc1270->fields.__4__this;
+    UIMsgWindowController_o *uimwc = uib->fields.msgWindowController;
     FieldWalkingManager_o *fwm = FieldManager_TypeInfo->static_fields->fwMng;
     int32_t itemID = ii->get_Id(nullptr);
+    auto * uim = (UIManager_o *)SingletonMonoBehaviour_object_::get_Instance(
+            SingletonMonoBehaviour_UIManager__get_Instance);
     switch (fieldFuncType) {
         case ItemData_FieldFunctionType::ITEMUSE_FLD_RECOVER:
         case ItemData_FieldFunctionType::ITEMUSE_FLD_WAZA:
@@ -409,9 +409,9 @@ void Dpr_UI_UIBag___c__DisplayClass127_1__ShowItemContextMenu_b__11(UIBag___c__D
             }
             ItemWork::SetSpray(itemID, (int16_t)(ii->GetParam(ItemData_PrmID::ATTACK, nullptr) * 5), nullptr);
             ItemWork::SubItem(itemID, 1, nullptr);
-            ((AudioManager_o *)SingletonMonoBehaviour_object_::get_Instance(
-                    SingletonMonoBehaviour_AudioManager__get_Instance))->
-                    PlaySe(0x8e8a8de1, nullptr, nullptr);
+            auto *am = (AudioManager_o *)SingletonMonoBehaviour_object_::get_Instance(
+                    SingletonMonoBehaviour_AudioManager__get_Instance);
+            am->PlaySe(0x8e8a8de1, nullptr, nullptr);
             MessageWordSetHelper::SetPlayerNickNameWord(0, nullptr);
             MessageWordSetHelper::SetItemWord(1, itemID, 1, nullptr);
             onCloseWindow = uibdc1270->fields.__9__17;
@@ -473,9 +473,7 @@ void Dpr_UI_UIBag___c__DisplayClass127_1__ShowItemContextMenu_b__11(UIBag___c__D
                 uibdc1270->fields.__9__13 = (UnityAction_UnityAction_UIWindow___o *)onCall;
                 system_array_init(&uibdc1270->fields.__9__13);
             }
-            ((UIManager_o *)SingletonMonoBehaviour_object_::get_Instance(
-                    SingletonMonoBehaviour_UIManager__get_Instance))->CloseXMenu(
-                            (UnityAction_UnityAction_UIWindow___o *)onCall,nullptr);
+            uim->CloseXMenu((UnityAction_UnityAction_UIWindow___o *)onCall, nullptr);
             return;
         }
         case ItemData_FieldFunctionType::ITEMUSE_FLD_POINTOKAADO: {
@@ -487,8 +485,7 @@ void Dpr_UI_UIBag___c__DisplayClass127_1__ShowItemContextMenu_b__11(UIBag___c__D
             return;
         }
         case ItemData_FieldFunctionType::ITEMUSE_FLD_DS_PLAYER: {
-            ((UIManager_o *)SingletonMonoBehaviour_object_::get_Instance(
-                    SingletonMonoBehaviour_UIManager__get_Instance))->UseDSPlayerItem(nullptr);
+            uim->UseDSPlayerItem(nullptr);
             String_o *labelName = StringLiteral_11720;
             if (!ItemWork::IsDsPlayer(nullptr)) {
                 labelName = StringLiteral_11719;
@@ -527,9 +524,7 @@ void Dpr_UI_UIBag___c__DisplayClass127_1__ShowItemContextMenu_b__11(UIBag___c__D
                         uibdc1270->fields.__9__19 = (UnityAction_UnityAction_UIWindow___o *)onCall;
                         system_array_init(&uibdc1270->fields.__9__19);
                     }
-                    ((UIManager_o *)SingletonMonoBehaviour_object_::get_Instance(
-                            SingletonMonoBehaviour_UIManager__get_Instance))->CloseXMenu(
-                                    (UnityAction_UnityAction_UIWindow___o *)onCall,nullptr);
+                    uim->CloseXMenu((UnityAction_UnityAction_UIWindow___o *)onCall,nullptr);
                     return;
                 }
             }
@@ -598,7 +593,7 @@ void RemoveMove(CoreParam_o *cp, int32_t removeMoveID) {
 extern String_o *StringLiteral_11741;
 extern bool DAT_7104cbd69d;
 void ForgetMove(UIBag_o *uib, CoreParam_o *cp, int32_t forgetMoveID, int32_t fallbackMoveID) {
-    EnsureTypeInfoLoaded(&DAT_7104cbd69d, 0x95ab);
+    EnsureTypeInfoInit(&DAT_7104cbd69d, 0x95ab);
     uint8_t wazaIndex = cp->GetWazaIndex(forgetMoveID, nullptr);
     if (wazaIndex == NULL_WAZA_IDX) return;
     RemoveMove(cp, forgetMoveID);
@@ -615,7 +610,7 @@ extern String_o *StringLiteral_11742;
 extern bool DAT_7104cbb9d0;
 extern bool DAT_7104cbd69e;
 void LearnMove(UIBag_o *uib, PokemonParam_o *pp, int32_t moveID) {
-    EnsureTypeInfoLoaded(&DAT_7104cbb9d0, 0x9a20);
+    EnsureTypeInfoInit(&DAT_7104cbb9d0, 0x9a20);
     auto *cp = (CoreParam_o *)pp;
     if (cp->GetWazaIndex(moveID, nullptr) != NULL_WAZA_IDX) return;
     uint8_t wazaIndex = cp->GetWazaCount(nullptr);
@@ -637,7 +632,7 @@ void LearnMove(UIBag_o *uib, PokemonParam_o *pp, int32_t moveID) {
     system_array_init(&uibdc1450->fields.pokemonParam);
     uibdc1450->fields.__4__this = uib;
     system_array_init(&uibdc1450->fields.__4__this);
-    EnsureTypeInfoLoaded(&DAT_7104cbd69e, 0x95ac);
+    EnsureTypeInfoInit(&DAT_7104cbd69e, 0x95ac);
     auto *uibdc1451 = (UIBag___c__DisplayClass145_1_o *)
             il2cpp_object_new(UIBag___c__DisplayClass145_1_TypeInfo);
     uibdc1451->fields.CS___8__locals1 = uibdc1450;
@@ -688,7 +683,7 @@ extern bool DAT_7104cbb9cf;
 extern String_o *StringLiteral_11712;
 void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemonPartyItem, ItemInfo_o *itemInfo,
                                     MethodInfo *method) {
-    EnsureTypeInfoLoaded(&DAT_7104cbb9cf, 0x9a2e);
+    EnsureTypeInfoInit(&DAT_7104cbb9cf, 0x9a2e);
     auto *uibdc1440 = (UIBag___c__DisplayClass144_0_o *)
             il2cpp_object_new(UIBag___c__DisplayClass144_0_TypeInfo);
     uibdc1440->ctor(nullptr);

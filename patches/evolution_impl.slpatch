@@ -1,0 +1,16 @@
+[target=main, version=bd_130]
+// CoreParam$$Evolve
+// 20496a0:
+//     b Pml_PokePara_CoreParam_Evolve
+
+// EvolveManager$$IsSatisfyEvolveConditionItem
+// 2052f50:
+//     b Pml_PokePara_EvolveManager_IsSatisfyEvolveConditionItem
+
+// poketool_evolution_util$$SetupEvolveSituation
+2bad5d0:
+    b poketool_poketool_evolution_util_SetupEvolveSituation
+
+// BattleProc.<FinalizeCoroutine>d__34$$MoveNext
+187e190:
+    b Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext

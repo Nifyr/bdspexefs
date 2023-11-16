@@ -12,7 +12,6 @@
 #include "Section_FieldEffect_Add.hpp"
 #include "Section_FreeFall_Release.hpp"
 #include "Section_FromEvent_AddViewEffect.hpp"
-#include "Section_FromEvent_ChangePokeType.hpp"
 #include "Section_FromEvent_ConsumeItem.hpp"
 #include "Section_FromEvent_Damage.hpp"
 #include "Section_FromEvent_DecrementPP.hpp"

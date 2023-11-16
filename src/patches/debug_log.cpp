@@ -3,8 +3,6 @@
 #include "util.hpp"
 #include "System/Array.hpp"
 #include "Pml/PokeParty.hpp"
-#include "Dpr/Battle/Logic/BATTLE_SETUP_PARAM.hpp"
-#include "Dpr/Battle/Logic/Setup.hpp"
 
 
 extern void * System_Byte_array_typeInfo;

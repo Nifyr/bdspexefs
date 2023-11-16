@@ -1,10 +1,7 @@
 #include "il2cpp.hpp"
 #include "logger.hpp"
 #include "util.hpp"
-#include "System/Array.hpp"
 #include "Pml/PokeParty.hpp"
-#include "Dpr/Battle/Logic/BATTLE_SETUP_PARAM.hpp"
-#include "Dpr/Battle/Logic/Setup.hpp"
 
 struct Pml_PokePara_EvolveSituation_o;
 
@@ -16,21 +13,6 @@ namespace Dpr
         {
 
             struct BattleEnv_o;
-
-            struct MainModule_o
-            {
-                // 02476980
-                void setSubProcForSetup(BATTLE_SETUP_PARAM_o *setup_param, MethodInfo *method);
-                // 02479570
-                void setup_raid_srcParty(MethodInfo *method);
-                // 02479640
-                void setup_raid_trainerParam(MethodInfo *method);
-                // 024797b0
-                void setup_raid_boss(BattleEnv_o *env, MethodInfo *method);
-                // 02477e90
-                void setSrcPartyToBattleEnv(BattleEnv_o *battleEnv, uint8_t clientID, bool forServer, MethodInfo *method);
-
-            };
 
             struct ExPokePos_ExpandResult_o;
             struct ExPokePos_o

@@ -908,7 +908,7 @@ void Dpr_Battle_Logic_BTL_POKEPARAM_ChangeForm(BTL_POKEPARAM_o *__this, uint8_t 
     cp->ChangeFormNo(formNo, nullptr, nullptr);
     __this->setupBySrcDataBase(true, true, bppcp->fields.gParam->fields.isGMode, nullptr);
     __this->correctMaxHP(nullptr);
-    EnsureTypeInfoLoaded(&DAT_7104cbfd50, 0x1ef9);
+    EnsureTypeInfoInit(&DAT_7104cbfd50, 0x1ef9);
     EnsureClassInit(Calc_TypeInfo);
     uint16_t monsno = bppcp->fields.monsno;
     uint16_t weight = Calc::PERSONAL_GetParam(monsno, formNo, 0x22, nullptr);
@@ -947,8 +947,8 @@ void Dpr_Battle_Logic_Section_FromEvent_FormChange_formChange(Section_FromEvent_
     __this->fields.super.m_pMainModule->RegisterZukanSeeFlag(poke, nullptr);
     uint16_t newTokusei = ((CoreParam_o *)poke->fields.m_coreParam->fields.ppSrc)->GetTokuseiNo(nullptr);
     if (newTokusei != poke->fields.m_tokusei) {
-        EnsureTypeInfoLoaded(&DAT_7104cbb66d, 0xa9f8);
-        EnsureTypeInfoLoaded(&DAT_7104cbe041, 0x2c33);
+        EnsureTypeInfoInit(&DAT_7104cbb66d, 0xa9f8);
+        EnsureTypeInfoInit(&DAT_7104cbe041, 0x2c33);
         auto *result = (Section_FromEvent_ChangeTokusei_Result_o *)
                 il2cpp_object_new(Section_FromEvent_ChangeTokusei_Result_TypeInfo);
         result->ctor(nullptr);

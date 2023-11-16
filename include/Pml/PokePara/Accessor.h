@@ -16,9 +16,14 @@ namespace Pml
             uint8_t GetSex(MethodInfo *method);
             int32_t GetTokuseiNo(MethodInfo *method);
             int32_t GetWazaNo(uint8_t wazaIndex, MethodInfo *method);
+            bool HaveCalcData(MethodInfo *method);
+            bool IsFuseiTamago(MethodInfo *method);
+            bool IsSpecialGEnable(MethodInfo *method);
+            bool IsTamago(MethodInfo *method);
             bool IsTokusei2(MethodInfo *method);
             bool IsTokusei3(MethodInfo *method);
             void SetFormNo(uint16_t formno, MethodInfo *method);
+            void SetItemNo(uint16_t itemno, MethodInfo *method);
             void SetPP(uint8_t wazaIndex, uint8_t pp, MethodInfo *method);
             void SetSex(uint8_t sex, MethodInfo *method);
             uint32_t SetTalentAgi(uint8_t value, MethodInfo * method);

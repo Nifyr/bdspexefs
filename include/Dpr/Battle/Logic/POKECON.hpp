@@ -3,6 +3,7 @@
 #include "il2cpp.hpp"
 #include "BTL_POKEPARAM.hpp"
 #include "MyStatus.hpp"
+#include "Section_FromEvent_ChangePokeType.hpp"
 #include "StrParam.hpp"
 
 namespace Dpr
@@ -14,7 +15,7 @@ namespace Dpr
             struct POKECON_c;
             
             struct POKECON_Fields {
-                struct MainModule_o* m_mainModule;
+                MainModule_o* m_mainModule;
                 struct BTL_PARTY_array* m_party;
                 struct BTL_POKEPARAM_array* m_activePokeParam;
                 struct BTL_POKEPARAM_array* m_storedPokeParam;

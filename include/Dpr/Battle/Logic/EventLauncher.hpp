@@ -3,6 +3,7 @@
 #include "il2cpp.hpp"
 #include "PokeAction.hpp"
 #include "EventSystem.hpp"
+#include "WazaParam.hpp"
 
 namespace Dpr
 {

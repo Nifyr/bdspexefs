@@ -17,10 +17,13 @@ namespace Pml
             void *monitor;
             CoreParam_Fields fields;
 
+            uint8_t CalcLevel(MethodInfo *method);
             void ChangeFormNo(uint16_t nextFormno, CoreParam_FormChangeResult_o *pResult, MethodInfo *method);
+            void ChangeMonsNo(int32_t newMonsno, uint16_t newFormno, MethodInfo *method);
             void CloseUpWazaPos(MethodInfo *method);
             bool EndFastMode(bool validFlag, MethodInfo *method);
             uint16_t GetFormNo(MethodInfo *method);
+            uint32_t GetHp(MethodInfo *method);
             uint32_t GetMaxHp(MethodInfo *method);
             int32_t GetMonsNo(MethodInfo *method);
             uint32_t GetSick(MethodInfo *method);

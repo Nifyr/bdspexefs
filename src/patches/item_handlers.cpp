@@ -101,7 +101,7 @@ void Dpr_Battle_Logic_Exp_CalcExp(Exp_CalcParam_o **calcParam, Exp_CalcResult_o 
         exp = 1;
     exp = Exp::getexp_calc_adjust_level(exp, ecp->fields.getPokeLevel, deadPokeLevel,
                                         nullptr);
-    EnsureTypeInfoLoaded(&DAT_7104cbc139, 0x47a5);
+    EnsureTypeInfoInit(&DAT_7104cbc139, 0x47a5);
     EnsureClassInit(Calc_TypeInfo);
     if (!ecp->fields.isMyPoke) {
         int32_t ratio = 0x1800;

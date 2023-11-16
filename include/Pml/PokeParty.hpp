@@ -26,5 +26,12 @@ namespace Pml
         PokeParty_Fields fields;
     };
 
+    struct PokeParty_array {
+        Il2CppObject obj;
+        Il2CppArrayBounds *bounds;
+        il2cpp_array_size_t max_length;
+        PokeParty_o* m_Items[65535];
+    };
+
     extern void ** PTR_PokeParty_TypeInfo;
 }

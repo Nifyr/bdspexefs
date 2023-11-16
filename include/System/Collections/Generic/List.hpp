@@ -56,6 +56,24 @@ namespace System
                 void Add(void *item, MethodInfo *method);
             };
 
+            struct List_EvolveDemoTools_Param__c;
+
+            struct List_EvolveDemoTools_Param__Fields {
+                struct EvolveDemoTools_Param_array* _items;
+                int32_t _size;
+                int32_t _version;
+                Il2CppObject* _syncRoot;
+            };
+
+            struct List_EvolveDemoTools_Param__o {
+                List_EvolveDemoTools_Param__c *klass;
+                void *monitor;
+                List_EvolveDemoTools_Param__Fields fields;
+
+                void Add(void *item, MethodInfo *method);
+                void Clear(MethodInfo *method);
+            };
+
             extern void *List_ContextMenuID__TypeInfo;
             extern void *List_PokemonPartyItem__TypeInfo;
 
@@ -64,6 +82,7 @@ namespace System
 
             extern MethodInfo *List_ContextMenuID__Add;
             extern MethodInfo *List_ContextMenuID__ToArray;
+            extern MethodInfo *List_EvolveDemoTools_Param__Add;
             extern MethodInfo *List_PokemonPartyItem__Add;
         }
     }

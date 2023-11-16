@@ -14,6 +14,10 @@ struct FieldManager_VTable {
     VirtualInvokeData _3_ToString;
 };
 
+struct FieldManager_o {
+    void add_OnZoneChangeEvent(Action_o *value, MethodInfo *method);
+};
+
 struct FieldManager_StaticFields {
     struct FieldManager_o* _Instance_k__BackingField;
     FieldWalkingManager_o* fwMng;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "il2cpp.hpp"
+#include "Dpr/EncountTools.hpp"
 #include "Pml/PokeParty.hpp"
-#include "Dpr/Battle/Logic/BATTLE_SETUP_PARAM.hpp"
 
 namespace Dpr
 {

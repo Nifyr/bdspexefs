@@ -12,4 +12,8 @@ namespace UnityEngine
     struct Color_o {
         Color_Fields fields;
     };
+
+    struct Color {
+        static Color_o get_black(MethodInfo *method);
+    };
 }

@@ -74,7 +74,7 @@ void Dpr_Battle_Logic_POKECON_setupPokeParam(POKECON_o *__this, BTL_POKEPARAM_o 
 }
 extern bool DAT_7104cc0077;
 void FormChange(CoreParam_o *cp, uint16_t nextFormID) {
-    EnsureTypeInfoLoaded(&DAT_7104cc0077, 0x3191);
+    EnsureTypeInfoInit(&DAT_7104cc0077, 0x3191);
     Accessor_o *a = cp->fields.m_accessor;
     int32_t dexID = cp->GetMonsNo(nullptr);
     a->SetFormNo(nextFormID, nullptr);
@@ -89,7 +89,7 @@ void FormChange(CoreParam_o *cp, uint16_t nextFormID) {
 extern bool DAT_7104cc00ff;
 void Pml_PokePara_CoreParam_SetWaza(CoreParam_o *__this,uint8_t wazaIndex, int32_t wazano, MethodInfo *method) {
     if (wazaIndex > 3) return;
-    EnsureTypeInfoLoaded(&DAT_7104cc00ff, 0xa7c0);
+    EnsureTypeInfoInit(&DAT_7104cc00ff, 0xa7c0);
     WazaTable_SheetWaza_array *wtsws = WazaDataSystem_TypeInfo->static_fields->s_wazaTable->fields.Waza;
     if ((uint32_t)wazano >= wtsws->max_length) return;
     Accessor_o *a = __this->fields.m_accessor;
