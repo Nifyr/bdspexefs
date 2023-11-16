@@ -1,7 +1,7 @@
 #include "il2cpp.hpp"
 
 #include "Pml/PokeParty.hpp"
-#include "Pml/PokePara/EvolveSituation.hpp"
+#include "Pml/PokePara/EvolveManager.hpp"
 #include "System/Action.hpp"
 #include "System/Collections/IEnumerator.hpp"
 

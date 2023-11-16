@@ -14,3 +14,7 @@
 // BattleProc.<FinalizeCoroutine>d__34$$MoveNext
 187e190:
     b Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext
+
+// EvolveManager$$GetEvolvedMonsNo_byLevelUp
+20498d0:
+    b Pml_PokePara_EvolveManager_GetEvolvedMonsNo_byLevelUp

@@ -226,7 +226,7 @@ uint8_t RKSSystemType(uint32_t itemNo) {
 System::Array<EventFactor_EventHandlerTable_o *> * CreateEventHandlerTable(uint32_t size) {
     auto *array = (System::Array<EventFactor_EventHandlerTable_o *> *) malloc(32 + 8 * size);
     array->max_length = size;
-    for (int i = 0; i < size; ++i)
+    for (uint32_t i = 0; i < size; ++i)
         array->m_Items[i] = nullptr;
     return array;
 }

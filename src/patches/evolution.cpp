@@ -16,8 +16,7 @@
 #include "Pml/Personal/EvolveCond.hpp"
 #include "Pml/Personal/PersonalSystem.hpp"
 #include "Pml/PokePara/CoreParam.hpp"
-#include "Pml/PokePara/EvolveManager.hpp"
-#include "Pml/PokePara/EvolveTableExtensions.hpp"
+#include "Pml/Personal/EvolveTableExtensions.hpp"
 #include "ZoneWork.hpp"
 
 using namespace Audio;
@@ -43,9 +42,43 @@ constexpr uint16_t EVERSTONE = 229;
 // DexIDs
 constexpr uint16_t RAICHU = 26;
 
+PokeResult_o * GetPokeResult(PokeParty_o *party, CoreParam_o * cp) {
+    if (BattleProc_TypeInfo->static_fields->setupParam == nullptr) return nullptr;
+    if (BattleProc_TypeInfo->static_fields->setupParam->fields.pokeResult == nullptr) return nullptr;
+    for (uint32_t i = 0; i < party->fields.m_memberCount; ++i)
+        if ((CoreParam_o *)party->fields.m_member->m_Items[i] == cp)
+            return BattleProc_TypeInfo->static_fields->setupParam->fields.pokeResult->m_Items[i];
+    return nullptr;
+}
+
+bool IsSatisfyEvolveConditionEvent(EvolveTable_SheetEvolve_o *etse, PokeParty_o *party, CoreParam_o * cp, EvolveSituation_o *es, uint8_t routeIndex) {
+    Accessor_o *a = cp->fields.m_accessor;
+    PokeResult_o *pr = GetPokeResult(party, cp);
+    uint8_t level;
+    if (a->HaveCalcData(nullptr))
+        level = a->GetLevel(nullptr);
+    else
+        level = cp->CalcLevel(nullptr);
+    if (EvolveTableExtensions::GetEvolveEnableLevel(etse, routeIndex, nullptr) > level)
+        return false;
+    uint16_t param = EvolveTableExtensions::GetEvolutionParam(etse, routeIndex, nullptr);
+    switch (EvolveTableExtensions::GetEvolutionCondition(etse, routeIndex, nullptr)) {
+        case EvolveCond::CRITICAL_HIT:
+            if (cp->GetHp(nullptr) > 0 && es->fields.criticalHitCount >= param)
+                return true;
+            return false;
+        case EvolveCond::TOTAL_DAMAGE_RECIEVED:
+            if (pr == nullptr) return true;
+            if (pr->fields.totalDamageRecieved >= 49 && pr->fields.deadCount == 0 && es->fields.isUltraSpace)
+                return true;
+            return false;
+        default: return false;
+    }
+}
+
 extern bool DAT_7104cc00ac;
 extern bool DAT_7104cc00eb;
-bool CanEventEvolve(PokemonParam_o *pp, EvolveSituation_o *es) {
+bool CanEventEvolve(PokeParty_o *party, PokemonParam_o *pp, EvolveSituation_o *es) {
     EnsureTypeInfoInit(&DAT_7104cc00ac, 0x4721);
     EnsureTypeInfoInit(&DAT_7104cc00eb, 0x4724);
     EnsureClassInit(PersonalSystem_TypeInfo);
@@ -54,24 +87,12 @@ bool CanEventEvolve(PokemonParam_o *pp, EvolveSituation_o *es) {
     if (a->IsSpecialGEnable(nullptr) || a->IsTamago(nullptr) || a->IsFuseiTamago(nullptr) || a->GetItemNo(nullptr) == EVERSTONE) return false;
     EvolveTable_SheetEvolve_o *etse = PersonalSystem::GetEvolutionTable(a->GetMonsNo(nullptr), a->GetFormNo(nullptr), nullptr);
     uint8_t routeCount = EvolveTableExtensions::GetEvolutionRouteNum(etse, nullptr);
-    uint8_t level;
-    if (a->HaveCalcData(nullptr))
-        level = a->GetLevel(nullptr);
-    else
-        level = cp->CalcLevel(nullptr);
-    for (uint8_t i = 0; i < routeCount; ++i) {
-        if (EvolveTableExtensions::GetEvolveEnableLevel(etse, i, nullptr) > level)
-            continue;
-        uint16_t param = EvolveTableExtensions::GetEvolutionParam(etse, i, nullptr);
-        switch (EvolveTableExtensions::GetEvolutionCondition(etse, i, nullptr)) {
-            case EvolveCond::CRITICAL_HIT:
-                if (cp->GetHp(nullptr) > 0 && es->fields.criticalHitCount >= param)
-                    return true;
-            default: continue;
-        }
-    }
+    for (uint8_t i = 0; i < routeCount; ++i)
+        if (IsSatisfyEvolveConditionEvent(etse, party, cp, es, i))
+            return true;
     return false;
 }
+
 extern bool DAT_7104cbb2cc;
 extern bool DAT_7104cc61bd;
 void poketool_poketool_evolution_util_SetupEvolveSituation(EvolveSituation_o *pSituation, bool isDeviceTurnedOver,
@@ -115,7 +136,6 @@ extern String_o *StringLiteral_7098;
 extern String_o *StringLiteral_7097;
 bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__FinalizeCoroutine_d__34_o *__this,
                                                                    MethodInfo *method) {
-    socket_log_initialize();
     EnsureTypeInfoInit(&DAT_7104cbbb84, 0x9077);
     EnsureTypeInfoInit(&DAT_7104cbbbcc, 0x6b3f);
     EnsureTypeInfoInit(&DAT_7104cbbbcd, 0x6bdd);
@@ -130,7 +150,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
     EnsureClassInit(UgFieldManager_TypeInfo);
     EnsureClassInit(SingletonMonoBehaviour_MessageManager__TypeInfo);
     EnsureClassInit(MessageWordSetHelper_TypeInfo);
-    socket_log("typeinfos and classes initialized!");
     int32_t *state = &__this->fields.__1__state;
     if (0x6 < *state)
         return false;
@@ -140,7 +159,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
     BATTLE_SETUP_PARAM_o *bsp = BattleProc_TypeInfo->static_fields->setupParam;
     auto *am = (AudioManager_o *)SingletonMonoBehaviour_object_::get_Instance(
             SingletonMonoBehaviour_AudioManager__get_Instance);
-    socket_log("starting vars good!");
     switch(*state) {
         case 0x0: {
             *state = -0x1;
@@ -149,7 +167,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
             *current = (Il2CppObject *)mm->LeavenOnErrorCoroutine(nullptr);
             system_array_init(current);
             *state = 0x1;
-            socket_log("no issue with state 0!");
             return true;
         }
         case 0x1: {
@@ -158,17 +175,14 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
             EncountTools::OnPostBattle(bsp,
                                        PlayerWork::get_playerParty(nullptr),
                                        &__this->fields._evolveCheckTargetIndices_5__2, &outDispError, nullptr);
-            socket_log("state 1 checking for outDispError...");
             if (outDispError == nullptr) break;
             *current = (Il2CppObject *)outDispError;
             system_array_init(current);
             *state = 2;
-            socket_log("state 1 exited with outDispError!");
             return true;
         }
         case 0x2:
             *state = -0x1;
-            socket_log("no issue with state 2!");
             break;
         case 0x3: {
             *state = -0x1;
@@ -189,7 +203,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
                 nextState = 0x5;
             }
             *state = nextState;
-            socket_log("no issue with state 3!");
             return true;
         }
         case 0x4: {
@@ -204,7 +217,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
                 nextState = 0x5;
             }
             *state = nextState;
-            socket_log("no issue with state 4!");
             return true;
         }
         case 0x5: {
@@ -214,7 +226,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
                 BattleProc::StopBGM(nullptr, nullptr);
                 bsp->Clear(nullptr);
                 bp->fields.isFinalized = true;
-                socket_log("state 5 exited without IsZenmetuFlag!");
                 return false;
             }
             am->StopBgm(nullptr);
@@ -256,7 +267,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
                     *current = nullptr;
                     system_array_init(current);
                     *state = 0x6;
-                    socket_log("state 5 exited with talking flag set!");
                     return true;
                 }
                 __this->fields.__8__1 = nullptr;
@@ -266,7 +276,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
             BattleProc::StopBGM(nullptr, nullptr);
             bsp->Clear(nullptr);
             bp->fields.isFinalized = true;
-            socket_log("state 5 exited normally!");
             return false;
         }
         case 0x6: {
@@ -275,7 +284,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
                 *current = nullptr;
                 system_array_init(current);
                 *state = 0x6;
-                socket_log("state 6 exited with talking flag set!");
                 return true;
             }
             __this->fields.__8__1 = nullptr;
@@ -284,11 +292,9 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
             BattleProc::StopBGM(nullptr, nullptr);
             bsp->Clear(nullptr);
             bp->fields.isFinalized = true;
-            socket_log("state 6 exited normally!");
             return false;
         }
     }
-    socket_log("Evolve routine entered!");
     List_EvolveDemoTools_Param__o *edtps = PlayerWork::get_evolveRequets(nullptr);
     edtps->Clear(nullptr);
     auto *es = (EvolveSituation_o *)il2cpp_object_new(EvolveSituation_TypeInfo);
@@ -296,24 +302,15 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
     poketool_poketool_evolution_util_SetupEvolveSituation(es, false, PlayerWork_TypeInfo->static_fields->
             _FieldWeather_k__BackingField, nullptr);
     PokeParty_o *pokeParty = PlayerWork::get_playerParty(nullptr);
-    socket_log_fmt("pokeParty->fields.m_memberCount: %i", pokeParty->fields.m_memberCount);
     for (uint32_t i = 0; i < pokeParty->fields.m_memberCount; ++i) {
-        socket_log_fmt("i: %i", i);
         PokemonParam_o *pokemonParam = pokeParty->GetMemberPointer(i, nullptr);
         uint16_t criticalCount = bsp->fields.pokeResult->m_Items[i]->fields.criticalCount;
-        socket_log_fmt("criticalCount: %i", criticalCount);
         es->fields.criticalHitCount = criticalCount;
         int32_t nextMonsNo = 0;
         uint32_t evolutionRoot = 0;
-        socket_log_fmt("(__this->fields._evolveCheckTargetIndices_5__2 & (0x1 << i)) == 0x0: %i", (__this->fields._evolveCheckTargetIndices_5__2 & (0x1 << i)) == 0x0);
-        socket_log_fmt("!EvolveDemoTools::CanEvolve(&nextMonsNo, &evolutionRoot, pokeParty, pokemonParam, es, nullptr, 0x0,\n"
-                       "                                        nullptr): %i", !EvolveDemoTools::CanEvolve(&nextMonsNo, &evolutionRoot, pokeParty, pokemonParam, es, nullptr, 0x0,
-                                                                                                           nullptr));
-        socket_log_fmt("!CanEventEvolve(pokemonParam, es): %i", !CanEventEvolve(pokemonParam, es));
         if ((((__this->fields._evolveCheckTargetIndices_5__2 & (0x1 << i)) == 0x0) ||
             !EvolveDemoTools::CanEvolve(&nextMonsNo, &evolutionRoot, pokeParty, pokemonParam, es, nullptr, 0x0,
-                                        nullptr)) && !CanEventEvolve(pokemonParam, es)) continue;
-        socket_log("Evolve check passed!");
+                                        nullptr)) && !CanEventEvolve(pokeParty, pokemonParam, es)) continue;
         EvolveDemoTools_param_o evdtp = { .fields = { .party = pokeParty, .pp = pokemonParam,
                 .criticalCount = criticalCount, .situation = es } };
         system_array_init(&evdtp.fields.party);
@@ -329,7 +326,6 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
             *current = (Il2CppObject *)EvolveDemoTools::RegisterZukanCoroutine(pokemonParam, nullptr, nullptr);
             system_array_init(current);
             *state = 0x3;
-            socket_log("Evolve routine exited from capture!");
             return true;
         }
     }
@@ -345,8 +341,30 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
         nextState = 0x5;
     }
     *state = nextState;
-    socket_log("Evolve routine exited normally!");
     return true;
+}
+
+int32_t Pml_PokePara_EvolveManager_GetEvolvedMonsNo_byLevelUp(EvolveManager_o *__this, CoreParam_o *poke,
+                                                              PokeParty_o *party, EvolveSituation_o *situation,
+                                                              uint32_t *root_num, MethodInfo *method) {
+    EnsureTypeInfoInit(&DAT_7104cc00ac, 0x4721);
+    EnsureClassInit(PersonalSystem_TypeInfo);
+    Accessor_o *a = poke->fields.m_accessor;
+    int32_t dexID = a->GetMonsNo(nullptr);
+    if (a->IsSpecialGEnable(nullptr)) return dexID;
+    if (a->IsTamago(nullptr)) return dexID;
+    if (a->IsFuseiTamago(nullptr)) return dexID;
+    if (a->GetItemNo(nullptr) == EVERSTONE) return dexID;
+    EvolveTable_SheetEvolve_o *self = PersonalSystem::GetEvolutionTable(dexID,a->GetFormNo(nullptr),nullptr);
+    uint8_t routeCount = EvolveTableExtensions::GetEvolutionRouteNum(self,nullptr);
+    for (uint8_t i = 0; i < routeCount; ++i) {
+        if (EvolveManager::IsSatisfyEvolveConditionLevelUp(nullptr, poke, party, situation, self, i, nullptr) ||
+                IsSatisfyEvolveConditionEvent(self, party, poke, situation, i)) {
+            *root_num = i;
+            return EvolveTableExtensions::GetEvolvedMonsNo(self,i,nullptr);
+        }
+    }
+    return dexID;
 }
 
 bool Pml_PokePara_EvolveManager_IsSatisfyEvolveConditionItem(
