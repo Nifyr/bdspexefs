@@ -9,6 +9,7 @@
 #include "Dpr/Message/MessageManager.hpp"
 #include "Dpr/Message/MessageWordSetHelper.hpp"
 #include "Dpr/MsgWindow/MsgWindowManager.hpp"
+#include "EntityManager.hpp"
 #include "EvolveDemoTools.hpp"
 #include "FieldManager.hpp"
 #include "GameManager.hpp"
@@ -41,8 +42,17 @@ constexpr uint16_t EVERSTONE = 229;
 
 // DexIDs
 constexpr uint16_t RAICHU = 26;
+constexpr uint16_t SPEWPA = 665;
+constexpr uint16_t VIVILLON = 666;
+constexpr uint16_t COSMOEM = 790;
+constexpr uint16_t SOLGALEO = 791;
+constexpr uint16_t LUNALA = 792;
+constexpr uint16_t MILCERY = 868;
+constexpr uint16_t ALCREMIE = 869;
 
+extern bool DAT_7104cbbb77;
 PokeResult_o * GetPokeResult(PokeParty_o *party, CoreParam_o * cp) {
+    EnsureTypeInfoInit(&DAT_7104cbbb77, 0x2243);
     if (BattleProc_TypeInfo->static_fields->setupParam == nullptr) return nullptr;
     if (BattleProc_TypeInfo->static_fields->setupParam->fields.pokeResult == nullptr) return nullptr;
     for (uint32_t i = 0; i < party->fields.m_memberCount; ++i)
@@ -367,34 +377,50 @@ int32_t Pml_PokePara_EvolveManager_GetEvolvedMonsNo_byLevelUp(EvolveManager_o *_
     return dexID;
 }
 
-bool Pml_PokePara_EvolveManager_IsSatisfyEvolveConditionItem(
-        EvolveManager_o *__this, CoreParam_o *poke, EvolveSituation_o *situation, uint32_t use_item,
-        EvolveTable_SheetEvolve_o *evolveData, int32_t evolveRouteIndex, MethodInfo *method) {
-    int32_t cond = EvolveTableExtensions::GetEvolutionCondition(evolveData, evolveRouteIndex, nullptr);
-    if (EvolveTableExtensions::GetEvolutionParam(evolveData, evolveRouteIndex, nullptr) != use_item) return false;
-    Accessor_o *a = poke->fields.m_accessor;
-    switch (cond) {
-        case EvolveCond::ITEM: return true;
-        case EvolveCond::ITEM_MALE: return a->GetSex(nullptr) == 0;
-        case EvolveCond::ITEM_FEMALE: return a->GetSex(nullptr) == 1;
-        case EvolveCond::PLACE_ULTRA_SPACE_ITEM : return ZoneWork::IsUnderGround(PlayerWork::get_zoneID(nullptr),
-                                                                                 nullptr);
-        default: return false;
-    }
-}
-
 extern bool DAT_7104cc0071;
+extern bool DAT_7104cbf462;
 void Pml_PokePara_CoreParam_Evolve(CoreParam_o *__this, int32_t nextMonsno, uint32_t routeIndex, MethodInfo *method) {
     EnsureTypeInfoInit(&DAT_7104cc0071, 0x319b);
+    EnsureTypeInfoInit(&DAT_7104cc61bd, 0xad3e);
+    EnsureTypeInfoInit(&DAT_7104cbb2cc, 0x6aee);
+    EnsureTypeInfoInit(&DAT_7104cbf462, 0x3f9a);
     EnsureClassInit(PersonalSystem_TypeInfo);
+    EnsureClassInit(PlayerWork_TypeInfo);
+    EnsureClassInit(GameManager_TypeInfo);
     Accessor_o *a = __this->fields.m_accessor;
+    uint16_t dexID = a->GetMonsNo(nullptr);
     uint16_t formID = a->GetFormNo(nullptr);
-    PersonalSystem::LoadEvolutionTable(a->GetMonsNo(nullptr), formID, nullptr);
+    PersonalSystem::LoadEvolutionTable(dexID, formID, nullptr);
     if (PersonalSystem::IsEvolvedFormNoSpecified(routeIndex, nullptr))
         formID = PersonalSystem::GetEvolvedFormNo(routeIndex, nullptr);
+    uint32_t trainerID = PlayerWork::get_playerStatus(nullptr)->fields.id;
+    if (dexID == SPEWPA && nextMonsno == VIVILLON)
+        formID = trainerID % 18;
+    if (dexID == COSMOEM && (nextMonsno == SOLGALEO || nextMonsno == LUNALA))
+        nextMonsno = (int32_t)(SOLGALEO + (trainerID >> 1) % 2);
+    if (dexID == MILCERY && nextMonsno == ALCREMIE) {
+        float yaw = EntityManager::get_activeFieldPlayer(nullptr)->fields.super.super.super.yawAngle;
+        int32_t periodOfDay = GameManager::get_currentPeriodOfDay(nullptr);
+        uint8_t group;
+        bool north = yaw >= 135 && yaw < 225;
+        bool west = yaw >= 225 && yaw < 315;
+        bool south = yaw >= 315 || yaw < 45;
+        bool east = yaw >= 45 && yaw < 135;
+        bool day = periodOfDay < 2;
+        bool night = periodOfDay > 2;
+        if (south && day) group = 0;
+        else if (east && day) group = 1;
+        else if (south && night) group = 2;
+        else if (north && night) group = 3;
+        else if (west && night) group = 4;
+        else if (east && night) group = 5;
+        else if (north && day) group = 6;
+        else if (west && day) group = 7;
+        else group = 8;
+        formID += group * 7;
+    }
     __this->ChangeMonsNo(nextMonsno, formID, nullptr);
     int32_t cond = PersonalSystem::GetEvolutionCondition(routeIndex, nullptr);
-    if (cond == EvolveCond::TUUSHIN_ITEM || cond == EvolveCond::SOUBI_NOON || cond == EvolveCond::SOUBI_NIGHT ||
-    cond == EvolveCond::AMEZAIKU)
+    if (cond == EvolveCond::TUUSHIN_ITEM || cond == EvolveCond::SOUBI_NOON || cond == EvolveCond::SOUBI_NIGHT)
         a->SetItemNo(NULL_ITEM, nullptr);
 }

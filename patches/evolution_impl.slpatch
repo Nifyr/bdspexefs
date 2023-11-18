@@ -1,11 +1,7 @@
 [target=main, version=bd_130]
 // CoreParam$$Evolve
-// 20496a0:
-//     b Pml_PokePara_CoreParam_Evolve
-
-// EvolveManager$$IsSatisfyEvolveConditionItem
-// 2052f50:
-//     b Pml_PokePara_EvolveManager_IsSatisfyEvolveConditionItem
+20496a0:
+    b Pml_PokePara_CoreParam_Evolve
 
 // poketool_evolution_util$$SetupEvolveSituation
 2bad5d0:
