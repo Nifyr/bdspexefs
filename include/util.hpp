@@ -25,6 +25,7 @@ void system_array_init(void *array);
 void * system_array_new(void * typeInfo, uint32_t len);
 
 extern void * System_Int64_array_TypeInfo;
+extern void * System_UInt32_array_TypeInfo;
 extern void * System_Int32_array_TypeInfo;
 extern void * System_Byte_array_TypeInfo;
 

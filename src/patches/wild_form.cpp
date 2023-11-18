@@ -1,7 +1,6 @@
 #include "il2cpp.hpp"
 #include "System/Array.hpp"
 #include "logger.hpp"
-#include "util.hpp"
 
 namespace Dpr
 {
@@ -65,7 +64,7 @@ void LastProc(EncountResult_o ** pResult, ENC_FLD_SPA_o * pSpa, MethodInfo *meth
     EncountResult_Fields * result = &((*pResult)->fields);
     ENC_FLD_SPA_Fields * spa = &pSpa->fields;
 
-    if (result->HatudouTokusei == 0 && spa->Egg == false && 
+    if (result->HatudouTokusei == 0 && !spa->Egg &&
         (spa->Spa == 0xE || spa->Spa == 0x69))
     {
         result->HatudouTokusei = spa->Spa;
@@ -83,7 +82,7 @@ void LastProc(EncountResult_o ** pResult, ENC_FLD_SPA_o * pSpa, MethodInfo *meth
     {
         socket_log_fmt("[LastProc] result->Enemy->m_Items[i]: %08X\n", result->Enemy->m_Items[i]);
         int32_t enemy = result->Enemy->m_Items[i] & 0x0000FFFF;
-        int32_t karanaForm = (result->Enemy->m_Items[i] & 0xFFFF0000) >> 16;
+        int32_t karanaForm = (int32_t )(result->Enemy->m_Items[i] & 0xFFFF0000) >> 16;
         if (karanaForm != 0)
         {
             cacheKaranaForm = karanaForm;

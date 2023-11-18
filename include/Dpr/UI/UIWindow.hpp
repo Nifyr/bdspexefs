@@ -1,10 +1,12 @@
 #include "il2cpp.hpp"
 
 #include "UnityEngine/Color.hpp"
+#include "UnityEngine/Events/UnityAction.hpp"
 #include "System/Collections/IEnumerator.hpp"
 #include "System/Action.hpp"
 
 using namespace UnityEngine;
+using namespace UnityEngine::Events;
 using namespace System::Collections;
 
 namespace Dpr
@@ -21,8 +23,8 @@ namespace Dpr
             int32_t _prevWindowId;
             struct MsgWindow_o* _messageWindow;
             struct UIManager_UIInstance_o* instance;
-            struct UnityEngine_Events_UnityAction_UIWindow__o* onClosed;
-            struct UnityEngine_Events_UnityAction_UIWindow__o* onPreClose;
+            UnityAction_UIWindow__o* onClosed;
+            UnityAction_UIWindow__o* onPreClose;
             bool _IsClosing_k__BackingField;
             int32_t _animStateIn;
             int32_t _animStateOut;

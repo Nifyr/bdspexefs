@@ -22,6 +22,6 @@ struct EvolveDemoTools_Param_Fields {
     EvolveSituation_o* situation;
 };
 
-struct EvolveDemoTools_param_o {
+struct EvolveDemoTools_Param_o {
     EvolveDemoTools_Param_Fields fields;
 };

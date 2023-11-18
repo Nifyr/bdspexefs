@@ -137,7 +137,7 @@ void Dpr_UnderGround_UgPokeLottery_LotteryPoke(UgPokeLottery_o *__this,
         // int32_t version = origList->m_Items[origListIdx]->fields.version;
         int32_t inMonsNo = origList->m_Items[origListIdx]->fields.monsno;
         int32_t monsNo = inMonsNo & 0x0000FFFF;
-        int32_t formNo = (inMonsNo & 0xFFFF0000) >> 16;
+        int32_t formNo = (int32_t)(inMonsNo & 0xFFFF0000) >> 16;
         // socket_log_fmt("Version: %X\n", version);
         socket_log_fmt("MonsNo: %X\n", monsNo);
         Pml::PokePara::CoreParam * poke_param = __this->CreatePokemonParam_by_Tokusei(monsNo, rareTryCount, (MethodInfo *) nullptr);

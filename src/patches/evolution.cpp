@@ -10,7 +10,6 @@
 #include "Dpr/Message/MessageWordSetHelper.hpp"
 #include "Dpr/MsgWindow/MsgWindowManager.hpp"
 #include "EntityManager.hpp"
-#include "EvolveDemoTools.hpp"
 #include "FieldManager.hpp"
 #include "GameManager.hpp"
 #include "PlayerWork.hpp"
@@ -321,7 +320,7 @@ bool Dpr_Battle_Logic_BattleProc__FinalizeCoroutine_d__34_MoveNext(BattleProc__F
         if ((((__this->fields._evolveCheckTargetIndices_5__2 & (0x1 << i)) == 0x0) ||
             !EvolveDemoTools::CanEvolve(&nextMonsNo, &evolutionRoot, pokeParty, pokemonParam, es, nullptr, 0x0,
                                         nullptr)) && !CanEventEvolve(pokeParty, pokemonParam, es)) continue;
-        EvolveDemoTools_param_o evdtp = { .fields = { .party = pokeParty, .pp = pokemonParam,
+        EvolveDemoTools_Param_o evdtp = { .fields = { .party = pokeParty, .pp = pokemonParam,
                 .criticalCount = criticalCount, .situation = es } };
         system_array_init(&evdtp.fields.party);
         system_array_init(&evdtp.fields.situation);

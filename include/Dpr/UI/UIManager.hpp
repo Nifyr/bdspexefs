@@ -8,6 +8,7 @@ namespace Dpr
     {
         struct UIManager_o {
             void CloseXMenu(UnityAction_UnityAction_UIWindow___o *onCall, MethodInfo *method);
+            Il2CppObject * CreateUIWindow_object_(int32_t windowId, MethodInfo *method);
             void UseDSPlayerItem(MethodInfo *method);
         };
 
@@ -60,5 +61,7 @@ namespace Dpr
         };
 
         extern UIManager_c *UIManager_TypeInfo;
+
+        extern MethodInfo *UIManager_CreateUIWindow_UILevelUp_;
     }
 }

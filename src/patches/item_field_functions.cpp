@@ -3,6 +3,7 @@
 #include "Dpr/Battle/Logic/Common.hpp"
 #include "Dpr/Message/MessageWordSetHelper.hpp"
 #include "Dpr/UI/PokemonPartyItem.hpp"
+#include "Dpr/UI/UILevelUp.hpp"
 #include "Dpr/UI/UIManager.hpp"
 #include "FieldManager.hpp"
 #include "FlagWork.hpp"
@@ -24,7 +25,6 @@
 #include "logger.hpp"
 #include "util.hpp"
 
-#define MAKEUP_BAG_ENABLED true
 #define MAX_MOVE_COUNT 4
 #define MAX_EGG_MOVE_COUNT 4
 
@@ -111,6 +111,11 @@ constexpr uint16_t N_SOLARIZER = 943;
 constexpr uint16_t N_LUNARIZER = 944;
 constexpr uint16_t RUSTED_SWORD = 1103;
 constexpr uint16_t RUSTED_SHIELD = 1104;
+constexpr uint16_t EXP_CANDY_XS = 1124;
+constexpr uint16_t EXP_CANDY_S = 1125;
+constexpr uint16_t EXP_CANDY_M = 1126;
+constexpr uint16_t EXP_CANDY_L = 1127;
+constexpr uint16_t EXP_CANDY_XL = 1128;
 constexpr uint16_t ROTOM_CATALOG = 1278;
 constexpr uint16_t REINS_OF_UNITY = 1590;
 
@@ -618,8 +623,6 @@ void LearnMove(UIBag_o *uib, PokemonParam_o *pp, int32_t moveID) {
         cp->SetWaza(wazaIndex, moveID, nullptr);
         MessageWordSetHelper::SetPokemonNickNameWord(0, cp, true, nullptr);
         MessageWordSetHelper::SetWazaNameWord(1, moveID, nullptr);
-        socket_log_initialize();
-        socket_log_fmt("StringLiteral_11737: %X", StringLiteral_11737);
         uib->fields.msgWindowController->OpenMsgWindow(0, StringLiteral_11737, true,
                                                        false, nullptr,
                                                        nullptr, nullptr);
@@ -731,7 +734,6 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
                 FormChange(__this, pokemonPartyItem, &success, 1);
         }
         case MAKEUP_BAG: {
-            if (!MAKEUP_BAG_ENABLED) break;
             if (dexID == PIKACHU && formID >= 1 && formID < 7) {
                 uint16_t nextFormID = formID % 6 + 1;
                 FormChange(__this, pokemonPartyItem, &success, nextFormID);
@@ -892,4 +894,44 @@ void Dpr_UI_UIBag_UseFormChangeItem(UIBag_o *__this, PokemonPartyItem_o *pokemon
     onCloseWindow->ctor((Il2CppObject *)__this, UIBag_EndSelectPokemonParty);
     uimwc->OpenMsgWindow(0, StringLiteral_11693, true, false,
                          nullptr, onCloseWindow, nullptr);
+}
+
+// Exp. candies
+extern bool DAT_7104cbd68f;
+void Dpr_UI_UIBag___c__DisplayClass133_2__OnPokemonPartyClickedToUseItem_g__DecideAction_3(
+        UIBag___c__DisplayClass133_2_o *__this, int32_t amount, MethodInfo *method) {
+    EnsureTypeInfoInit(&DAT_7104cbd68f, 0x9583);
+    EnsureClassInit(SingletonMonoBehaviour_UIManager__TypeInfo);
+    auto *uibdc1333 = (UIBag___c__DisplayClass133_3_o *)il2cpp_object_new(UIBag___c__DisplayClass133_3_TypeInfo);
+    uibdc1333->fields.CS___8__locals3 = __this;
+    system_array_init(&uibdc1333->fields.CS___8__locals3);
+    uibdc1333->fields.amount = amount;
+    auto *uim = (UIManager_o *)
+            SingletonMonoBehaviour_object_::get_Instance(SingletonMonoBehaviour_UIManager__get_Instance);
+    auto *uilu = (UILevelUp_o *)uim->CreateUIWindow_object_(0xc,UIManager_CreateUIWindow_UILevelUp_);
+    auto *onClosed = (UnityAction_XMenuTopItem__o *)il2cpp_object_new(UnityAction_UIWindow__TypeInfo);
+    onClosed->ctor((Il2CppObject *)uibdc1333, UIBag___c__DisplayClass133_3__OnPokemonPartyClickedToUseItem_b__4);
+    uilu->fields.super.onClosed = (UnityAction_UIWindow__o *)onClosed;
+    system_array_init(&uilu->fields.super.onClosed);
+    UIBag___c__DisplayClass133_0_o *uibdc1330 = __this->fields.CS___8__locals2->fields.CS___8__locals1;
+    UILevelUp_Param_o uilup = { .fields = {
+            .AddExpValues = (System_UInt32_array *) system_array_new(System_UInt32_array_TypeInfo, uibdc1330->
+            fields.__4__this->fields.pokemonParty->fields._activeItems->fields._size),
+            .TargetIndex = 0,
+            .LevelUpCount = 0,
+            .BattleExpGetResult = nullptr,
+    } };
+    switch (uibdc1330->fields.itemInfo->get_Id(nullptr)) {
+        case EXP_CANDY_XS: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 100; break;
+        case EXP_CANDY_S: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 800; break;
+        case EXP_CANDY_M: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 3000; break;
+        case EXP_CANDY_L: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 10000; break;
+        case EXP_CANDY_XL: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 30000; break;
+        default:
+            uilup.fields.AddExpValues = nullptr;
+            uilup.fields.TargetIndex = uibdc1330->fields.index;
+            uilup.fields.LevelUpCount = amount;
+            break;
+    }
+    uilu->Open(&uilup, -0x1, nullptr);
 }

@@ -3,13 +3,13 @@
 
 #include "ContextMenuID.hpp"
 #include "Dpr/UnderGround/UgFieldManager.hpp"
+#include "EvolveDemoTools.hpp"
 #include "PlayerWork.hpp"
 #include "Pml/PokePara/PokemonParam.hpp"
 #include "SmartPoint/Components/Fader.hpp"
 #include "System/Action.hpp"
 #include "System/Collections/Generic/List.hpp"
 #include "UIMsgWindowController.hpp"
-#include "UnityEngine/Events/UnityAction.hpp"
 
 using namespace Dpr::Item;
 using namespace Pml::PokePara;
@@ -182,8 +182,8 @@ namespace Dpr
         struct UIBag___c__DisplayClass127_2_c;
 
         struct UIBag___c__DisplayClass127_2_Fields {
-            struct UnityEngine_Events_UnityAction_UIWindow__o* saveOnPreClose;
-            struct UnityEngine_Events_UnityAction_UIWindow__o* saveOnClosed;
+            UnityAction_UIWindow__o* saveOnPreClose;
+            UnityAction_UIWindow__o* saveOnClosed;
             struct UIBag___c__DisplayClass127_1_o* CS___8__locals2;
         };
 
@@ -192,10 +192,74 @@ namespace Dpr
             void *monitor;
             UIBag___c__DisplayClass127_2_Fields fields;
         };
+        
+        struct UIBag___c__DisplayClass133_1_c;
+        
+        struct UIBag___c__DisplayClass133_0_c;
+        
+        struct UIBag___c__DisplayClass133_0_Fields {
+            struct UIBag_o* __4__this;
+            struct Pml_PokePara_PokemonParam_o* pokeParam;
+            ItemInfo_o* itemInfo;
+            int32_t index;
+            struct PokemonPartyItem_o* pokemonPartyItem;
+            struct System_Action_o* __9__7;
+            struct System_Action_o* __9__8;
+            struct System_Action_o* __9__10;
+            struct System_Action_o* __9__15;
+        };
+        
+        struct UIBag___c__DisplayClass133_0_o {
+            UIBag___c__DisplayClass133_0_c *klass;
+            void *monitor;
+            UIBag___c__DisplayClass133_0_Fields fields;
+        };
+        
+        struct UIBag___c__DisplayClass133_1_Fields {
+            int32_t seikaku;
+            int32_t powerID;
+            int32_t addExpValue;
+            uint32_t beforeHp;
+            struct UIBag___c__DisplayClass133_0_o* CS___8__locals1;
+            struct System_Action_int__o* __9__6;
+        };
+        
+        struct UIBag___c__DisplayClass133_1_o {
+            UIBag___c__DisplayClass133_1_c *klass;
+            void *monitor;
+            UIBag___c__DisplayClass133_1_Fields fields;
+        };
+        
+        struct UIBag___c__DisplayClass133_2_c;
+        
+        struct UIBag___c__DisplayClass133_2_Fields {
+            EvolveDemoTools_Param_o evolveParam;
+            struct UIBag___c__DisplayClass133_1_o* CS___8__locals2;
+        };
+
+        struct UIBag___c__DisplayClass133_2_o {
+            UIBag___c__DisplayClass133_2_c *klass;
+            void *monitor;
+            UIBag___c__DisplayClass133_2_Fields fields;
+        };
+
+        struct UIBag___c__DisplayClass133_3_c;
+
+        struct UIBag___c__DisplayClass133_3_Fields {
+            int32_t amount;
+            struct UIBag___c__DisplayClass133_2_o* CS___8__locals3;
+        };
+
+        struct UIBag___c__DisplayClass133_3_o {
+            UIBag___c__DisplayClass133_3_c *klass;
+            void *monitor;
+            UIBag___c__DisplayClass133_3_Fields fields;
+        };
 
         extern void *UIBag___c__DisplayClass127_2_TypeInfo;
         extern void *UIBag___c__DisplayClass127_5_TypeInfo;
         extern void *UIBag___c__DisplayClass127_6_TypeInfo;
+        extern void *UIBag___c__DisplayClass133_3_TypeInfo;
         extern void *UIBag___c__DisplayClass144_0_TypeInfo;
         extern void *UIBag___c__DisplayClass145_0_TypeInfo;
         extern void *UIBag___c__DisplayClass145_1_TypeInfo;
@@ -206,6 +270,7 @@ namespace Dpr
         extern MethodInfo *UIBag___c__DisplayClass127_0__ShowItemContextMenu_b__17;
         extern MethodInfo *UIBag___c__DisplayClass127_0__ShowItemContextMenu_b__19;
         extern MethodInfo *UIBag___c__DisplayClass127_2__ShowItemContextMenu_b__14;
+        extern MethodInfo *UIBag___c__DisplayClass133_3__OnPokemonPartyClickedToUseItem_b__4;
         extern MethodInfo *UIBag___c__DisplayClass144_0__UseFormChangeItem_b__0;
         extern MethodInfo *UIBag___c__DisplayClass145_1__ShowFormChangeResult_b__2;
         extern MethodInfo *UIBag_EndSelectPokemonParty;
