@@ -1,6 +1,15 @@
 [target=main, version=bd_130]
 18bfa90:
     b Dpr_UnderGround_UgPokeLottery_LotteryPoke
+
+// UgPokeLottery$$GetEnablePokes
+18bf394:
+    bl UgResManager_GetUgPokeData
+
+// UgPokeLottery$$LotteryPoke
+18bfd10:
+    bl UgResManager_GetUgPokeData
+
 // 18bec98:
 //    bl Dpr_UnderGround_UgPokeLottery_GetEnablePokes
 // 1efc790:

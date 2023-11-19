@@ -1,9 +1,11 @@
 #include "il2cpp.hpp"
-#include "Pml/PokePara/CoreParam.h"
-#include "Pml/Local/Random.h"
 #include "System/Array.hpp"
 #include "logger.hpp"
 
+#include "Pml/Local/Random.h"
+#include "Pml/PokePara/CoreParam.h"
+#include "UgResManager.hpp"
+#include "XLSXContent/UgPokemonData.hpp"
 
 namespace XLSXContent
 {
@@ -91,6 +93,7 @@ namespace Dpr
 }
 
 using namespace Dpr::UnderGround;
+using namespace XLSXContent;
 
 struct System_Collections_Generic_List_UgPokeLottery_PokeSlot__Fields {
 	System::Array<UgPokeLottery_PokeSlot_o *>* _items;
@@ -110,12 +113,7 @@ struct System_Collections_Generic_List_UgPokeLottery_PokeSlot__o {
 System::Array<XLSXContent::UgEncount_Sheettable_o *> * Dpr_UnderGround_UgPokeLottery_GetEnablePokes(UgPokeLottery_o *__this,
         int32_t versionNo,int32_t storyNo, MethodInfo *method)
 {
-    socket_log_fmt("Dpr_UnderGround_UgPokeLottery_GetEnablePokes\n");
-    // socket_log_fmt("__this: %08X\n", __this);
-    // socket_log_fmt("__this->fields.monsData: %08X\n", __this->fields.monsData);
-    // socket_log_fmt("__this->fields.monsData->fields.table: %08X\n", __this->fields.monsData->fields.table);
     __this->GetEnablePokes(versionNo, storyNo, method);
-    socket_log_fmt("Dpr_UnderGround_UgPokeLottery_GetEnablePokes END\n");
     return __this->fields.monsData->fields.table;
 }
 
@@ -124,35 +122,27 @@ void Dpr_UnderGround_UgPokeLottery_LotteryPoke(UgPokeLottery_o *__this,
                System_Collections_Generic_List_UgPokeLottery_PokeSlot__o *slots, uint8_t rareTryCount,
                MethodInfo *method)
 {
-    socket_log_fmt("Dpr_UnderGround_UgPokeLottery_LotteryPoke\n");
-    // socket_log_fmt("Pml::Local::Random::GetValue: %08X\n", &Pml::Local::Random::GetValue);
-    socket_log_fmt("Dpr::UnderGround::UgPokeLottery::CreatePokemonParam_by_Tokusei: %08X\n", &UgPokeLottery_o::CreatePokemonParam_by_Tokusei);
-    socket_log_fmt("Pml::PokePara::CoreParam::ChangeFormNo: %08X\n", &Pml::PokePara::CoreParam::ChangeFormNo);
-    socket_log_fmt("origList->max_length: %08X\n", origList->max_length);
     for (int i = 0; i < slots->fields._size; i++)
     {
-        socket_log_fmt("Slot: %i\n", i);
         uint32_t origListIdx = Pml::Local::Random::GetValue((MethodInfo *) nullptr) % origList->max_length;
-        socket_log_fmt("origListIdx: %X\n", origListIdx);
         // int32_t version = origList->m_Items[origListIdx]->fields.version;
         int32_t inMonsNo = origList->m_Items[origListIdx]->fields.monsno;
         int32_t monsNo = inMonsNo & 0x0000FFFF;
         int32_t formNo = (int32_t)(inMonsNo & 0xFFFF0000) >> 16;
-        // socket_log_fmt("Version: %X\n", version);
-        socket_log_fmt("MonsNo: %X\n", monsNo);
         Pml::PokePara::CoreParam * poke_param = __this->CreatePokemonParam_by_Tokusei(monsNo, rareTryCount, (MethodInfo *) nullptr);
-        socket_log_fmt("Poke Param: %X\n", poke_param);
         if (formNo != 0)
         {
-            socket_log_fmt("Changing form of pokemon\n");
             poke_param->ChangeFormNo((uint16_t) formNo, nullptr, (MethodInfo *) nullptr);
         }
         slots->fields._items->m_Items[i]->fields.param = poke_param;
     }
-    socket_log_fmt("Dpr_UnderGround_UgPokeLottery_LotteryPoke END\n");
 }
 
 bool GetEnablePokes_b0(void *__this, void *x, MethodInfo *method)
 {
     return true;
+}
+
+UgPokemonData_Sheettable_o * UgResManager_GetUgPokeData(int32_t monsNo, MethodInfo *method) {
+    return UgResManager::GetUgPokeData((uint16_t) monsNo, method);
 }

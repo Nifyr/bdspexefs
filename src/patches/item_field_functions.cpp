@@ -908,7 +908,7 @@ void Dpr_UI_UIBag___c__DisplayClass133_2__OnPokemonPartyClickedToUseItem_g__Deci
     uibdc1333->fields.amount = amount;
     auto *uim = (UIManager_o *)
             SingletonMonoBehaviour_object_::get_Instance(SingletonMonoBehaviour_UIManager__get_Instance);
-    auto *uilu = (UILevelUp_o *)uim->CreateUIWindow_object_(0xc,UIManager_CreateUIWindow_UILevelUp_);
+    auto *uilu = (UILevelUp_o *)uim->CreateUIWindow_object_(0xc, UIManager_CreateUIWindow_UILevelUp_);
     auto *onClosed = (UnityAction_XMenuTopItem__o *)il2cpp_object_new(UnityAction_UIWindow__TypeInfo);
     onClosed->ctor((Il2CppObject *)uibdc1333, UIBag___c__DisplayClass133_3__OnPokemonPartyClickedToUseItem_b__4);
     uilu->fields.super.onClosed = (UnityAction_UIWindow__o *)onClosed;
@@ -921,17 +921,18 @@ void Dpr_UI_UIBag___c__DisplayClass133_2__OnPokemonPartyClickedToUseItem_g__Deci
             .LevelUpCount = 0,
             .BattleExpGetResult = nullptr,
     } };
+    uint32_t *targetExpValue = &uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index];
     switch (uibdc1330->fields.itemInfo->get_Id(nullptr)) {
-        case EXP_CANDY_XS: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 100; break;
-        case EXP_CANDY_S: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 800; break;
-        case EXP_CANDY_M: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 3000; break;
-        case EXP_CANDY_L: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 10000; break;
-        case EXP_CANDY_XL: uilup.fields.AddExpValues->m_Items[uibdc1330->fields.index] = 30000; break;
+        case EXP_CANDY_XS: *targetExpValue = 100; break;
+        case EXP_CANDY_S: *targetExpValue = 800; break;
+        case EXP_CANDY_M: *targetExpValue = 3000; break;
+        case EXP_CANDY_L: *targetExpValue = 10000; break;
+        case EXP_CANDY_XL: *targetExpValue = 30000; break;
         default:
             uilup.fields.AddExpValues = nullptr;
             uilup.fields.TargetIndex = uibdc1330->fields.index;
             uilup.fields.LevelUpCount = amount;
             break;
     }
-    uilu->Open(&uilup, -0x1, nullptr);
+    uilu->Open(&uilup, -1, nullptr);
 }

@@ -51,6 +51,7 @@ _ZN11UnityEngine6Events30UnityAction_UIWindow__TypeInfoE = 0x4c59e60 - 0x0570800
 _ZN11UnityEngine6Events43UnityAction_PokemonPartyItem__int__TypeInfoE = 0x4c61ee0 - 0x05708000;
 _ZN11UnityEngine6Events43UnityAction_UnityAction_UIWindow___TypeInfoE = 0x4c61e90 - 0x05708000;
 _ZN12BtlTowerWork5GetBPEP10MethodInfo = 0x18df170 - 0x05708000;
+_ZN12UgResManager13GetUgPokeDataEiP10MethodInfo = 0x1b1b540 - 0x05708000;
 _ZN13EntityManager21get_activeFieldPlayerEP10MethodInfo = 0x1f0a9e0 - 0x05708000;
 _ZN14FieldManager_o21add_OnZoneChangeEventEPN6System8Action_oEP10MethodInfo = 0x1797b40 - 0x05708000;
 _ZN14FieldManager_o9GetFormNoEiiiP10MethodInfo = 0x179f560 - 0x05708000;
