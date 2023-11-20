@@ -24,6 +24,17 @@ constexpr uint16_t EXP_CHARM = 1587;
 constexpr uint16_t FARFETCH_D = 83;
 constexpr uint16_t KYOGRE = 382;
 constexpr uint16_t GROUDON = 383;
+constexpr uint16_t NIHILEGO = 793;
+constexpr uint16_t BUZZWOLE = 794;
+constexpr uint16_t PHEROMOSA = 795;
+constexpr uint16_t XURKITREE = 796;
+constexpr uint16_t CELESTEELA = 797;
+constexpr uint16_t KARTANA = 798;
+constexpr uint16_t GUZZLORD = 799;
+constexpr uint16_t POIPOLE = 803;
+constexpr uint16_t NAGANADEL = 804;
+constexpr uint16_t STAKATAKA = 805;
+constexpr uint16_t BLACEPHALON = 806;
 constexpr uint16_t SIRFETCH_D = 865;
 
 // HanderTables
@@ -128,4 +139,23 @@ void Dpr_Battle_Logic_Exp_CalcExp(Exp_CalcParam_o **calcParam, Exp_CalcResult_o 
         pResult->fields.isContainBonus = true;
     }
     pResult->fields.exp = exp;
+}
+
+// Beast Ball
+bool Dpr_Battle_Logic_UltraBeast_IsUltraBeast(BTL_POKEPARAM_o **poke, MethodInfo *method) {
+    switch ((*poke)->GetMonsNo(nullptr)) {
+        case NIHILEGO:
+        case BUZZWOLE:
+        case PHEROMOSA:
+        case XURKITREE:
+        case CELESTEELA:
+        case KARTANA:
+        case GUZZLORD:
+        case POIPOLE:
+        case NAGANADEL:
+        case STAKATAKA:
+        case BLACEPHALON:
+            return true;
+        default: return false;
+    }
 }

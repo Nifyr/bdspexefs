@@ -48,6 +48,10 @@
 20397f0:
     b Dpr_Battle_Logic_MainModule_HasPlayerGakusyuSouti
 
+// UltraBeast$$IsUltraBeast
+1f72a60:
+    b Dpr_Battle_Logic_UltraBeast_IsUltraBeast
+
 // UIBag.<>c__DisplayClass133_2$$<OnPokemonPartyClickedToUseItem>g__DecideAction|3
 1be0520:
     b Dpr_UI_UIBag___c__DisplayClass133_2__OnPokemonPartyClickedToUseItem_g__DecideAction_3
